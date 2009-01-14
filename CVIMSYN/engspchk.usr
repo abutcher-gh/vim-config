@@ -1,0 +1,11 @@
+
+syn keyword GoodWord transparent	Octrees
+syn keyword GoodWord transparent	Quadtree
+syn keyword GoodWord transparent	Quadtrees
+syn keyword GoodWord transparent	Octree
+syn keyword GoodWord transparent	NURBS
+syn keyword GoodWord transparent	rasterizing
+syn keyword GoodWord transparent	rasterization
+syn keyword GoodWord transparent	EasyJet
+syn keyword GoodWord transparent	BCG
+syn keyword GoodWord transparent	accessor

@@ -1,0 +1,82 @@
+
+Doxygen support for VIM
+
+1) Abbreviations to insert file comments and function comments
+
+   Source the file doxygen.vim and type "_DMH" (without the quotes) on the
+   first line of your file. It will insert this comment:
+
+         /*!
+          * \file README
+          *
+          * \brief 
+          *
+          *
+          * $Id$
+          *
+          * \author Ralf Schandl <schandl@de.ibm.com>
+          * \date   Wed Dec 27 16:02:53 MEZ 2000
+          */
+
+    The exact format depends on your comment format settings. For the
+    example above I used:
+         comments=sr:/*,mb:*,er:*/,://
+
+    With comments=sr:/*,mb:\ \ ,er:*/,:// you get:
+         /*!
+           \file e.c
+         
+           \brief 
+         
+         
+           $Id$
+         
+           \author Ralf Schandl <schandl@de.ibm.com>
+           \date   Wed Dec 27 16:10:41 MEZ 2000
+         */
+
+    With the abbreviation "_DHF" you can insert a comment above an
+    _existing_ function.
+
+    /*! 
+     * \brief 
+     *
+     * \param counter
+     * \param name
+     * \param ppnumber
+     *
+     * \return int 
+     */
+    int test_func(int counter, char *name, int **ppnumber)
+
+
+    This functions can be configured with the following global variables:
+      - g:fullid                The name of the developer. (used for
+                                \author)
+      - g:DoxyDateFormat        The date format used for the file comment
+                                (parameter to strftime)
+      - g:DoxyVoidParamString   What to use for a empty parameter list?
+
+
+2) Syntax highlighting of doxygen tags in comments
+
+   1) Create the subdir $HOME/.vim and $HOME/.vim/syntax.
+   2) Copy the file mysyntax.vim to $HOME/.vim.
+   3) Copy the files c.vim, cpp.vim and c-doxygen.vim to $HOME/.vim/syntax.
+   4) Add this line to your .vimrc:
+       let mysyntaxfile = "~/.vim/mysyntax.vim"
+
+   ... and the doxygen tags should be highlighted in the comments of your C
+   and C++ files.
+
+   If you want another directory structure you have to change the files
+   c.vim, cpp.vim and mysyntax.vim.
+
+   Note:
+   With upcoming Version 6.0 of VIM, it will load private syntax files from
+   ~/.vim/syntax by default.
+
+
+3) Questions?
+
+   Ralf Schandl <schandl@de.ibm.com>

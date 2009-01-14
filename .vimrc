@@ -1,0 +1,799 @@
+
+let g:initial = " "
+let g:lead = " "
+
+let g:intellisense_vimfiles = $VIM . '/vimfiles'
+
+set sessionoptions=blank,buffers,curdir,folds,help,options,tabpages,winsize,winpos,resize
+
+filetype plugin on
+
+" attributes used by the file-to-html converter
+"
+let use_xhtml=1
+let html_use_css=1
+let html_js=1
+let html_number_lines=1
+
+let c_c_vim_compatible = 1
+let c_C99 = 1
+
+" zsh is great but running external commands through it via
+"   execvp( { "zsh", "-c", ... } )
+" as vim does lands you in the wrong directory (pwd is simply '.')
+" in the case where one of the directories in the cwd is examinable
+" but not readable (--x).  Since my system has /home setup this way
+" most of my external commands end up starting in the wrong dir after
+" a cd.  It seems that this only happens after a :cd or :lcd in vim
+" though.  It all works fine if I run commands without changing
+" directory.
+" Workaround for the momemnt until I figure out whats what is to use
+" bash to shell out from vim.
+if &shell =~ "zsh"
+   set shell=bash
+endif
+
+" some simple printer setting commands
+"
+set printfont=:h7
+command! CodePrintLandscape set printoptions=number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
+command! CodePrintPortrait  set printoptions=number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
+command! TextPrintLandscape set printoptions=number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
+command! TextPrintPortrait  set printoptions=number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
+command! ColorPrinter set printdevice=xcpx5
+command! BlackPrinter set printdevice=xcpm1
+
+function! Repath()
+ 
+   let &path = ""
+
+   " stick the C++ include path into Vim's file navigation search path
+   if $OS =~ "Windows"
+      if $USE_GCC == "1"
+         let &path = ".," . substitute($CPLUS_INCLUDE_PATH, ';', ',', 'g') . &path
+      else
+         let &path = ".," . substitute($INCLUDE, ';', ',', 'g') . &path
+      endif
+   else
+      let &path = ".," . substitute($CPLUS_INCLUDE_PATH, ':', ',', 'g') . &path
+   endif
+
+endfunction
+
+function! AddGccSysPaths()
+   
+   try
+
+      if $OS =~ "Windows"
+         let &path = &path . "," . system(
+                \'cmd /q/c "set CPLUS_INCLUDE_PATH= && set C_INCLUDE_PATH= && set CPATH= | '.$CROSS_PREFIX.'g++ -Wp,-v -x c++ -E - 2>&1"
+                \| sed -n "/^ /s/^ //p"
+                \| tr "\n" ","
+                \| sed "s/,$//"
+                \')
+      else
+         let &path = &path . "," . system(
+                \'echo | CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= CPATH= ${CROSS_PREFIX}g++ -Wp,-v -x c++ -E - 2>&1
+                \| sed -n "/^ /s/^ //p"
+                \| tr "\n" ","
+                \| sed "s/,$//"
+                \')
+      endif
+
+   catch
+      echo "Failed to query gcc."
+   endtry
+
+endfunction
+
+command! ClearPaths let &path = ""
+command! Repath call Repath()
+command! AddGccSysPaths call AddGccSysPaths()
+
+Repath
+
+" fonts:
+"
+" DejaVu Sans Mono       -- http://dejavu.sourceforge.net/wiki/index.php/Main_Page 
+" Anonymous              -- http://www.ms-studio.com/FontSales/anonymous.html
+" ProFont                -- http://www.tobias-jung.de/seekingprofont/
+" MonteCarlo             -- http://www.bok.net/MonteCarlo/
+"
+" Proggy{Square,Tiny}SZ  -- http://www.proggyfonts.com/index.php?menu=download
+" Opti                   -- http://www.proggyfonts.com/index.php?menu=download
+
+" font names are subtly different in Windows than in X
+if $OS =~ "Windows"
+   let s:font="DejaVu_Sans_Mono:h"
+   let s:anonfont="Anonymous:h"
+   let s:profont="ProFontWindows:h"
+   let s:montefont="MonteCarlo:h"
+else
+   let s:font="DejaVu\ Sans\ Mono\ "
+   let s:anonfont="Anonymous\ "
+   let s:profont="ProFont\ "
+   let s:montefont="MonteCarlo\ "
+endif
+let s:deffontsize=9
+let s:deffontsizeanon=8
+let s:deffontsizepro=8
+let s:deffontsizemonte=8
+
+" command to switch font/size easily
+"
+function! Font(...)
+   if a:0 == 0
+      let &guifont = s:font . '9'
+   else
+      if a:1 == "default"
+         set guifont=
+      else
+         let l:size = a:1
+         if a:0 > 1 | let l:name = a:2 | else | let l:name = '' | endif
+         if l:size == "-"
+            exe ":let l:size = s:deffontsize" . l:name
+         endif
+         exe ":let \&guifont = s:" . l:name . "font . '" . l:size . "'"
+      endif
+   endif
+   let g:last_guifont = &guifont
+endfunc
+command! -nargs=* Font :call Font(<f-args>)
+
+" enable thesaurus and spell checker.
+"
+" NOTE: completion X:  during insert mode:
+"     ctrl-x ctrl-t == thesaurus
+"     ctrl-x ctrl-k == complete from dictionary
+"     ctrl-x ctrl-s == spelling suggestion
+"     ctrl-x ctrl-o == omni-completion!
+"
+set thesaurus=~/.wordlists/mthes/mobythes.aur
+set spell
+
+" if diffing, open the biggest window possible.. AJB: This seems to me
+" like the best way to open a full screen diff window.  But it
+" probably isn't!
+if &diff
+   set lines=1000 columns=1000
+   " turn off spelling in terminal (it can't do underlining and
+   " background highlighting confuses the diff)
+   if &term !~ "gui" 
+      set nospell
+   endif
+   " add some shortcuts
+   " next and prev change
+   map \<Down> ]c
+   map \<Up> [c
+   " pull and push change
+   map \<Right> :diffget<CR>
+   map \<Left> :diffput<CR>
+   map \z :diffupdate<CR>
+endif
+
+" remove some unnecessary gui bits
+set go-=m
+set go-=t
+set go-=T
+set go-=r
+
+function! ToggleGuiOption(option)
+   if &go =~ a:option
+      exe ":set go-=" . a:option
+   else 
+      exe ":set go+=" . a:option
+   endif
+endfunction
+
+" some people like to add permanent scroll bars
+" make it easy for them
+map <silent> <A-Down>  :call ToggleGuiOption('b')<CR>
+map <silent> <A-Right> :call ToggleGuiOption('r')<CR>
+map <silent> <A-Left>  :call ToggleGuiOption('l')<CR>
+
+" a scroll bar at the top is not common, set
+" alt up to toggle the menu instead
+map <silent> <A-Up>    :call ToggleGuiOption('m')<CR>
+
+" set default font unless overridden by VIMFONT var
+if expand("$VIMFONT") == "$VIMFONT" && !exists("g:last_guifont")
+   Font 9
+else
+   exec $VIMFONT
+endif
+
+" tag search path
+let &tags="./tags;/,tags;/," . substitute($TAG_PATHS, '##', ',', 'g') 
+
+" typelist window configuration
+set updatetime=1000
+let Tlist_Use_SingleClick=1
+let Tlist_Inc_Winwidth=0
+
+" some macros to manage buffers
+map - :bp<CR>
+map = :bn<CR>
+map _ :bd<CR>
+map + :w<CR>:bn<CR>
+
+" some macros to manage folds
+"
+"   open fold at cursor
+"   close fold at cursor
+"   open recursively at cursor
+"   close recursively at cursor
+"   open all folds at the current level
+"   close all folds at the current level
+"   open all folds at all levels
+"   close all folds at all levels
+"
+map f<Left> zc
+map f<Right> zo
+map f<Up> zC
+map f<Down> zO
+map f<PageUp> zr
+map f<PageDown> zm
+map f<Ins> zR
+map f<Del> zM
+
+" functions to handle file navigation; step into/out-of include and
+" toggle between associate files
+"
+if !exists("g:file_nav_stack")
+   let g:file_nav_stack=[]
+endif
+
+function! PushInclude(split) range
+   let l:fullpath = findfile( expand("<cfile>") )
+   if !filereadable( l:fullpath )
+      if l:fullpath == ''
+         echo "File '" . expand("<cfile>") . "' not found in search path."
+      else
+         echo "File '" . l:fullpath . "' not readable."
+      endif
+      return
+   endif
+   let l:item = expand("%")
+   if l:item == ""
+      let l:item = '.!.' .  winbufnr(0)
+   endif
+   call insert( g:file_nav_stack, l:item )
+   try
+      if a:split
+         normal F
+      else
+         normal gF
+      endif
+   catch
+      echo "File '" . expand("<cfile>:t") . "' was readable but can't abandon current buffer. (target's full path is '" . l:fullpath . "')"
+      call remove( g:file_nav_stack, 0, 0 )
+   endtry
+endfunction
+
+function! PopInclude() range
+   try
+      let l:val=get( g:file_nav_stack, 0 )
+      call remove( g:file_nav_stack, 0, 0 )
+      if !filereadable( l:val )
+         if match( l:val, '.!.' ) == 0
+            let l:val = l:val[3:]
+         else
+            echo "File '" . l:val . "' not readable, skipped."
+            return
+         endif
+      endif
+      " windows frig, places cursor at top using :e
+      try
+         exe "b ".l:val
+         return
+      catch
+      endtry
+      e `=l:val`
+   catch
+      echo "No file navigation stack."
+   endtry
+endfunction
+
+
+function! EditParent() range
+
+   try 
+      e %:h
+   catch 
+      e %:p:h
+   endtry
+   e
+
+endfunction
+
+" these lists contain file pattern match, path mutation list, and
+" target extension list.
+"
+let g:EATypeList =
+\[
+\   [ 'c\(pp\|xx\)\?',    ['', 's/\(.*\)src/\1include/'
+\                            , 's:\(.*\)src:\1include/\*:'
+\                         ],                              ['inl', 'impl', 'ixx', 'h', 'hpp', 'hxx'] ],
+\   [ 'h\(pp\|xx\)\?',    ['', 's/\(.*\)include/\1src/'
+\                            , 's:\(.*\)include/[^/]*:\1src:'
+\                         ],                              ['cpp', 'cxx', 'c', 'inl', 'impl', 'ixx'] ],
+\   [ 'i\(nl\|xx\|mpl\)', ['', 's/\(.*\)src/\1include/'
+\                            , 's:\(.*\)src:\1include/\*:'
+\                         ],                              ['h', 'hpp', 'hxx', 'cpp', 'cxx', 'c']    ],
+\   [ 'l', ['', 's/l$/y/'], ['y'] ],
+\   [ 'y', ['', 's/y$/l/'], ['l'] ],
+\]
+
+function! EditAssociate() range
+   let realext=expand("%:e")
+
+   for [pattern, pathlist, extlist] in g:EATypeList
+      
+      if realext =~ pattern
+         for ext in extlist
+         
+            for path in pathlist
+
+               let full=expand("%:p:r:".path)
+
+               let name=expand(full.".".ext)
+               
+               if filereadable(name)
+                  " windows frig, places cursor at top using :e
+                  try
+                     exe "b ".name
+                     return
+                  catch
+                  endtry
+                  try
+                     e `=name`
+                     return
+                  catch
+                     echo "File '" . name . "' was readable but can't abandon current buffer."
+                     return
+                  endtry
+               endif
+            endfor
+
+         endfor
+      endif
+   endfor
+
+   echo "No associate of '".expand("%:t")."' could be found with provided rules."
+
+endfunction
+
+function! GetRelativePath( BasePath, TargetPath )
+
+   let base   = split( resolve(expand(a:BasePath)),   '[\\/]')
+   let target = split( resolve(expand(a:TargetPath)), '[\\/]')
+
+   let bname = ""
+   let tname = ""
+
+   " determine matching stem
+   while 1
+
+      if bname != tname 
+         break
+      endif
+
+      if len(base) == 0 || len(target) == 0
+         let tname = ""
+         let bname = ""
+         break
+      endif 
+
+      let [ bname; base   ] = base
+      let [ tname; target ] = target
+
+   endwhile
+
+   let rc = repeat("../",len(base))
+
+   if !empty(bname) | let rc .= "../" | endif
+   if !empty(tname) | let rc .= tname."/" | endif
+
+   return  rc . join(target, "/")
+
+endfunction
+
+function! ListAssociates( ArgLead, CmdLine, CursorPos )
+   
+   let rc=""
+
+   let realext=expand("%:e")
+
+   let pwd=getcwd()
+
+   for [pattern, pathlist, extlist] in g:EATypeList
+      
+      if realext =~ pattern
+         for path in pathlist
+            for ext in extlist
+
+               let full=expand("%:p:r:".path)
+               let name=expand(full.".".ext)
+
+               let rc .= GetRelativePath(pwd,name) . "\n"
+
+            endfor
+         endfor
+      endif
+   endfor
+   
+   return rc
+
+endfunction
+com! -bang -nargs=1 -complete=custom,ListAssociates EditAssociate :e<bang> <args>
+
+
+" some keys for normal-mode file navigation
+"
+"  A-\  --  show current file's directory
+"  A-.  --  navigate into the file below the cursor
+"  A-,  --  return to the previous file on the navigation stack
+"  A-/  --  switch to an associated file if it exists (h->cpp, cpp->h etc.)
+"
+map <silent> <A-\> :call EditParent()<CR>
+map <silent> <A-.> :call PushInclude(0)<CR>
+map <silent> <A-<Bar>> :call PushInclude(1)<CR>
+map <silent> <A-,> :call PopInclude()<CR>
+map <silent> <A-/> :call EditAssociate()<CR>
+"
+" ALT/META <A-*>/<M-*> only works in an environment supporting
+" keyboard modifiers (e.g. in X or Windows).  The two character
+" <backslash><char> works fine for basic character terminals and, of
+" course, also in X and Windows.
+"
+" although the push with split looks strange |> instead of \.
+" all you need is to hold shift whilst using the normal goto
+" sequence
+"
+map <silent> \\ :call EditParent()<CR>
+map <silent> \. :call PushInclude(0)<CR>
+map <silent> <Bar>> :call PushInclude(1)<CR>
+map <silent> \, :call PopInclude()<CR>
+map <silent> \/ :call EditAssociate()<CR>
+map <silent> \<Tab> :EditAssociate<Space>
+
+" focus previously focused window
+map <silent> <Tab> 
+map <silent> <C-Tab> 
+
+" some function key macros
+"
+" open/close error log and navigate log messages
+"
+map <S-F5> :cclose<CR>
+map <F5>   :cw<CR>
+map <S-F6> :cp<CR>
+map <F6>   :cn<CR>
+map <F7>   :cp<CR>
+" 
+" typelist window
+"
+map <F10>  :TlistSync<CR>
+map <F11>  :Tlist<CR>
+"
+" tag traversal -- forward, backward and list-matches
+"
+map \] <C-]>
+map \[ <C-T>
+map \# :ts<CR>
+map \= :tn<CR>
+map \- :tp<CR>
+"
+" holding shift when stepping in opens a new window
+"
+map <Bar>} <C-w><C-]>
+"
+" launch viewtex on the current file (only makes sense in an
+" environment which can show the resulting document graphically.
+"
+map <F12>  :!viewtex %<CR>
+
+" virtual edit
+function! ToggleVirtualEdit(option)
+   if &ve =~ a:option
+      exe ":set ve-=" . a:option
+   else 
+      exe ":set ve+=" . a:option
+   endif
+endfunction
+map \v :call ToggleVirtualEdit('all')<CR>
+
+
+com! -nargs=* Shthis :cex system("sh ".expand("%")." ".<q-args>)
+com! -nargs=* Zshthis :cex system("zsh ".expand("%")." ".<q-args>)
+com! -nargs=* Gxxthis :cex system("g++ ".expand("%")." ".<q-args>)
+
+com! -nargs=* Cb :set nomodified | :cb
+
+" allow modified buffers to be hidden
+set hidden
+
+" default tab of 3 and use spaces instead of literal tabs
+set ts=3
+set expandtab
+
+" default backspace like normal
+set bs=2
+
+"""""""""""""""""""""""""""""""""""""""""""""""""
+
+set ai            " auto-indent ALWAYS
+set si            " smart-indent
+set cin           " C-aware indent
+set sw=3          " Indent width
+
+
+set vb            " visible bell rather than beep
+
+set linespace=1 "pixel
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+" text and display wrapping
+
+" display wrapping
+
+set nowrap " off by default
+set linebreak
+set showbreak=--\ 
+set sidescroll=5
+set sidescrolloff=1
+set listchars+=precedes:«,extends:»
+
+" toggle wrapping modes (real and display)
+" when display wrapping is on make cursor up/down move by
+" display line rather than real line.
+
+map  <silent> <F2> :call ToggleDisplayWrap()<CR>
+imap <silent> <F2> <C-O><F2><C-O>:sleep 300m<CR>
+function! ToggleDisplayWrap()
+  if &wrap
+    echo "Display Wrap OFF"
+    setlocal nowrap
+    setlocal display-=lastline
+    silent! nunmap <buffer> <Up>
+    silent! nunmap <buffer> <Down>
+    silent! nunmap <buffer> <Home>
+    silent! nunmap <buffer> <End>
+    silent! iunmap <buffer> <Up>
+    silent! iunmap <buffer> <Down>
+    silent! iunmap <buffer> <Home>
+    silent! iunmap <buffer> <End>
+  else
+    echo "Display Wrap ON"
+    setlocal wrap linebreak nolist
+    setlocal display+=lastline
+    noremap  <buffer> <silent> <Up>   gk
+    noremap  <buffer> <silent> <Down> gj
+    noremap  <buffer> <silent> <Home> g<Home>
+    noremap  <buffer> <silent> <End>  g<End>
+    inoremap <buffer> <silent> <Up>   <C-o>gk
+    inoremap <buffer> <silent> <Down> <C-o>gj
+    inoremap <buffer> <silent> <Home> <C-o>g<Home>
+    inoremap <buffer> <silent> <End>  <C-o>g<End>
+  endif
+endfunction
+
+" text wrapping - on by default
+
+let g:default_textwidth = 70
+let &textwidth = g:default_textwidth
+
+map  <silent> <F3> :call ToggleTextWrap()<CR>
+imap <silent> <F3> <C-O><F3><C-O>:sleep 300m<CR>
+function! ToggleTextWrap()
+  if &textwidth == 0
+    echo "Text Wrap ON"
+    try
+       let &l:textwidth = b:lasttextwidth
+    catch
+       let &l:textwidth = g:default_textwidth
+    endtry
+  else
+    echo "Text Wrap OFF"
+    let b:lasttextwidth=&textwidth
+    setlocal textwidth=0
+  endif
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+" don't save backups
+set nobackup
+
+" do highlighting of search pattern and enable incremental search
+set hlsearch
+set incsearch
+
+" set cursor indications in gui mode
+set guicursor=n-v-c:block-lCursor/Cursor,ve:ver35-Cursor,o:block-Cursor,i-ci:block-wCursor/Cursor-blinkwait60-blinkoff60-blinkon60,r-cr:block-oCursor/Cursor-blinkwait60-blinkoff60-blinkon60,sm:block-lCursor/Cursor-blinkwait175-blinkoff150-blinkon175
+
+" show the position of the cursor
+set ruler
+
+" show matching parenthesise.
+set showmatch
+
+
+if has("autocmd")
+         
+   " disable spell under some conditions
+   autocmd FileType diff setlocal nospell
+   autocmd FileType patch setlocal nospell
+   autocmd FileType qf setlocal nospell
+   autocmd FileType messages setlocal nospell
+
+   autocmd BufNewFile,BufRead *.git-diff set ft=git-diff nospell
+
+   " Set some sensible defaults for editing C-files
+   augroup clikeprog
+     " Remove all cprog autocommands
+     au!
+   
+     " When starting to edit a file:
+     "   For *.c and *.h files set formatting of comments and set C-indenting on.
+     "   For other files switch it off.
+     "   Don't change the order, it's important that the line with * comes first.
+     autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent comments&
+     autocmd BufNewFile,BufRead *.gpp set filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
+     autocmd BufNewFile,BufRead *.impl set filetype=cpp
+     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
+     autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i set filetype=asm tabstop=14 formatoptions=croql cindent comments=";"
+     autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
+     autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
+   augroup END
+   
+   " Also, support editing of gzip-compressed files. DO NOT REMOVE THIS!
+   " This is also used when loading the compressed helpfiles.
+   augroup gzip
+     " Remove all gzip autocommands
+     au!
+   
+     " Enable editing of gzipped files
+     "     read:  set binary mode before reading the file
+     "      uncompress text in buffer after reading
+     "    write:  compress file after writing
+     "   append:  uncompress file, append, compress file
+     autocmd BufReadPre,FileReadPre *.gz set bin
+     autocmd BufReadPre,FileReadPre *.gz let ch_save = &ch|set ch=2
+     autocmd BufReadPost,FileReadPost  *.gz '[,']!gunzip
+     autocmd BufReadPost,FileReadPost  *.gz set nobin
+     autocmd BufReadPost,FileReadPost  *.gz let &ch = ch_save|unlet ch_save
+     autocmd BufReadPost,FileReadPost  *.gz execute ":doautocmd BufReadPost %:r"
+   
+     autocmd BufWritePost,FileWritePost   *.gz !mv <afile> <afile>:r
+     autocmd BufWritePost,FileWritePost   *.gz !gzip <afile>:r
+   
+     autocmd FileAppendPre       *.gz !gunzip <afile>
+     autocmd FileAppendPre       *.gz !mv <afile>:r <afile>
+     autocmd FileAppendPost      *.gz !mv <afile> <afile>:r
+     autocmd FileAppendPost      *.gz !gzip <afile>:r
+   augroup END
+   
+   augroup bzip2
+     " Remove all bzip2 autocommands
+     au!
+   
+     " Enable editing of bzipped files
+     "       read: set binary mode before reading the file
+     "             uncompress text in buffer after reading
+     "      write: compress file after writing
+     "     append: uncompress file, append, compress file
+     autocmd BufReadPre,FileReadPre        *.bz2 set bin
+     autocmd BufReadPre,FileReadPre        *.bz2 let ch_save = &ch|set ch=2
+     autocmd BufReadPost,FileReadPost      *.bz2 set cmdheight=2|'[,']!bunzip2
+     autocmd BufReadPost,FileReadPost      *.bz2 set cmdheight=1 nobin|execute ":doautocmd BufReadPost %:r"
+     autocmd BufReadPost,FileReadPost      *.bz2 let &ch = ch_save|unlet ch_save
+   
+     autocmd BufWritePost,FileWritePost    *.bz2 !mv <afile> <afile>:r
+     autocmd BufWritePost,FileWritePost    *.bz2 !bzip2 <afile>:r
+   
+     autocmd FileAppendPre                 *.bz2 !bunzip2 <afile>
+     autocmd FileAppendPre                 *.bz2 !mv <afile>:r <afile>
+     autocmd FileAppendPost                *.bz2 !mv <afile> <afile>:r
+     autocmd FileAppendPost                *.bz2 !bzip2 -9 --repetitive-best <afile>:r
+   augroup END
+
+endif " has ("autocmd")
+
+
+if $_ =~ "gvim"
+" show the gui now, if possible (i.e. if running a gui capable vim).
+" some things below depend on overriding defaults provided by default
+" when opening the gui window.
+try
+:gui
+catch
+endtry
+endif
+
+if $USERNAME == 'root' && &term =~ 'gui'
+   colorscheme darkblue
+   set bg=dark
+elseif &term != '' && &term !~ 'gui' && &term != 'win32'
+
+   colorscheme evening
+   set bg=dark
+
+   let html_my_rendering = 1 
+   hi def htmlBold                term=bold cterm=bold gui=bold
+   hi def htmlBoldUnderline       term=bold,underline cterm=bold,underline gui=bold,underline
+   hi def htmlBoldItalic          term=bold cterm=bold gui=bold
+   hi def htmlBoldUnderlineItalic term=bold,underline cterm=bold,underline gui=bold,underline
+   hi def htmlUnderline           term=underline cterm=underline gui=underline
+   hi def htmlUnderlineItalic     term=underline cterm=underline gui=underline
+   hi def htmlItalic              term=bold cterm=bold gui=bold
+
+else
+   colorscheme default
+   set bg=light
+endif
+
+
+" ignore escape color sequences in quick-fix window.
+" this accepts n color escape sequences before and after file, line and
+" column refs.
+if !exists("g:set_error_format")
+   let g:set_error_format = 1
+   "let &errorformat = 
+   "  \ '%*[^"]"%f"%*\D%l: %m,"%f"%*\D%l: %m,%-G%f:%l: (Each undeclared %identifier is reported only once,%-G%f:%l: for each function it appears in.),%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,"%f"\, line %l%*\D%c%*[^ ] %m,%D%*\a[%*\d]: Entering directory .%f.,%X%*\a[%*\d]: Leaving directory .%f.,%D%*\a: Entering directory .%f.,%X%*\a: Leaving directory .%f.,%DMaking %*\a in %f,%f|%l| %m,In file included from %f:%l:'
+   let &errorformat = '%*[^"]"%f"%*\D%l: %m'
+     \ . ',%f"%*\D%l: %m'
+     \ . ',%-G%f:%l: (Each undeclared identifier is reported only once'
+     \ . ',%-G%f:%l: for each function it appears in.)'
+     \ . ',%f:%l:%c:%m'
+     \ . ',%f(%l):%m'
+     \ . ',%f:%l:%m'
+     \ . ',"%f"\, line %l'
+     \ . ',%D%*\a: Entering directory %.%f%.'
+     \ . ',%X%*\a: Leaving directory %.%f%.'
+     \ . ',%D%*\a[%*\d]: Entering directory %.%f%.'
+     \ . ',%X%*\a[%*\d]: Leaving directory %.%f%.'
+     \ . ',%DMaking %*\a in %f'
+     \ . ',%f|%l| %m'
+     \ . ',%m %f:%l:'
+   let &errorformat = substitute( &errorformat, '%\([flc]\)', '%\\%%([%.%\\{-}m%\\)%#%\1%\\%%([%.%\\{-}m%\\)%#', 'g' )
+endif
+   
+
+" syntax highlighting on
+syntax on
+
+" lighten up control characters
+hi SpecialKey guifg=gray
+
+" replace solid background of spell/grammar errors in cterm with bright underline
+if &term !~ 'gui'
+
+   let s:underline = ",underline"
+   if &term == 'win32'
+      let s:underline = ""
+   endif
+
+   exe ":hi SpellBad   term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=1 gui=undercurl guisp=Red"
+   exe ":hi SpellCap   term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=4 gui=undercurl guisp=Blue"
+   exe ":hi SpellLocal term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan"
+   exe ":hi SpellRare  term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta"
+endif
+
+
+" convenience for reloading cursor colors if changing color-scheme
+function! ResetCursor()
+   try 
+      source ~/.vim/cursor.vim
+   catch
+      source $VIM/vimfiles/cursor.vim
+   endtry
+endfunction
+command! ResetCursor call ResetCursor()
+ResetCursor
+
+" allow overriding without changing this, possibly, version controlled
+" file
+runtime vimrc-overrides
+
