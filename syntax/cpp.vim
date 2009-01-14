@@ -41,7 +41,7 @@ syn match cdoxyTag           contained /[\\@]f[\[\]\$]\s*/
 syn match cdoxyTagOptions    contained /\[[^\]]*\]/
 syn match cdoxyTagBold       contained /[\\@]\(c\|b\|d\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn match cdoxyTagEmph       contained /[\\@]\(e\|t\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
-syn match cdoxyTagWithArg    contained /[\\@]\(al\?\|\(sub\)\?page\|anchor\|ref\|itemref\|param\|class\|\(sub\)*section\|defgroup\|ingroup\|copydoc\|see\|sa\|throws\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
+syn match cdoxyTagWithArg    contained /[\\@]\(al\?\|\(sub\)\?page\|anchor\|ref\|itemref\|param\|class\|\(sub\)*section\|defgroup\|ingroup\|copyd\(oc\|etail\)\|see\|sa\|throws\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn region cdoxyBraceTag     contained keepend start=/[\\@]\([A-Za-z_]\+\){/  end=/}/       contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagBold contained keepend start=/[\\@]\(b_\|d_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagEmph contained keepend start=/[\\@]\(e_\|t_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
@@ -49,6 +49,7 @@ syn match cdoxyTitle         contained /[\\@]\(\(main\)\?page\|par\>\|section\|\
 syn match cdoxyUrl           contained `\<[a-z0-9]*:/\+\S\+`
 syn region cdoxyCommentSpecial contained keepend start=+"+hs=s+1 skip=+\\["\\]+ end=+"+he=e-1 end="\*\+/"me=s-1 contains=@Spell
 syn match cdoxyCommentEmph contained /\([A-Za-z0-9_:][A-Za-z0-9_\-\+=<>!:]*\ze([^)]*)\)/
+syn match cdoxyCommentEmph contained /\([A-Za-z0-9_:][A-Za-z0-9_\-\+=<>!:]*\ze<[^>]*>\)/
 syn match cdoxyCommentEmph contained /¯\([^ 	()]*\)/ contains=cGhost
 syn match cGhost /\(¯\)/ contained 
 
@@ -78,7 +79,7 @@ hi def link cdoxyBound        Comment
 hi def link cdoxySentanceOne  SpecialComment
 hi def link cdoxyRepeatedStar Comment
 hi def link cdoxyCode        cdoxyCommentSpecial
-hi def link cdoxyCommentEmph  Function
+hi def link cdoxyCommentEmph  Statement
 hi def link cdoxyCommentSpecial LineNr
 hi def link cGhost  Ignore
 

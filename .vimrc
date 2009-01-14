@@ -244,10 +244,19 @@ if !exists("g:file_nav_stack")
 endif
 
 function! PushInclude(split) range
-   let l:fullpath = findfile( expand("<cfile>") )
+   let l:arg = expand("<cfile>") 
+   let l:fullpath = findfile( l:arg )
+
+   " if file starts with a/ or b/ and is not readable, assume
+   " this buffer is a git-diff and try the path without the
+   " first two chars
+   if match( l:arg, '[ab]/' ) == 0 && !filereadable( l:fullpath )
+      let l:fullpath = findfile( l:arg[2:] )
+   endif
+
    if !filereadable( l:fullpath )
       if l:fullpath == ''
-         echo "File '" . expand("<cfile>") . "' not found in search path."
+         echo "File '" . l:arg . "' not found in search path."
       else
          echo "File '" . l:fullpath . "' not readable."
       endif
@@ -255,14 +264,15 @@ function! PushInclude(split) range
    endif
    let l:item = expand("%")
    if l:item == ""
-      let l:item = '.!.' .  winbufnr(0)
+      let l:item = '!:!' . winbufnr(0)
    endif
+   call insert( g:file_nav_stack, getpos('.') )
    call insert( g:file_nav_stack, l:item )
    try
       if a:split
-         normal F
+         sp `=l:fullpath`
       else
-         normal gF
+         e `=l:fullpath`
       endif
    catch
       echo "File '" . expand("<cfile>:t") . "' was readable but can't abandon current buffer. (target's full path is '" . l:fullpath . "')"
@@ -274,21 +284,26 @@ function! PopInclude() range
    try
       let l:val=get( g:file_nav_stack, 0 )
       call remove( g:file_nav_stack, 0, 0 )
+
+      let l:pos=get( g:file_nav_stack, 0 )
+      call remove( g:file_nav_stack, 0, 0 )
+
       if !filereadable( l:val )
-         if match( l:val, '.!.' ) == 0
+         if match( l:val, '!:!' ) == 0
             let l:val = l:val[3:]
          else
             echo "File '" . l:val . "' not readable, skipped."
             return
          endif
       endif
-      " windows frig, places cursor at top using :e
+      " try existing buffer first
       try
          exe "b ".l:val
-         return
       catch
+         e `=l:val`
       endtry
-      e `=l:val`
+      " reposition cursor
+      call setpos( '.', l:pos )
    catch
       echo "No file navigation stack."
    endtry
