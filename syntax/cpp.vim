@@ -60,6 +60,7 @@ syn match cdoxyAngles contained /<[^A-Za-z0-9_"/]/hs=e+1
 syn match cdoxyAngles contained /[^A-Za-z0-9_"/]>/hs=e+1
 
 syn region cdoxyBound       keepend start="/\*[*!]\+" end="\*\+/" contains=cdoxySentanceOne,@cppCommentHtml,cdoxyTag,cdoxyBraceTagBold,cdoxyBraceTagEmph,cdoxyBraceTag,cdoxyTitle,cdoxyTagWithArg,cdoxyTagBold,cdoxyTagEmph,cdoxyCommentEmph,cdoxyCommentSpecial,cdoxyRepeatedStar,@cCommentGroup,cdoxyCode,cdoxyAngles,cdoxyUrl
+syn match  cComment     /\/\*\+\*\//
 syn region cdoxySentanceOne contained keepend start="/\*[*!]\+"hs=e+1 skip="\.\\" end="\.$" end="\.[ \t\r&]" end="[^{][@\\]"me=s-2,he=s-1 end="\*\+/"me=s-1 contains=@cppCommentHtml,cdoxyRepeatedStar,cdoxyCommentSpecial,@cCommentGroup,cdoxyTag,cdoxyBraceTagBold,cdoxyBraceTagEmph,cdoxyBraceTag,cdoxyTitle,cdoxyTagWithArg,cdoxyTagBold,cdoxyTagEmph,cdoxyAngles,cdoxyCommentEmph
 syn match  cdoxyRepeatedStar /^[     ]*\*\+/ contained
 syn case match

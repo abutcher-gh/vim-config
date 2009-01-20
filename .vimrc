@@ -809,6 +809,7 @@ command! ResetCursor call ResetCursor()
 ResetCursor
 
 " allow overriding without changing this, possibly, version controlled
-" file
+" file; this file should be placed in ~/.vim/ on unix or personal or
+" system-wide vimfiles on windows.
 runtime vimrc-overrides
 
