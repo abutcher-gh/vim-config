@@ -634,6 +634,79 @@ set ruler
 " show matching parenthesise.
 set showmatch
 
+" ignore escape color sequences in quick-fix window.
+" this accepts n color escape sequences before and after file, line and
+" column refs.
+if !exists("g:set_error_format")
+   let g:set_error_format = 1
+   let &errorformat = '%*[^"]"%f"%*\D%l: %m'
+     \ . ',%f"%*\D%l: %m'
+     \ . ',%-G%f:%l: (Each undeclared identifier is reported only once'
+     \ . ',%-G%f:%l: for each function it appears in.)'
+     \ . ',%f:%l:%c:%m'
+     \ . ',%f(%l):%m'
+     \ . ',%f:%l:%m'
+     \ . ',"%f"\, line %l'
+     \ . ',%D%*\a: Entering directory %.%f%.'
+     \ . ',%X%*\a: Leaving directory %.%f%.'
+     \ . ',%D%*\a[%*\d]: Entering directory %.%f%.'
+     \ . ',%X%*\a[%*\d]: Leaving directory %.%f%.'
+     \ . ',%DMaking %*\a in %f'
+     \ . ',%f|%l| %m'
+     \ . ',%m %f:%l:'
+   let &errorformat = substitute( &errorformat, '%\([flc]\)', '%\\%%([%.%\\{-}m%\\)%#%\1%\\%%([%.%\\{-}m%\\)%#', 'g' )
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+" function to set highlighting options to look better on terminals
+function! SetTerminalHighlighting()
+
+   " disable underline on windows console
+   let l:underline  = "underline"
+   let l:cunderline = ",underline"
+   if &term == 'win32'
+      let l:underline = ""
+      let l:cunderline = ""
+   endif
+
+   " remove solid background from html highlighting
+   let html_my_rendering = 1 
+   exe ''
+   \.'  hi htmlBold                term=bold cterm=bold gui=bold'                                                 
+   \.'| hi htmlBoldUnderline       term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline    
+   \.'| hi htmlBoldItalic          term=bold cterm=bold gui=bold'                                                 
+   \.'| hi htmlBoldUnderlineItalic term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline    
+   \.'| hi htmlUnderline           term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
+   \.'| hi htmlUnderlineItalic     term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
+   \.'| hi htmlItalic              term=bold cterm=bold gui=bold'                                                 
+
+   " replace solid background of spell/grammar errors in cterm with bright underline
+   exe ''
+   \.'  hi SpellBad   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=1 gui=undercurl guisp=Red"'
+   \.'| hi SpellCap   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=4 gui=undercurl guisp=Blue"'
+   \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan"'
+   \.'| hi SpellRare  term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta"'
+
+endfunction 
+
+" convenience for reloading cursor colors if changing color-scheme
+" (now called from change event autocmd)
+function! ResetCursor()
+
+   hi clear CursorLine
+   hi clear CursorColumn
+   
+   hi CursorLine   guibg=lightgray
+   hi CursorColumn guibg=lightgray
+   
+   "hi Cursor		  guifg=bg	guibg=#305080
+   hi wCursor		  guifg=bg	guibg=#FF1020
+   hi oCursor		  guifg=bg	guibg=#CC20FF
+
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("autocmd")
          
@@ -642,6 +715,8 @@ if has("autocmd")
    autocmd FileType patch setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
+
+   autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
 
    autocmd BufNewFile,BufRead *.git-diff set ft=git-diff nospell
 
@@ -727,86 +802,34 @@ catch
 endtry
 endif
 
+
+" set colorscheme based on user name and terminal type
+"
 if $USERNAME == 'root' && &term =~ 'gui'
+
    colorscheme darkblue
    set bg=dark
+
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
    colorscheme evening
    set bg=dark
 
-   let html_my_rendering = 1 
-   hi def htmlBold                term=bold cterm=bold gui=bold
-   hi def htmlBoldUnderline       term=bold,underline cterm=bold,underline gui=bold,underline
-   hi def htmlBoldItalic          term=bold cterm=bold gui=bold
-   hi def htmlBoldUnderlineItalic term=bold,underline cterm=bold,underline gui=bold,underline
-   hi def htmlUnderline           term=underline cterm=underline gui=underline
-   hi def htmlUnderlineItalic     term=underline cterm=underline gui=underline
-   hi def htmlItalic              term=bold cterm=bold gui=bold
-
 else
+
    colorscheme default
    set bg=light
+
 endif
 
-
-" ignore escape color sequences in quick-fix window.
-" this accepts n color escape sequences before and after file, line and
-" column refs.
-if !exists("g:set_error_format")
-   let g:set_error_format = 1
-   "let &errorformat = 
-   "  \ '%*[^"]"%f"%*\D%l: %m,"%f"%*\D%l: %m,%-G%f:%l: (Each undeclared %identifier is reported only once,%-G%f:%l: for each function it appears in.),%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,"%f"\, line %l%*\D%c%*[^ ] %m,%D%*\a[%*\d]: Entering directory .%f.,%X%*\a[%*\d]: Leaving directory .%f.,%D%*\a: Entering directory .%f.,%X%*\a: Leaving directory .%f.,%DMaking %*\a in %f,%f|%l| %m,In file included from %f:%l:'
-   let &errorformat = '%*[^"]"%f"%*\D%l: %m'
-     \ . ',%f"%*\D%l: %m'
-     \ . ',%-G%f:%l: (Each undeclared identifier is reported only once'
-     \ . ',%-G%f:%l: for each function it appears in.)'
-     \ . ',%f:%l:%c:%m'
-     \ . ',%f(%l):%m'
-     \ . ',%f:%l:%m'
-     \ . ',"%f"\, line %l'
-     \ . ',%D%*\a: Entering directory %.%f%.'
-     \ . ',%X%*\a: Leaving directory %.%f%.'
-     \ . ',%D%*\a[%*\d]: Entering directory %.%f%.'
-     \ . ',%X%*\a[%*\d]: Leaving directory %.%f%.'
-     \ . ',%DMaking %*\a in %f'
-     \ . ',%f|%l| %m'
-     \ . ',%m %f:%l:'
-   let &errorformat = substitute( &errorformat, '%\([flc]\)', '%\\%%([%.%\\{-}m%\\)%#%\1%\\%%([%.%\\{-}m%\\)%#', 'g' )
-endif
-   
 
 " syntax highlighting on
 syntax on
 
+
 " lighten up control characters
 hi SpecialKey guifg=gray
 
-" replace solid background of spell/grammar errors in cterm with bright underline
-if &term !~ 'gui'
-
-   let s:underline = ",underline"
-   if &term == 'win32'
-      let s:underline = ""
-   endif
-
-   exe ":hi SpellBad   term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=1 gui=undercurl guisp=Red"
-   exe ":hi SpellCap   term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=4 gui=undercurl guisp=Blue"
-   exe ":hi SpellLocal term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan"
-   exe ":hi SpellRare  term=bold cterm=bold" . s:underline . " ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta"
-endif
-
-
-" convenience for reloading cursor colors if changing color-scheme
-function! ResetCursor()
-   try 
-      source ~/.vim/cursor.vim
-   catch
-      source $VIM/vimfiles/cursor.vim
-   endtry
-endfunction
-command! ResetCursor call ResetCursor()
-ResetCursor
 
 " allow overriding without changing this, possibly, version controlled
 " file; this file should be placed in ~/.vim/ on unix or personal or
