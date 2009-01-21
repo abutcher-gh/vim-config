@@ -282,31 +282,35 @@ function! s:GuiColorScheme(fname)
         " handle simple if nesting
         if line =~ '^\(if\|elseif\)'
             if line =~ '^else'
-                let l:ifdone[-1] = l:iftrue[-1]
+                let l:ifdone[-1] = l:ifdone[-1] || l:iftrue[-1]
                 let l:iftrue[-1] = 0
             else
-                let l:iftrue += [0]
-                let l:ifdone += [0]
+                " decision is already made if an existing outer scope is false
+                let l:ifdone += [ len(l:iftrue) > 0 && l:iftrue[-1] == 0 ]
+                let l:iftrue += [ 0 ]
             endif
             if l:ifdone[-1] == 0
                 let l:tokend = match(line, "[ \t]")
                 exe 'let l:iftrue[-1] = ' . strpart(line, l:tokend)
             endif
         elseif line =~ '^else'
-            let l:ifdone[-1] = l:iftrue[-1]
-            let l:iftrue[-1] = !l:iftrue[-1]
+            let l:ifdone[-1] = l:ifdone[-1] || l:iftrue[-1]
+            let l:iftrue[-1] = !l:ifdone[-1]
         elseif line =~ '^endif'
-            let l:iftrue = l:iftrue[0:-2]
             let l:ifdone = l:ifdone[0:-2]
+            let l:iftrue = l:iftrue[0:-2]
         endif
 
-        " skip false clauses
-        if len(l:iftrue) > 0 && l:iftrue[-1] == 0
-            continue
+        " any live conditions?
+        if len(l:iftrue) > 0
+            " skip false clauses
+            if l:ifdone[-1] == 1 || l:iftrue[-1] == 0
+                continue
+            endif
         endif
 
-        " execute let lines
-        if line =~ '^let'
+        " execute set/let lines
+        if line =~ '^[sl]et' && line !~ 'colors_name'
             exe line
         endif
 
