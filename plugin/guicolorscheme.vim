@@ -197,13 +197,31 @@ function! s:cindex(rgb) "{{{
     return s:color(l:r, l:g, l:b)
 endfunction "}}}
 
+
+" default colors; to allow for assignments like ctermfg=bg etc. 
+let s:def_fg = '7'
+let s:def_bg = '16'
+
 function! s:HL(group, fg, bg, attr) "{{{
     "The main highlight (HL) function
-    if a:fg != ""
-        exec "hi " . a:group . " guifg=#" . a:fg . " ctermfg=" . s:cindex(a:fg)
+    let l:fg = a:fg
+    let l:bg = a:bg
+    if a:group == "Normal"
+        let s:def_fg = l:fg
+        let s:def_bg = l:bg
+    else
+        if l:fg =~ '[fb]g'
+            exe 'let l:fg = s:def_' . l:fg
+        endif
+        if l:bg =~ '[fb]g'
+            exe 'let l:bg = s:def_' . l:bg
+        endif
     endif
-    if a:bg != ""
-        exec "hi " . a:group . " guibg=#" . a:bg . " ctermbg=" . s:cindex(a:bg)
+    if l:fg != ""
+        exec "hi " . a:group . " guifg=#" . l:fg . " ctermfg=" . s:cindex(l:fg)
+    endif
+    if l:bg != ""
+        exec "hi " . a:group . " guibg=#" . l:bg . " ctermbg=" . s:cindex(l:bg)
     endif
     if a:attr != ""
         exec "hi " . a:group . " gui=" . a:attr . " cterm=" . a:attr
@@ -248,7 +266,51 @@ function! s:GuiColorScheme(fname)
         return 0
     endif
 
+    " simplistic nested if handling; these are both empty if there are
+    " no if's
+    let l:iftrue = []  " list of 0 or 1 for the current clause of each if level
+    let l:ifdone = []  " list of 0 or 1 for the completed (i.e. true done) state of each if level
+
     for line in readfile(l:file)
+
+        " chomp front
+        let line = substitute(line, '^\s*', '', '')
+
+        " transform variable names to be local (:exe won't work on s: vars)
+        let line = substitute(line, 's:', 'l:gcs_s_', 'g')
+
+        " handle simple if nesting
+        if line =~ '^\(if\|elseif\)'
+            if line =~ '^else'
+                let l:ifdone[-1] = l:iftrue[-1]
+                let l:iftrue[-1] = 0
+            else
+                let l:iftrue += [0]
+                let l:ifdone += [0]
+            endif
+            if l:ifdone[-1] == 0
+                let l:tokend = match(line, "[ \t]")
+                exe 'let l:iftrue[-1] = ' . strpart(line, l:tokend)
+            endif
+        elseif line =~ '^else'
+            let l:ifdone[-1] = l:iftrue[-1]
+            let l:iftrue[-1] = !l:iftrue[-1]
+        elseif line =~ '^endif'
+            let l:iftrue = l:iftrue[0:-2]
+            let l:ifdone = l:ifdone[0:-2]
+        endif
+
+        " skip false clauses
+        if len(l:iftrue) > 0 && l:iftrue[-1] == 0
+            continue
+        endif
+
+        " execute let lines
+        if line =~ '^let'
+            exe line
+        endif
+
+        " process highlight lines
         if line =~ '^hi'
             let l:name = ""
             let l:fg = ""
@@ -307,6 +369,8 @@ function! s:GuiColorScheme(fname)
             call s:HL(l:name, l:fg, l:bg, l:attr)
         endif
     endfor
+
+    doautocmd ColorScheme *
 endfunction
 
 " vim:ft=vim:fdl=0:fdm=marker:ts=4:sw=4

@@ -683,10 +683,10 @@ function! SetTerminalHighlighting()
 
    " replace solid background of spell/grammar errors in cterm with bright underline
    exe ''
-   \.'  hi SpellBad   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=1 gui=undercurl guisp=Red"'
-   \.'| hi SpellCap   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=4 gui=undercurl guisp=Blue"'
-   \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan"'
-   \.'| hi SpellRare  term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta"'
+   \.'  hi SpellBad   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=1 gui=undercurl guisp=Red'
+   \.'| hi SpellCap   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=4 gui=undercurl guisp=Blue'
+   \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan'
+   \.'| hi SpellRare  term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta'
 
 endfunction 
 
@@ -802,6 +802,12 @@ catch
 endtry
 endif
 
+" vimwiki stuff
+let g:vimwiki_home = "~/.vimwiki/"
+
+" syntax highlighting on
+syntax on
+
 " best guess at user name
 let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
@@ -815,8 +821,9 @@ if g:user == 'root' && &term =~ 'gui'
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
    if g:user == 'ajb'
-      colorscheme moria
       set bg=dark
+      runtime plugin/guicolorscheme.vim
+      GuiColorScheme moria
    else
       colorscheme evening
       set bg=dark
@@ -828,10 +835,6 @@ else
    set bg=light
 
 endif
-
-
-" syntax highlighting on
-syntax on
 
 
 " lighten up control characters
