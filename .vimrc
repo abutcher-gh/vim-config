@@ -802,18 +802,25 @@ catch
 endtry
 endif
 
+" best guess at user name
+let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
 " set colorscheme based on user name and terminal type
 "
-if $USERNAME == 'root' && &term =~ 'gui'
+if g:user == 'root' && &term =~ 'gui'
 
    colorscheme darkblue
    set bg=dark
 
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
-   colorscheme evening
-   set bg=dark
+   if g:user == 'ajb'
+      colorscheme moria
+      set bg=dark
+   else
+      colorscheme evening
+      set bg=dark
+   endif
 
 else
 
