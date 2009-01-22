@@ -476,6 +476,24 @@ map <silent> \<Tab> :EditAssociate<Space>
 map <silent> <Tab> 
 map <silent> <C-Tab> 
 
+" window resizing
+if !exists('g:winresizestep')
+   let g:winresizestep = 10
+endif
+function! ResizeWin(orient,op) range
+   if a:lastline > a:firstline
+     let g:winresizestep = a:lastline - a:firstline + 1
+   endif
+   exe ':'.a:orient.' resize '.a:op.g:winresizestep
+endfunction
+map <silent> \<Left> :call ResizeWin('vertical','-')<CR>
+map <silent> \<Right> :call ResizeWin('vertical','+')<CR>
+map <silent> \<Up> :call ResizeWin('','+')<CR>
+map <silent> \<Down> :call ResizeWin('','-')<CR>
+
+" re-source vimrc
+com! Reinit :runtime! .vimrc
+
 " some function key macros
 "
 " open/close error log and navigate log messages
