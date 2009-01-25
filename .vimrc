@@ -823,6 +823,10 @@ endif
 " vimwiki stuff
 let g:vimwiki_home = "~/.vimwiki/"
 
+if &term =~ 'rxvt'
+   set t_Co=256
+endif
+
 " syntax highlighting on
 syntax on
 
