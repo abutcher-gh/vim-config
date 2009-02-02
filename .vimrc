@@ -27,7 +27,7 @@ let c_C99 = 1
 " a cd.  It seems that this only happens after a :cd or :lcd in vim
 " though.  It all works fine if I run commands without changing
 " directory.
-" Workaround for the momemnt until I figure out whats what is to use
+" Workaround for the moment until I figure out whats what is to use
 " bash to shell out from vim.
 if &shell =~ "zsh"
    set shell=bash
@@ -540,6 +540,7 @@ map \v :call ToggleVirtualEdit('all')<CR>
 com! -nargs=* Shthis :cex system("sh ".expand("%")." ".<q-args>)
 com! -nargs=* Zshthis :cex system("zsh ".expand("%")." ".<q-args>)
 com! -nargs=* Gxxthis :cex system("g++ ".expand("%")." ".<q-args>)
+com! -nargs=* Exec :cex system(<q-args>." ".expand("%"))
 
 com! -nargs=* Cb :set nomodified | :cb
 
@@ -663,6 +664,7 @@ if !exists("g:set_error_format")
      \ . ',%-G%f:%l: for each function it appears in.)'
      \ . ',%f:%l:%c:%m'
      \ . ',%f(%l):%m'
+     \ . ',%[ ]%#%f(%l) :%m'
      \ . ',%f:%l:%m'
      \ . ',"%f"\, line %l'
      \ . ',%D%*\a: Entering directory %.%f%.'
