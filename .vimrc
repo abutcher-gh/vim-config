@@ -823,7 +823,7 @@ endtry
 endif
 
 " vimwiki stuff
-let g:vimwiki_home = "~/.vimwiki/"
+let g:vimwiki_home = $HOME . "/.vimwiki/"
 
 if &term =~ 'rxvt'
    set t_Co=256
