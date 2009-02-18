@@ -60,6 +60,22 @@ function! Repath()
 
 endfunction
 
+function! PrependPath( p )
+   let &path = a:p . "," . &path
+endfunc
+
+function! AppendPath( p )
+   let &path = &path . "," . a:p
+endfunc
+
+function! RemovePath( p )
+   exe "set path-=" . a:p
+endfunc
+
+command! -nargs=1 PrependPath :call PrependPath(<f-args>)
+command! -nargs=1 AppendPath  :call AppendPath(<f-args>)
+command! -nargs=1 RemovePath  :call RemovePath(<f-args>)
+
 function! AddGccSysPaths()
    
    try
@@ -536,11 +552,26 @@ function! ToggleVirtualEdit(option)
 endfunction
 map \v :call ToggleVirtualEdit('all')<CR>
 
+if $OS =~ "Windows" 
+   if $_ !~ "gvim"
+      let g:pipeteeterm=" \| tee CON:"
+   else
+      let g:pipeteeterm=""
+   endif
+else
+   let g:pipeteeterm=" \| tee /dev/tty"
+endif
 
-com! -nargs=* Shthis :cex system("sh ".expand("%")." ".<q-args>)
-com! -nargs=* Zshthis :cex system("zsh ".expand("%")." ".<q-args>)
-com! -nargs=* Gxxthis :cex system("g++ ".expand("%")." ".<q-args>)
-com! -nargs=* Exec :cex system(<q-args>." ".expand("%"))
+function! CexLive(cmdline)
+   :echo "Executing: ".a:cmdline.g:pipeteeterm
+   :cex system(a:cmdline.g:pipeteeterm)
+endfun
+
+com! -nargs=* Shthis call CexLive("sh ".expand("%")." ".<q-args>)   | :normal <C-L>
+com! -nargs=* Zshthis call CexLive("zsh ".expand("%")." ".<q-args>) | :normal <C-L>
+com! -nargs=* Gxxthis call CexLive("g++ ".expand("%")." ".<q-args>) | :normal <C-L>
+com! -nargs=* Exec call CexLive(<q-args>." ".expand("%"))           | :normal <C-L>
+com! -nargs=* NExec call CexLive(<q-args>)                          | :normal <C-L>
 
 com! -nargs=* Cb :set nomodified | :cb
 
