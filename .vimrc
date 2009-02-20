@@ -566,14 +566,22 @@ map \v :call ToggleVirtualEdit('all')<CR>
 " color sequences but strips any such
 " sequences from the resulting capture
 " that ends up in the quickfix buffer.
-let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush; while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
+if $OS !~ "Windows"
+   let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush; while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
+else
+   let &shellpipe='2>&1| perl -e "$|=1; open OUT, """^> ${ARGV[0]}"""; use IO::Handle; OUT->autoflush; while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; $s=~s/[^m]*m//g; print $s; print OUT $s; }; close OUT;" '
+endif
 
 " This used to :cex tee'd through a system-specific pipe to show live
 " output (hence the name).  Now it temporarily reassigns makeprg to
 " the requested shell command, performs it with the perl filter above
 " and resets it.
 function! CexLive(cmdline)
-   let l:makeprg="echo;echo Executing: ".a:cmdline."; ".a:cmdline
+   if $OS !~ "Windows"
+      let l:makeprg="echo;echo Executing: ".a:cmdline."; ".a:cmdline
+   else
+      let l:makeprg=a:cmdline
+   endif
    let l:makeprg=substitute(l:makeprg,'	','\\t','g')
    let l:makeprg=substitute(l:makeprg,'|','\\|','g')
    let l:makeprg=substitute(l:makeprg,'\\','\\\\','g')
