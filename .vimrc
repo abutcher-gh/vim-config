@@ -552,26 +552,37 @@ function! ToggleVirtualEdit(option)
 endfunction
 map \v :call ToggleVirtualEdit('all')<CR>
 
-if $OS =~ "Windows" 
-   if $_ !~ "gvim"
-      let g:pipeteeterm=" \| tee CON:"
-   else
-      let g:pipeteeterm=""
-   endif
-else
-   let g:pipeteeterm=" \| tee /dev/tty"
-endif
+" This contorted, but portable, perl pipe
+" gives rapid feedback including any ansi
+" color sequences but strips any such
+" sequences from the resulting capture
+" that ends up in the quickfix buffer.
+let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush; while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 
+" This used to :cex tee'd through a system-specific pipe to show live
+" output (hence the name).  Now it temporarily reassigns makeprg to
+" the requested shell command, performs it with the perl filter above
+" and resets it.
 function! CexLive(cmdline)
-   :echo "Executing: ".a:cmdline.g:pipeteeterm
-   :cex system(a:cmdline.g:pipeteeterm)
+   let l:makeprg="echo;echo Executing: ".a:cmdline."; ".a:cmdline
+   let l:makeprg=substitute(l:makeprg,'	','\\t','g')
+   let l:makeprg=substitute(l:makeprg,'|','\\|','g')
+   let l:makeprg=substitute(l:makeprg,'\\','\\\\','g')
+   let l:oldmakeprg=&makeprg
+   try
+      let &makeprg=l:makeprg
+      echo l:makeprg
+      make
+   catch
+   endtry
+   let &makeprg=l:oldmakeprg
 endfun
 
-com! -nargs=* Shthis call CexLive("sh ".expand("%")." ".<q-args>)   | :normal <C-L>
-com! -nargs=* Zshthis call CexLive("zsh ".expand("%")." ".<q-args>) | :normal <C-L>
-com! -nargs=* Gxxthis call CexLive("g++ ".expand("%")." ".<q-args>) | :normal <C-L>
-com! -nargs=* Exec call CexLive(<q-args>." ".expand("%"))           | :normal <C-L>
-com! -nargs=* NExec call CexLive(<q-args>)                          | :normal <C-L>
+com! -nargs=* -complete=file Shthis call CexLive("sh ".expand("%")." ".<q-args>)
+com! -nargs=* -complete=file Zshthis call CexLive("zsh ".expand("%")." ".<q-args>)
+com! -nargs=* -complete=file Gxxthis call CexLive("g++ ".expand("%")." ".<q-args>)
+com! -nargs=* -complete=file Exec call CexLive(<q-args>." ".expand("%"))
+com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 
 com! -nargs=* Cb :set nomodified | :cb
 
