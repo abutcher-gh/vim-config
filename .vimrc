@@ -905,8 +905,12 @@ elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
    if g:user == 'ajb'
       set bg=dark
-      runtime plugin/guicolorscheme.vim
-      GuiColorScheme moria
+      if &term != 'linux'
+         runtime plugin/guicolorscheme.vim
+         GuiColorScheme moria
+      else
+         colorscheme default
+      endif
    else
       colorscheme evening
       set bg=dark
