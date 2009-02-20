@@ -35,13 +35,22 @@ endif
 
 " some simple printer setting commands
 "
-set printfont=:h7
-command! CodePrintLandscape set printoptions=number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
-command! CodePrintPortrait  set printoptions=number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
-command! TextPrintLandscape set printoptions=number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
-command! TextPrintPortrait  set printoptions=number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
+if $OS =~ "Windows"
+   let s:printfont="DejaVu_Sans_Mono"
+else
+   let s:printfont=""
+endif
+function! PrintFont(...)
+   let &printfont = s:printfont . a:1
+endfunc
+command! -nargs=1 PrintFont :call PrintFont(<f-args>)
+command! CodePrintLandscape set printoptions=paper:A4,number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
+command! CodePrintPortrait  set printoptions=paper:A4,number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
+command! TextPrintLandscape set printoptions=paper:A4,number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
+command! TextPrintPortrait  set printoptions=paper:A4,number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
 command! ColorPrinter set printdevice=xcpx5
 command! BlackPrinter set printdevice=xcpm1
+PrintFont :h7
 
 function! Repath()
  
