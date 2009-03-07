@@ -18,9 +18,9 @@ syn match qfWarning "[Ww]arning:.*" contains=qfWarningQuoted,qfSymbol,qfNumber,q
 
 hi link qfError          WarningMsg
 hi link qfWarning        Type
-hi link qfQuoted         Title
-hi link qfErrorQuoted    Title
-hi link qfWarningQuoted  Title
+hi link qfQuoted         Statement
+hi link qfErrorQuoted    Statement
+hi link qfWarningQuoted  Statement
 hi link qfType           Type
 hi link qfSymbol         Directory
 hi link qfNumber         Comment
