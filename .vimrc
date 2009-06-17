@@ -582,9 +582,9 @@ function! CexLive(cmdline)
    else
       let l:makeprg=a:cmdline
    endif
+   let l:makeprg=substitute(l:makeprg,'\\','\\\\','g')
    let l:makeprg=substitute(l:makeprg,'	','\\t','g')
    let l:makeprg=substitute(l:makeprg,'|','\\|','g')
-   let l:makeprg=substitute(l:makeprg,'\\','\\\\','g')
    let l:oldmakeprg=&makeprg
    try
       let &makeprg=l:makeprg
@@ -903,17 +903,12 @@ if g:user == 'root' && &term =~ 'gui'
 
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
-   if g:user == 'ajb'
-      set bg=dark
-      if &term != 'linux'
-         runtime plugin/guicolorscheme.vim
-         GuiColorScheme moria
-      else
-         colorscheme default
-      endif
+   set bg=dark
+   if &term != 'linux'
+      runtime plugin/guicolorscheme.vim
+      GuiColorScheme moria
    else
-      colorscheme evening
-      set bg=dark
+      colorscheme default
    endif
 
 else
