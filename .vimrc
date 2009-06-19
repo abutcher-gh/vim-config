@@ -904,11 +904,12 @@ if g:user == 'root' && &term =~ 'gui'
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
    set bg=dark
-   if &term != 'linux'
+   if &term != 'linux' && &t_Co == '256'
       runtime plugin/guicolorscheme.vim
       GuiColorScheme moria
    else
       colorscheme default
+      set bg=dark
    endif
 
 else
