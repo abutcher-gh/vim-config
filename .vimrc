@@ -791,6 +791,7 @@ if has("autocmd")
          
    " disable spell under some conditions
    autocmd FileType diff setlocal nospell
+   autocmd FileType git-diff setlocal nospell
    autocmd FileType patch setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
@@ -918,6 +919,15 @@ else
    set bg=light
 
 endif
+
+
+function! GNUStyle()
+   set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
+   set shiftwidth=2
+   set tabstop=8
+   set noexpandtab
+endfunction
+command! GNUStyle call GNUStyle()
 
 
 " lighten up control characters
