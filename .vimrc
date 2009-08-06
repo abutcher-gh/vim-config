@@ -926,6 +926,7 @@ function! GNUStyle()
    set shiftwidth=2
    set tabstop=8
    set noexpandtab
+   set comments=s:/*,m:\ \ \ ,re:*/,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
 endfunction
 command! GNUStyle call GNUStyle()
 
