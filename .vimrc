@@ -261,6 +261,41 @@ map f<PageDown> zm
 map f<Ins> zR
 map f<Del> zM
 
+function! GetRelativePath( BasePath, TargetPath )
+
+   let base   = split( resolve(expand(a:BasePath)),   '[\\/]')
+   let target = split( resolve(expand(a:TargetPath)), '[\\/]')
+
+   let bname = ""
+   let tname = ""
+
+   " determine matching stem
+   while 1
+
+      if bname != tname 
+         break
+      endif
+
+      if len(base) == 0 || len(target) == 0
+         let tname = ""
+         let bname = ""
+         break
+      endif 
+
+      let [ bname; base   ] = base
+      let [ tname; target ] = target
+
+   endwhile
+
+   let rc = repeat("../",len(base))
+
+   if !empty(bname) | let rc .= "../" | endif
+   if !empty(tname) | let rc .= tname."/" | endif
+
+   return  rc . join(target, "/")
+
+endfunction
+
 " functions to handle file navigation; step into/out-of include and
 " toggle between associate files
 "
@@ -274,9 +309,11 @@ function! PushInclude(split) range
 
    " if file starts with a/ or b/ and is not readable, assume
    " this buffer is a git-diff and try the path without the
-   " first two chars
+   " first two chars (in this and all parent directories)
    if match( l:arg, '[ab]/' ) == 0 && !filereadable( l:fullpath )
-      let l:fullpath = findfile( l:arg[2:] )
+      " note: the relative path formation here may turn out to be more
+      " annoying than useful.  only time will tell.
+      let l:fullpath = GetRelativePath(getcwd(),findfile( l:arg[2:], ".;" ))
    endif
 
    if !filereadable( l:fullpath )
@@ -400,41 +437,6 @@ function! EditAssociate() range
    endfor
 
    echo "No associate of '".expand("%:t")."' could be found with provided rules."
-
-endfunction
-
-function! GetRelativePath( BasePath, TargetPath )
-
-   let base   = split( resolve(expand(a:BasePath)),   '[\\/]')
-   let target = split( resolve(expand(a:TargetPath)), '[\\/]')
-
-   let bname = ""
-   let tname = ""
-
-   " determine matching stem
-   while 1
-
-      if bname != tname 
-         break
-      endif
-
-      if len(base) == 0 || len(target) == 0
-         let tname = ""
-         let bname = ""
-         break
-      endif 
-
-      let [ bname; base   ] = base
-      let [ tname; target ] = target
-
-   endwhile
-
-   let rc = repeat("../",len(base))
-
-   if !empty(bname) | let rc .= "../" | endif
-   if !empty(tname) | let rc .= tname."/" | endif
-
-   return  rc . join(target, "/")
 
 endfunction
 
