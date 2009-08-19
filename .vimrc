@@ -313,7 +313,10 @@ function! PushInclude(split) range
    if match( l:arg, '[ab]/' ) == 0 && !filereadable( l:fullpath )
       " note: the relative path formation here may turn out to be more
       " annoying than useful.  only time will tell.
-      let l:fullpath = GetRelativePath(getcwd(),findfile( l:arg[2:], ".;" ))
+      " let l:fullpath = GetRelativePath(getcwd(),findfile( l:arg[2:], ".;" ))
+      " GetRelativePath needs fixing as per Mark P's boost::fs change
+      " to handle trailing dirs/files
+      let l:fullpath = findfile( l:arg[2:], ".;" )
    endif
 
    if !filereadable( l:fullpath )
