@@ -186,15 +186,15 @@ if &diff
    if &term !~ "gui" 
       set nospell
    endif
-   " add some shortcuts
-   " next and prev change
-   map \<Down> ]c
-   map \<Up> [c
-   " pull and push change
-   map \<Right> :diffget<CR>
-   map \<Left> :diffput<CR>
-   map \z :diffupdate<CR>
 endif
+" add some shortcuts
+" next and prev change
+map <Bar><Down> ]c
+map <Bar><Up> [c
+" pull and push change
+map <Bar><Right> :diffget<CR>
+map <Bar><Left> :diffput<CR>
+map \z :diffupdate<CR>
 
 " remove some unnecessary gui bits
 set go-=m
