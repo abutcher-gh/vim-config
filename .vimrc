@@ -193,9 +193,9 @@ map <Bar><Down> ]c
 map <Bar><Up> [c
 " pull and push change
 map \g :diffget<CR>
-map \g :diffput<CR>
+map \p :diffput<CR>
 map \n ]c
-map \p [c
+map <Bar>N [c
 map \z :diffupdate<CR>
 
 " remove some unnecessary gui bits
