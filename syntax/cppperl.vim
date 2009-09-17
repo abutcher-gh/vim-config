@@ -8,9 +8,11 @@ unlet b:current_syntax
 syn include @cppperlEmbeddedPerl syntax/perl.vim
 let b:current_syntax = b:old_syntax
 syn clear perlHereDoc
+syn region cppperlRegion matchgroup=perlcppTags start=+@{\[eval{+ end=+}\]}+ contains=@cppperlEmbeddedPerl,cppperlEscapeToCpp
 syn region cppperlRegion matchgroup=perlcppTags start=+\[\[+ end=+\]\]+ contains=@cppperlEmbeddedPerl,cppperlEscapeToCpp
 syn region cppperlRegion matchgroup=perlcppComprTags start=+\[\[\[+ end=+\]\]\]+ contains=@cppperlEmbeddedPerl,cppperlEscapeToCpp
-syn region cppperlEscapeToCpp matchgroup=perlcppTags start=/<<\(\"\z([^"]\+\)\"\|\z([0-9A-Za-z_]\+\)\)/ end=/^\(\z1\|\z2\)$/ end=/##\(\z1\|\z2\)##/ nextgroup=cppperlEmbeddedPerl contained contains=TOP
+syn region cppperlEscapeToCpp matchgroup=perlcppTags start=/<<"\?\z([0-9A-Za-z_]\+\)"\?/ end=/^\z1$/ end=/##\z1##/ nextgroup=cppperlEmbeddedPerl contained contains=TOP
+syn region cppperlEscapeToCpp matchgroup=perlcppTags start=/<<"\z([^"]\+\)"/ end=/^\z1$/ nextgroup=cppperlEmbeddedPerl contained contains=TOP
 hi link perlcppTags WarningMsg
 hi link perlcppComprTags Comment
 

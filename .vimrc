@@ -192,8 +192,10 @@ endif
 map <Bar><Down> ]c
 map <Bar><Up> [c
 " pull and push change
-map <Bar><Right> :diffget<CR>
-map <Bar><Left> :diffput<CR>
+map \g :diffget<CR>
+map \g :diffput<CR>
+map \n ]c
+map \p [c
 map \z :diffupdate<CR>
 
 " remove some unnecessary gui bits
