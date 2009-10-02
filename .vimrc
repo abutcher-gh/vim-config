@@ -608,7 +608,9 @@ com! -nargs=* -complete=file Gxxthis call CexLive("g++ ".expand("%")." ".<q-args
 com! -nargs=* -complete=file Exec call CexLive(<q-args>." ".expand("%"))
 com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 
-com! -nargs=* Cb :set nomodified | :cb
+" Cb kept for legacy reasons -- set nomodified is only required to be set when nohidden is set
+com! -nargs=* Cb :cb
+com! -nargs=* GrepParse let oef=&errorformat | let &errorformat='%f:%l:%m' | :cb | let &errorformat=oef
 
 " allow modified buffers to be hidden
 set hidden
