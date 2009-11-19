@@ -24,12 +24,12 @@
 "
 
 " insert doxygen function header
-iabbr _DFH <C-R>=DoxyFuncComment()<CR><ESC>XXi*<esc>?\\brief<CR>A
+"iabbr _DFH <C-R>=DoxyFuncComment()<CR><ESC>XXi*<esc>?\\brief<CR>A
 " insert only parameter list (can be used if param list changed)
-iabbr _DFHp <SPACE><C-R>=DoxyParamList()<CR>
+"iabbr _DFHp <SPACE><C-R>=DoxyParamList()<CR>
 
 " insert doxygen file header
-iabbr _DMH <C-R>=DoxyFileComment()<CR><ESC>XXi*<esc>?\\brief<CR>A
+"iabbr _DMH <C-R>=DoxyFileComment()<CR><ESC>XXi*<esc>?\\brief<CR>A
 
 if !exists("g:fullid")
     let g:fullid = 'Developer name not set. Set it in "g:fullid"'
