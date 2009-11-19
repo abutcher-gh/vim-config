@@ -98,10 +98,17 @@ syn match cTodo contained /\(TODO\)\|\(FIXME\)\|\(XXX\)\|\(\\todo\)/
 syn region cppErrorText matchgroup=Preproc start="#\s*error\s" end="$"
 hi def link cppErrorText WarningMsg
 
-syn match cppCast		"\<assert_\(static_\)\?cast\s*<"me=e-1
-syn match cppCast		"\<assert_\(static_\)\?cast\s*$"
-syn match cppCast		"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*<"me=e-1
-syn match cppCast		"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*$"
+syn match cppCast	"\<assert_\(static_\)\?cast\s*<"me=e-1
+syn match cppCast	"\<assert_\(static_\)\?cast\s*$"
+syn match cppCast	"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*<"me=e-1
+syn match cppCast	"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*$"
+
+syn match Special	"\<\(OpaqueLock\|[Ss]cope\(Acquire\|Relinquish\)\|\([Aa]cquire\|[Rr]el\(ease\|inquish\)\)[A-Za-z]*Lock\)\>"
+syn match Special	"\<\(shared\|upgrade\|upgrade_to_unique\|unique\)_lock\>"
+
+syn match Special	"\<\([Ll]\|[Uu]nl\)ock\s*("me=e-1
+syn match Special	"\<move\s*("me=e-1
+syn match Special	"\<forward\s*<"me=e-1
 
 syn match cppScopeRes "::"
 hi def link cppScopeRes Special
