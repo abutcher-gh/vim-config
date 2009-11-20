@@ -56,8 +56,8 @@ syn match cGhost /\(¯\)/ contained
 " highlight these differently
 syn match cdoxyMarkers contained /[\\@]\(end\)\?\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)/
 syn region cdoxyCode contained keepend start=/[\\@]\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/hs=e+1,rs=e+1 end=/[\\@]end\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/ contains=cdoxyRepeatedStar,cdoxyMarkers
-syn match cdoxyAngles contained /<[^A-Za-z0-9_"/]/hs=e+1
-syn match cdoxyAngles contained /[^A-Za-z0-9_"/]>/hs=e+1
+syn match cdoxyAngles contained /<[^A-Za-z0-9_"/-]/hs=e+1
+syn match cdoxyAngles contained /[^A-Za-z0-9_"/-]>/hs=e+1
 
 syn region cdoxyBound       keepend start="/\*[*!]\+" end="\*\+/" contains=cdoxySentanceOne,@cppCommentHtml,cdoxyTag,cdoxyBraceTagBold,cdoxyBraceTagEmph,cdoxyBraceTag,cdoxyTitle,cdoxyTagWithArg,cdoxyTagBold,cdoxyTagEmph,cdoxyCommentEmph,cdoxyCommentSpecial,cdoxyRepeatedStar,@cCommentGroup,cdoxyCode,cdoxyAngles,cdoxyUrl
 syn match  cComment     /\/\*\+\*\//
@@ -106,7 +106,7 @@ syn match cppCast	"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*$"
 syn match Special	"\<\(OpaqueLock\|[Ss]cope\(Acquire\|Relinquish\)\|\([Aa]cquire\|[Rr]el\(ease\|inquish\)\)[A-Za-z]*Lock\)\>"
 syn match Special	"\<\(shared\|upgrade\|upgrade_to_unique\|unique\)_lock\>"
 
-syn match Special	"\<\([Ll]\|[Uu]nl\)ock\s*("me=e-1
+syn match Special	"\(->\|[.]\)\s*\zs\([Ll]\|[Uu]nl\)ock\s*("me=e-1
 syn match Special	"\<move\s*("me=e-1
 syn match Special	"\<forward\s*<"me=e-1
 
