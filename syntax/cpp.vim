@@ -56,8 +56,8 @@ syn match cGhost /\(¯\)/ contained
 " highlight these differently
 syn match cdoxyMarkers contained /[\\@]\(end\)\?\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)/
 syn region cdoxyCode contained keepend start=/[\\@]\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/hs=e+1,rs=e+1 end=/[\\@]end\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/ contains=cdoxyRepeatedStar,cdoxyMarkers
-syn match cdoxyAngles contained /<[^A-Za-z0-9_"/-]/hs=e+1
-syn match cdoxyAngles contained /[^A-Za-z0-9_"/-]>/hs=e+1
+syn match cdoxyAngles contained /<[^A-Za-z0-9_()"/-]/hs=e+1
+syn match cdoxyAngles contained /[^A-Za-z0-9_()"/-]>/hs=e+1
 
 syn region cdoxyBound       keepend start="/\*[*!]\+" end="\*\+/" contains=cdoxySentanceOne,@cppCommentHtml,cdoxyTag,cdoxyBraceTagBold,cdoxyBraceTagEmph,cdoxyBraceTag,cdoxyTitle,cdoxyTagWithArg,cdoxyTagBold,cdoxyTagEmph,cdoxyCommentEmph,cdoxyCommentSpecial,cdoxyRepeatedStar,@cCommentGroup,cdoxyCode,cdoxyAngles,cdoxyUrl
 syn match  cComment     /\/\*\+\*\//
