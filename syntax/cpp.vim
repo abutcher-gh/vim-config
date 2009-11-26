@@ -110,7 +110,8 @@ syn match Special	"\(->\|[.]\)\s*\zs\([Ll]\|[Uu]nl\)ock\s*("me=e-1
 syn match Special	"\<move\s*("me=e-1
 syn match Special	"\<forward\s*<"me=e-1
 
-syn match Keyword	"\<\(auto_for\|for_auto\|foreach\)\>"
+syn keyword Keyword foreach
+syn keyword Keyword auto_for for_auto
 
 syn match cppScopeRes "::"
 hi def link cppScopeRes Special
