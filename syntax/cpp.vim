@@ -106,7 +106,7 @@ syn match cppCast	"\<\(reinterpret\|static\|const\|dynamic\)_pointer_cast\s*$"
 syn match Special	"\<\(OpaqueLock\|[Ss]cope\(Acquire\|Relinquish\)\|\([Aa]cquire\|[Rr]el\(ease\|inquish\)\)[A-Za-z]*Lock\)\>"
 syn match Special	"\<\(shared\|upgrade\|upgrade_to_unique\|unique\)_lock\>"
 
-syn match Special	"\(->\|[.]\)\s*\zs\([Ll]\|[Uu]nl\)ock\s*("me=e-1
+syn match Special	"\(->\|[.]\)\s*\zs\(\(Try\|try_\)\?[Ll]\|[Uu]nl\)ock\s*("me=e-1
 syn match Special	"\<move\s*("me=e-1
 syn match Special	"\<forward\s*<"me=e-1
 
