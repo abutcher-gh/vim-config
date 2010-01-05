@@ -642,10 +642,16 @@ set linespace=1 "pixel
 
 set nowrap " off by default
 set linebreak
-set showbreak=--\ 
 set sidescroll=5
 set sidescrolloff=1
 set listchars+=precedes:«,extends:»
+try
+   set breakindent
+   set breakindentshift=2
+   set showbreak=
+catch
+   set showbreak=--\ 
+endtry
 
 " toggle wrapping modes (real and display)
 " when display wrapping is on make cursor up/down move by
