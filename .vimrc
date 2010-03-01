@@ -803,17 +803,15 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 if has("autocmd")
-         
+
    " disable spell under some conditions
-   autocmd FileType diff setlocal nospell
+   autocmd FileType diff setlocal nospell comments=n:###,n:##,n:#,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO
    autocmd FileType git-diff setlocal nospell
    autocmd FileType patch setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
 
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
-
-   autocmd BufNewFile,BufRead *.git-diff set ft=git-diff nospell
 
    " Set some sensible defaults for editing C-files
    augroup clikeprog
@@ -824,7 +822,7 @@ if has("autocmd")
      "   For *.c and *.h files set formatting of comments and set C-indenting on.
      "   For other files switch it off.
      "   Don't change the order, it's important that the line with * comes first.
-     autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent comments&
+     autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent noautoindent comments&
      autocmd BufNewFile,BufRead *.gpp set filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead *.impl set filetype=cpp
      autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
@@ -832,13 +830,16 @@ if has("autocmd")
      autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
    augroup END
-   
+
+   autocmd BufNewFile,BufRead *.git-diff set ft=git-diff
+   autocmd BufNewFile,BufRead *.diff set ft=diff
+
    " Also, support editing of gzip-compressed files. DO NOT REMOVE THIS!
    " This is also used when loading the compressed helpfiles.
    augroup gzip
      " Remove all gzip autocommands
      au!
-   
+
      " Enable editing of gzipped files
      "     read:  set binary mode before reading the file
      "      uncompress text in buffer after reading
@@ -859,7 +860,7 @@ if has("autocmd")
      autocmd FileAppendPost      *.gz !mv <afile> <afile>:r
      autocmd FileAppendPost      *.gz !gzip <afile>:r
    augroup END
-   
+
    augroup bzip2
      " Remove all bzip2 autocommands
      au!
