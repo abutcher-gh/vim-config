@@ -474,6 +474,24 @@ function! ListAssociates( ArgLead, CmdLine, CursorPos )
 endfunction
 com! -bang -nargs=1 -complete=custom,ListAssociates EditAssociate :e<bang> <args>
 
+" Vertical split and edit the base filename (i.e. the filename without
+" extension.)  This is useful, for example, for jumping from a patch
+" reject such as file.xyz.rej to the file being patched (file.xyz).
+function! SplitEditBase()
+
+   if expand("%:e") == ""
+      echo "File '".expand("%:t")."' does not have an extension."
+      return
+   endif
+
+   let basefile=expand("%:p:r:")
+   try
+      vs `=basefile`
+   catch
+      echo "File '" . basefile . "' could not be opened."
+   endtry
+
+endfunction
 
 " some keys for normal-mode file navigation
 "
@@ -487,6 +505,8 @@ map <silent> <A-.> :call PushInclude(0)<CR>
 map <silent> <A-<Bar>> :call PushInclude(1)<CR>
 map <silent> <A-,> :call PopInclude()<CR>
 map <silent> <A-/> :call EditAssociate()<CR>
+map <silent> <A-?> :call SplitEditBase()<CR>
+
 "
 " ALT/META <A-*>/<M-*> only works in an environment supporting
 " keyboard modifiers (e.g. in X or Windows).  The two character
@@ -502,7 +522,8 @@ map <silent> \. :call PushInclude(0)<CR>
 map <silent> <Bar>> :call PushInclude(1)<CR>
 map <silent> \, :call PopInclude()<CR>
 map <silent> \/ :call EditAssociate()<CR>
-map <silent> \<Tab> :EditAssociate<Space>
+map <silent> <Bar>? :call SplitEditBase()<CR>
+map \<Tab> :EditAssociate<Space>
 
 " focus previously focused window
 map <silent> <Tab> 
