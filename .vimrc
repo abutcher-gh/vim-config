@@ -484,12 +484,15 @@ function! SplitEditBase()
       return
    endif
 
+   let oldspr = &splitright
    let basefile=expand("%:p:r:")
    try
+      set splitright
       vs `=basefile`
    catch
       echo "File '" . basefile . "' could not be opened."
    endtry
+   let &splitright = oldspr
 
 endfunction
 
