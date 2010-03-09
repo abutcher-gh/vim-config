@@ -487,7 +487,7 @@ function! SplitEditBase()
    let oldspr = &splitright
    let basefile=expand("%:p:r:")
 
-   if !exists(basefile)
+   if !filereadable(basefile)
       echo "No such file '".basefile."' exists."
       return
    endif

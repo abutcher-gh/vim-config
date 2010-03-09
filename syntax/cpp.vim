@@ -146,6 +146,7 @@ syn keyword cppBoostPP BOOST_PP_SUB BOOST_PP_SUB_D  BOOST_PP_TUPLE_EAT BOOST_PP_
 syn keyword cppBoostPP BOOST_PP_VALUE  BOOST_PP_WHILE BOOST_PP_WHILE_ BOOST_PP_WSTRINGIZE  BOOST_PP_XOR
 
 syn match cppBoostPP /#.*BOOST_PP_IS_ITERATING.*$/
+syn match cppBoostPP /#.*BOOST_PP_ITERATE\>.*$/
 
 hi def link cppBoostPP WarningMsg
 
