@@ -445,6 +445,23 @@ function! EditAssociate() range
 
 endfunction
 
+function! MkdirAndEdit( file )
+
+   let dir=fnamemodify(expand(a:file), ":h")
+   let file=fnamemodify(expand(a:file), ":t")
+
+   if !isdirectory(dir)
+      if inputdialog("Create directory '".dir."' for file '".file."'? ", "y") == "y"
+         :call mkdir(dir, "p")
+      else
+         echo "Ignored."
+         return
+      endif
+   endif
+   :exe ":e ".expand(a:file)
+
+endfunction
+
 function! ListAssociates( ArgLead, CmdLine, CursorPos )
    
    let rc=""
@@ -472,7 +489,7 @@ function! ListAssociates( ArgLead, CmdLine, CursorPos )
    return rc
 
 endfunction
-com! -bang -nargs=1 -complete=custom,ListAssociates EditAssociate :e<bang> <args>
+com! -bang -nargs=1 -complete=custom,ListAssociates EditAssociate :call MkdirAndEdit(<q-args>)
 
 " Vertical split and edit the base filename (i.e. the filename without
 " extension.)  This is useful, for example, for jumping from a patch
