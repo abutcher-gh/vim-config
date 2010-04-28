@@ -829,6 +829,10 @@ function! SetTerminalHighlighting()
    \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan'
    \.'| hi SpellRare  term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta'
 
+   if exists(':Hreload')
+      Hreload
+   endif
+
 endfunction 
 
 " convenience for reloading cursor colors if changing color-scheme

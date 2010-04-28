@@ -56,6 +56,14 @@ function! LoadHighlights()
   endif
 endfunction
 
+
+function! ReloadHighlights()
+  let s:loaded_data = 0
+  call LoadHighlights()
+endfunction
+command! Hreload call ReloadHighlights()
+
+
 " Return last visually selected text or '\<cword\>'.
 " what = 1 (selection), or 2 (cword), or 0 (guess if 1 or 2 is wanted).
 function! s:Pattern(what)
