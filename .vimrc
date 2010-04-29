@@ -999,6 +999,17 @@ endfunction
 command! GNUStyle call GNUStyle()
 
 
+function! LogView()
+   colorscheme moria
+   Colo dark
+   GuiColo moria
+   set ft=asm
+   set nospell
+   normal \m
+endfunction
+command! LogView call LogView()
+
+
 " lighten up control characters
 hi SpecialKey guifg=gray
 
