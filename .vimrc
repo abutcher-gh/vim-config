@@ -1000,9 +1000,14 @@ command! GNUStyle call GNUStyle()
 
 
 function! LogView()
-   colorscheme moria
-   Colo dark
-   GuiColo moria
+   if &term != 'linux' && &t_Co == '256'
+      runtime plugin/guicolorscheme.vim
+      set bg=dark
+      GuiColorScheme moria
+   else
+      colorscheme default
+      set bg=dark
+   endif
    set ft=asm
    set nospell
    normal \m
