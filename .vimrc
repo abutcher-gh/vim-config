@@ -582,6 +582,8 @@ map <F5>   :cw<CR>
 map <S-F6> :cp<CR>
 map <F6>   :cn<CR>
 map <F7>   :cp<CR>
+map <F8>   :cnf<CR>
+map <F9>   :cpf<CR>
 " 
 " typelist window
 "
