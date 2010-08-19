@@ -59,12 +59,12 @@ function! Repath()
    " stick the C++ include path into Vim's file navigation search path
    if $OS =~ "Windows"
       if $USE_GCC == "1"
-         let &path = ".," . substitute($CPLUS_INCLUDE_PATH, ';', ',', 'g') . &path
+         let &path = ".," . substitute($CPATH.';'.$CPLUS_INCLUDE_PATH, ';', ',', 'g') . &path
       else
          let &path = ".," . substitute($INCLUDE, ';', ',', 'g') . &path
       endif
    else
-      let &path = ".," . substitute($CPLUS_INCLUDE_PATH, ':', ',', 'g') . &path
+      let &path = ".," . substitute($CPATH.':'.$CPLUS_INCLUDE_PATH, ':', ',', 'g') . &path
    endif
 
 endfunction
@@ -189,14 +189,14 @@ if &diff
 endif
 " add some shortcuts
 " next and prev change
-map <Bar><Down> ]c
-map <Bar><Up> [c
+nmap <Bar><Down> ]c
+nmap <Bar><Up> [c
 " pull and push change
-map \g :diffget<CR>
-map \p :diffput<CR>
-map \n ]c
-map <Bar>N [c
-map \z :diffupdate<CR>
+nmap \g :diffget<CR>
+nmap \p :diffput<CR>
+nmap \n ]c
+nmap <Bar>N [c
+nmap \z :diffupdate<CR>
 
 " remove some unnecessary gui bits
 set go-=m
@@ -238,10 +238,10 @@ let Tlist_Use_SingleClick=1
 let Tlist_Inc_Winwidth=0
 
 " some macros to manage buffers
-map - :bp<CR>
-map = :bn<CR>
-map _ :bd<CR>
-map + :w<CR>:bn<CR>
+nmap - :bp<CR>
+nmap = :bn<CR>
+nmap _ :bd<CR>
+nmap + :w<CR>:bn<CR>
 
 " some macros to manage folds
 "
@@ -254,14 +254,14 @@ map + :w<CR>:bn<CR>
 "   open all folds at all levels
 "   close all folds at all levels
 "
-map f<Left> zc
-map f<Right> zo
-map f<Up> zC
-map f<Down> zO
-map f<PageUp> zr
-map f<PageDown> zm
-map f<Ins> zR
-map f<Del> zM
+nmap f<Left> zc
+nmap f<Right> zo
+nmap f<Up> zC
+nmap f<Down> zO
+nmap f<PageUp> zr
+nmap f<PageDown> zm
+nmap f<Ins> zR
+nmap f<Del> zM
 
 function! GetRelativePath( BasePath, TargetPath )
 
@@ -526,12 +526,12 @@ endfunction
 "  A-,  --  return to the previous file on the navigation stack
 "  A-/  --  switch to an associated file if it exists (h->cpp, cpp->h etc.)
 "
-map <silent> <A-\> :call EditParent()<CR>
-map <silent> <A-.> :call PushInclude(0)<CR>
-map <silent> <A-<Bar>> :call PushInclude(1)<CR>
-map <silent> <A-,> :call PopInclude()<CR>
-map <silent> <A-/> :call EditAssociate()<CR>
-map <silent> <A-?> :call SplitEditBase()<CR>
+nmap <silent> <A-\> :call EditParent()<CR>
+nmap <silent> <A-.> :call PushInclude(0)<CR>
+nmap <silent> <A-<Bar>> :call PushInclude(1)<CR>
+nmap <silent> <A-,> :call PopInclude()<CR>
+nmap <silent> <A-/> :call EditAssociate()<CR>
+nmap <silent> <A-?> :call SplitEditBase()<CR>
 
 "
 " ALT/META <A-*>/<M-*> only works in an environment supporting
@@ -543,17 +543,17 @@ map <silent> <A-?> :call SplitEditBase()<CR>
 " all you need is to hold shift whilst using the normal goto
 " sequence
 "
-map <silent> \\ :call EditParent()<CR>
-map <silent> \. :call PushInclude(0)<CR>
-map <silent> <Bar>> :call PushInclude(1)<CR>
-map <silent> \, :call PopInclude()<CR>
-map <silent> \/ :call EditAssociate()<CR>
-map <silent> <Bar>? :call SplitEditBase()<CR>
-map \<Tab> :EditAssociate<Space>
+nmap <silent> \\ :call EditParent()<CR>
+nmap <silent> \. :call PushInclude(0)<CR>
+nmap <silent> <Bar>> :call PushInclude(1)<CR>
+nmap <silent> \, :call PopInclude()<CR>
+nmap <silent> \/ :call EditAssociate()<CR>
+nmap <silent> <Bar>? :call SplitEditBase()<CR>
+nmap \<Tab> :EditAssociate<Space>
 
 " focus previously focused window
-map <silent> <Tab> 
-map <silent> <C-Tab> 
+nmap <silent> <Tab> 
+nmap <silent> <C-Tab> 
 
 " window resizing
 if !exists('g:winresizestep')
@@ -565,10 +565,10 @@ function! ResizeWin(orient,op) range
    endif
    exe ':'.a:orient.' resize '.a:op.g:winresizestep
 endfunction
-map <silent> \<Left> :call ResizeWin('vertical','-')<CR>
-map <silent> \<Right> :call ResizeWin('vertical','+')<CR>
-map <silent> \<Up> :call ResizeWin('','+')<CR>
-map <silent> \<Down> :call ResizeWin('','-')<CR>
+nmap <silent> \<Left> :call ResizeWin('vertical','-')<CR>
+nmap <silent> \<Right> :call ResizeWin('vertical','+')<CR>
+nmap <silent> \<Up> :call ResizeWin('','+')<CR>
+nmap <silent> \<Down> :call ResizeWin('','-')<CR>
 
 " re-source vimrc
 com! Reinit :runtime! .vimrc
@@ -577,35 +577,35 @@ com! Reinit :runtime! .vimrc
 "
 " open/close error log and navigate log messages
 "
-map <S-F5> :cclose<CR>
-map <F5>   :cw<CR>
-map <S-F6> :cp<CR>
-map <F6>   :cn<CR>
-map <F7>   :cp<CR>
+nmap <S-F5> :cclose<CR>
+nmap <F5>   :cw<CR>
+nmap <S-F6> :cp<CR>
+nmap <F6>   :cn<CR>
+nmap <F7>   :cp<CR>
 map <F8>   :cnf<CR>
 map <F9>   :cpf<CR>
 " 
 " typelist window
 "
-map <F10>  :TlistSync<CR>
-map <F11>  :Tlist<CR>
+nmap <F10>  :TlistSync<CR>
+nmap <F11>  :Tlist<CR>
 "
 " tag traversal -- forward, backward and list-matches
 "
-map \] <C-]>
-map \[ <C-T>
-map \# :ts<CR>
-map \= :tn<CR>
-map \- :tp<CR>
+nmap \] <C-]>
+nmap \[ <C-T>
+nmap \# :ts<CR>
+nmap \= :tn<CR>
+nmap \- :tp<CR>
 "
 " holding shift when stepping in opens a new window
 "
-map <Bar>} <C-w><C-]>
+nmap <Bar>} <C-w><C-]>
 "
 " launch viewtex on the current file (only makes sense in an
 " environment which can show the resulting document graphically.
 "
-map <F12>  :!viewtex %<CR>
+nmap <F12>  :!viewtex %<CR>
 
 " virtual edit
 function! ToggleVirtualEdit(option)
@@ -615,7 +615,62 @@ function! ToggleVirtualEdit(option)
       exe ":set ve+=" . a:option
    endif
 endfunction
-map \v :call ToggleVirtualEdit('all')<CR>
+nmap \v :call ToggleVirtualEdit('all')<CR>
+
+function! ReexpandTab(from, to) range
+   let oldet = &expandtab
+   let oldts = &ts
+   let &ts = a:from
+   set noexpandtab
+   exe ":".a:firstline.",".a:lastline." retab!"
+   let &ts = a:to
+   set expandtab
+   exe ":".a:firstline.",".a:lastline." retab"
+   let &ts = oldts
+   let &expandtab = oldet
+endfunction
+command! -nargs=* -range=% ReexpandTab :<line1>,<line2> call ReexpandTab(<f-args>)
+
+function! OpenNamedWindow(name)
+   let winnum = bufwinnr(a:name)
+   if winnum != -1
+      " Jump to the existing window
+      if winnr() != winnum
+         exe winnum . 'wincmd w'
+         return 0
+      endif
+   else
+      " Create a new window.
+      " If the named buffer already exists, then reuse it.
+      " Otherwise create a new buffer
+      let bufnum = bufnr(a:name)
+      if bufnum == -1
+         " Create a new buffer
+         let wcmd = a:name
+      else
+         " Edit the existing buffer
+         let wcmd = '+buffer' . bufnum
+      endif
+
+      " Create the named window vertically split
+      exe 'silent! vs ' . wcmd
+      return 1
+   endif
+endfunction
+
+" Show the git commit-ish under the cursor in a git-show-output window
+" set to filetype git-diff with all folds opened
+"
+" Use \s to show the commit and activate the window.
+" Use shift-{\s} (i.e. |S or <Bar>S) to jump back to the source window.
+"
+" Use a count to open a distinct window to allow multiple views
+" I.e. 2\s will use git-show-output-2
+"      5\s will use git-show-output-5
+"      \s, 0\s, 1\s will use git-show-output-1
+"
+command! -range -nargs=1 GitShow let winnum = winnr() | let commit = expand(<q-args>) | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git show '.commit | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
+nmap <silent> \s :GitShow <cword><CR>
 
 " This contorted, but portable, perl pipe
 " gives rapid feedback including any ansi
@@ -706,7 +761,7 @@ endtry
 " when display wrapping is on make cursor up/down move by
 " display line rather than real line.
 
-map  <silent> <F2> :call ToggleDisplayWrap()<CR>
+nmap <silent> <F2> :call ToggleDisplayWrap()<CR>
 imap <silent> <F2> <C-O><F2><C-O>:sleep 300m<CR>
 function! ToggleDisplayWrap()
   if &wrap
@@ -741,7 +796,7 @@ endfunction
 let g:default_textwidth = 70
 let &textwidth = g:default_textwidth
 
-map  <silent> <F3> :call ToggleTextWrap()<CR>
+nmap <silent> <F3> :call ToggleTextWrap()<CR>
 imap <silent> <F3> <C-O><F3><C-O>:sleep 300m<CR>
 function! ToggleTextWrap()
   if &textwidth == 0
@@ -797,7 +852,8 @@ if !exists("g:set_error_format")
      \ . ',%DMaking %*\a in %f'
      \ . ',%f|%l| %m'
      \ . ',%m %f:%l:'
-   let &errorformat = substitute( &errorformat, '%\([flc]\)', '%\\%%([%.%\\{-}m%\\)%#%\1%\\%%([%.%\\{-}m%\\)%#', 'g' )
+   let &errorformat = substitute( &errorformat, '%[.flc]',   '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
+   let &errorformat = substitute( &errorformat, '%\*\\[ad]', '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""
