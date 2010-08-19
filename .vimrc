@@ -1006,7 +1006,7 @@ function! LogView()
       runtime plugin/guicolorscheme.vim
       set bg=dark
       GuiColorScheme moria
-   else
+   elseif &term != 'builtin_gui'
       colorscheme default
       set bg=dark
    endif
