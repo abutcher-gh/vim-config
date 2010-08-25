@@ -831,9 +831,18 @@ set ruler
 " show matching parenthesise.
 set showmatch
 
-" ignore escape color sequences in quick-fix window.
-" this accepts n color escape sequences before and after file, line and
-" column refs.
+" Ignore superfluous character sequences in error lists to allow correct
+" parsing of errors for the quick-fix window.  Superfluous character
+" sequences include:
+"   *  ansi color escape sequences
+"   *  "[pid] " prefixes (including ones colored by ansi sequences)
+" This accepts n color escape sequences before and after file, line and
+" column refs as well as around directory names.
+"
+" This makes for huge processor-intensive match patterns; it would be
+" nicer if vim provided another variable, say errorfilter, for
+" preprocessing each line of error prior to matching with errorformat.
+"
 if !exists("g:set_error_format")
    let g:set_error_format = 1
    let &errorformat = '%*[^"]"%f"%*\D%l: %m'
@@ -852,6 +861,7 @@ if !exists("g:set_error_format")
      \ . ',%DMaking %*\a in %f'
      \ . ',%f|%l| %m'
      \ . ',%m %f:%l:'
+   let &errorformat = substitute( &errorformat, '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)', '\1%\\%%([%*\\d]%\\)%\\? %#', 'g' )
    let &errorformat = substitute( &errorformat, '%[.flc]',   '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
    let &errorformat = substitute( &errorformat, '%\*\\[ad]', '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
 endif
