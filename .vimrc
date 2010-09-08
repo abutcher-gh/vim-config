@@ -861,7 +861,7 @@ if !exists("g:set_error_format")
      \ . ',%DMaking %*\a in %f'
      \ . ',%f|%l| %m'
      \ . ',%m %f:%l:'
-   let &errorformat = substitute( &errorformat, '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)', '\1%\\%%([%*\\d]%\\)%\\? %#', 'g' )
+   let &errorformat = substitute( &errorformat, '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)', '\1%\\%%([ %#%*\\d]%\\)%\\? %#', 'g' )
    let &errorformat = substitute( &errorformat, '%[.flc]',   '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
    let &errorformat = substitute( &errorformat, '%\*\\[ad]', '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
 endif
@@ -1077,6 +1077,7 @@ function! LogView()
       set bg=dark
    endif
    set ft=asm
+   set ts=10
    set nospell
    normal \m
 endfunction
