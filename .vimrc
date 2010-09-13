@@ -847,6 +847,8 @@ if !exists("g:set_error_format")
    let g:set_error_format = 1
    let &errorformat = '%*[^"]"%f"%*\D%l: %m'
      \ . ',%f"%*\D%l: %m'
+     \ . ',%+G%m %f:%l:'
+     \ . ',%+G%m %f:%l\,'
      \ . ',%-G%f:%l: (Each undeclared identifier is reported only once'
      \ . ',%-G%f:%l: for each function it appears in.)'
      \ . ',%f:%l:%c:%m'
@@ -860,7 +862,6 @@ if !exists("g:set_error_format")
      \ . ',%X%*\a[%*\d]: Leaving directory %.%f%.'
      \ . ',%DMaking %*\a in %f'
      \ . ',%f|%l| %m'
-     \ . ',%m %f:%l:'
    let &errorformat = substitute( &errorformat, '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)', '\1%\\%%([ %#%*\\d]%\\)%\\? %#', 'g' )
    let &errorformat = substitute( &errorformat, '%[.flc]',   '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
    let &errorformat = substitute( &errorformat, '%\*\\[ad]', '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
