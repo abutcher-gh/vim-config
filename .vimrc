@@ -597,7 +597,7 @@ com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
 "
 nmap <silent> <S-F5> :cclose<CR>
 nmap <silent> <Leader><F5> :cclose<CR>
-nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>J
+nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>Jzz
 nmap <silent> <S-F6> :cp<CR>:call CondCenterView()<CR>
 nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
 nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
