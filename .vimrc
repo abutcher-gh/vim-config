@@ -596,7 +596,8 @@ com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
 " open/close error log and navigate log messages
 "
 nmap <silent> <S-F5> :cclose<CR>
-nmap <silent> <F5>   :cw<CR>:call CondCenterView()<CR>
+nmap <silent> <Leader><F5> :cclose<CR>
+nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>J
 nmap <silent> <S-F6> :cp<CR>:call CondCenterView()<CR>
 nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
 nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
