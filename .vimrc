@@ -866,7 +866,8 @@ set showmatch
 "
 if !exists("g:set_error_format")
    let g:set_error_format = 1
-   let &errorformat = '%*[^"]"%f"%*\D%l: %m'
+   let &errorformat
+     \ = '%*[^"]"%f"%*\D%l: %m'
      \ . ',%f"%*\D%l: %m'
      \ . ',%+G%m %f:%l:'
      \ . ',%+G%m %f:%l\,'
@@ -1064,7 +1065,7 @@ elseif &term != '' && &term !~ 'gui' && &term != 'win32'
    set bg=dark
    if &term != 'linux' && &t_Co == '256'
       runtime plugin/guicolorscheme.vim
-      set bg=light
+      "set bg=light
       GuiColorScheme moria
    else
       colorscheme default
