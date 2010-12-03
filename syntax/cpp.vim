@@ -112,6 +112,10 @@ syn match Special	"\<forward\s*<"me=e-1
 
 syn keyword Keyword foreach
 syn keyword Keyword auto_for for_auto
+syn keyword Keyword	thread_local
+syn keyword Keyword	alignof
+
+syn keyword Type	constexpr
 
 syn match cppScopeRes "::"
 hi def link cppScopeRes Special

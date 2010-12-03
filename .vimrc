@@ -573,17 +573,35 @@ nmap <silent> \<Down> :call ResizeWin('','-')<CR>
 " re-source vimrc
 com! Reinit :runtime! .vimrc
 
+if !exists("g:center_view_on_jump")
+   let g:center_view_on_jump = 1 " XXX: is enabled the best default?
+endif
+function! CondCenterView()
+   if g:center_view_on_jump
+      normal zz
+   endif
+endfunction
+function! ToggleCenterViewOnJump()
+   let g:center_view_on_jump = !g:center_view_on_jump
+   if g:center_view_on_jump
+      echo "Center view on jump is enabled."
+   else
+      echo "Center view on jump is disabled."
+   endif
+endfunction
+com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
+
 " some function key macros
 "
 " open/close error log and navigate log messages
 "
-nmap <S-F5> :cclose<CR>
-nmap <F5>   :cw<CR>
-nmap <S-F6> :cp<CR>
-nmap <F6>   :cn<CR>
-nmap <F7>   :cp<CR>
-map <F8>   :cnf<CR>
-map <F9>   :cpf<CR>
+nmap <silent> <S-F5> :cclose<CR>
+nmap <silent> <F5>   :cw<CR>:call CondCenterView()<CR>
+nmap <silent> <S-F6> :cp<CR>:call CondCenterView()<CR>
+nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
+nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
+map <silent> <F8>   :cnf<CR>:call CondCenterView()<CR>
+map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
 " 
 " typelist window
 "
