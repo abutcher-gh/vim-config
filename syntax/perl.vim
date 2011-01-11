@@ -74,8 +74,11 @@ if exists("perl_fold") && exists("perl_fold_blocks")
   syn match perlConditional		"\<elsif\>"
   syn match perlConditional		"\<unless\>"
   syn match perlConditional		"\<else\>" nextgroup=perlElseIfError skipwhite skipnl skipempty
+  syn match perlConditional		"\<given\>"
+  syn match perlConditional		"\<when\>"
+  syn match perlConditional		"\<default\>"
 else
-  syn keyword perlConditional		if elsif unless
+  syn keyword perlConditional		if elsif unless given when default
   syn keyword perlConditional		else nextgroup=perlElseIfError skipwhite skipnl skipempty
 endif
 syn keyword perlConditional		switch eq ne gt lt ge le cmp not and or xor err
@@ -86,18 +89,19 @@ if exists("perl_fold") && exists("perl_fold_blocks")
   syn match perlRepeat			"\<do\>"
   syn match perlRepeat			"\<until\>"
   syn match perlRepeat			"\<continue\>"
+  syn match perlRepeat			"\<break\>"
 else
-  syn keyword perlRepeat		while for foreach do until continue
+  syn keyword perlRepeat		while for foreach do until continue break
 endif
 syn keyword perlOperator		defined undef and or not bless ref
 if exists("perl_fold")
   " if BEGIN/END would be a keyword the perlBEGINENDFold does not work
-  syn match perlControl			"\<BEGIN\|CHECK\|INIT\|END\>" contained
+  syn match perlControl			"\<BEGIN\|CHECK\|INIT\|END\|UNITCHECK\>" contained
 else
-  syn keyword perlControl		BEGIN END CHECK INIT
+  syn keyword perlControl		BEGIN END CHECK INIT UNITCHECK
 endif
 
-syn keyword perlStatementStorage	my local our
+syn keyword perlStatementStorage	my local our state
 syn keyword perlStatementControl	goto return last next redo
 syn keyword perlStatementScalar		chomp chop chr crypt index lc lcfirst length ord pack reverse rindex sprintf substr uc ucfirst
 syn keyword perlStatementRegexp		pos quotemeta split study
@@ -105,7 +109,7 @@ syn keyword perlStatementNumeric	abs atan2 cos exp hex int log oct rand sin sqrt
 syn keyword perlStatementList		splice unshift shift push pop split join reverse grep map sort unpack
 syn keyword perlStatementHash		each exists keys values tie tied untie
 syn keyword perlStatementIOfunc		carp confess croak dbmclose dbmopen die syscall
-syn keyword perlStatementFiledesc	binmode close closedir eof fileno getc lstat print printf readdir readline readpipe rewinddir select stat tell telldir write nextgroup=perlFiledescStatementNocomma skipwhite
+syn keyword perlStatementFiledesc	binmode close closedir eof fileno getc lstat print printf readdir readline readpipe rewinddir select stat tell telldir write nextgroup=perlFiledescStatementNocomma skipwhite say
 syn keyword perlStatementFiledesc	fcntl flock ioctl open opendir read seek seekdir sysopen sysread sysseek syswrite truncate nextgroup=perlFiledescStatementComma skipwhite
 syn keyword perlStatementVector		pack vec
 syn keyword perlStatementFiles		chdir chmod chown chroot glob link mkdir readlink rename rmdir symlink umask unlink utime
