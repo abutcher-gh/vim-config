@@ -591,6 +591,9 @@ function! ToggleCenterViewOnJump()
 endfunction
 com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
 
+nmap <silent> \; [{zz
+nmap <silent> \' :call search('{')<CR>zz
+
 " some function key macros
 "
 " open/close error log and navigate log messages
