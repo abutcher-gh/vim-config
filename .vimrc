@@ -624,10 +624,25 @@ nmap \- :tp<CR>
 "
 nmap <Bar>} <C-w><C-]>
 "
-" launch viewtex on the current file (only makes sense in an
-" environment which can show the resulting document graphically.
+" Launch viewtex on the current file (only makes sense in an
+" environment which can show the resulting document graphically; e.g. 
+" over an X11 connection or on windows).  Arguments given are
+" persistent such that a subsequent launch without arguments will use
+" those set previously.  Launching with only '--' resets the persisted
+" arguments.
 "
-nmap <F12>  :!viewtex %<CR>
+function! ViewTeX(...)
+   let a = join(a:000, ' ')
+   if a == '--'
+      let g:viewtexargs = ''
+   elseif a != ''
+      let g:viewtexargs = a
+   endif
+   exe ":!viewtex ".g:viewtexargs." ".expand("%")
+endfunction
+command! -nargs=* ViewTeX call ViewTeX(<f-args>)
+
+nmap <F12> :ViewTeX<CR>
 
 " virtual edit
 function! ToggleVirtualEdit(option)
