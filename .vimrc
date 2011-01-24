@@ -631,6 +631,7 @@ nmap <Bar>} <C-w><C-]>
 " those set previously.  Launching with only '--' resets the persisted
 " arguments.
 "
+let g:viewtexargs = ''
 function! ViewTeX(...)
    let a = join(a:000, ' ')
    if a == '--'
