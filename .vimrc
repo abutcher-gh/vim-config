@@ -639,7 +639,7 @@ function! ViewTeX(...)
    elseif a != ''
       let g:viewtexargs = a
    endif
-   exe ":!viewtex ".g:viewtexargs." ".expand("%")
+   call CexLive("viewtex --verbose ".g:viewtexargs." ".expand("%"))
 endfunction
 command! -nargs=* ViewTeX call ViewTeX(<f-args>)
 
@@ -718,7 +718,7 @@ nmap <silent> \s :GitShow <cword><CR>
 if $OS !~ "Windows"
    let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 else
-   let &shellpipe='2>&1| perl -e "$|=1; open OUT, """^> ${ARGV[0]}"""; use IO::Handle; OUT->autoflush; while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; $s=~s/[^m]*m//g; print $s; print OUT $s; }; close OUT;" '
+   let &shellpipe='2>&1| '.substitute(findfile('bin/wintee.exe', &rtp), '[\\/]\+', '/', 'g').' '
 endif
 
 " This used to :cex tee'd through a system-specific pipe to show live
