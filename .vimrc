@@ -718,7 +718,13 @@ nmap <silent> \s :GitShow <cword><CR>
 if $OS !~ "Windows"
    let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 else
-   let &shellpipe='2>&1| '.substitute(findfile('bin/wintee.exe', &rtp), '[\\/]\+', '/', 'g').' '
+   for i in split(&rtp,',')
+      let wintee = i.'/bin/wintee'
+      if executable(wintee)
+         let &shellpipe='2>&1| "'.wintee.'" '
+         break
+      endif
+   endfor
 endif
 
 " This used to :cex tee'd through a system-specific pipe to show live
