@@ -1099,7 +1099,7 @@ elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
 else
 
-   colorscheme default
+   colorscheme moria
    set bg=light
 
 endif
