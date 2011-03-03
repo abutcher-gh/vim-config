@@ -42,6 +42,7 @@ syn match cdoxyTagOptions    contained /\[[^\]]*\]/
 syn match cdoxyTagBold       contained /[\\@]\(c\|b\|d\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn match cdoxyTagEmph       contained /[\\@]\(e\|t\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn match cdoxyTagWithArg    contained /[\\@]\(al\?\|\(sub\)\?page\|anchor\|ref\|itemref\|t\?param\|class\|struct\|namespace\|fn\|\(sub\)*section\|defgroup\|ingroup\|copyd\(oc\|etail\)\|see\|sa\|throws\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
+syn match cdoxyTagWithArg    contained /#\S\+/hs=s+1
 syn region cdoxyBraceTag     contained keepend start=/[\\@]\([A-Za-z_]\+\){/  end=/}/       contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagBold contained keepend start=/[\\@]\(b_\|d_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagEmph contained keepend start=/[\\@]\(e_\|t_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
