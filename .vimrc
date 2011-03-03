@@ -710,8 +710,9 @@ endfunction
 command! -range -nargs=1 GitShow let winnum = winnr() | let commit = expand(<q-args>) | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git log --patch-with-stat -n1 '.commit | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> \s :GitShow <cword><CR>
 nmap <silent> \h :GitShow HEAD<CR>
-command! -range GitShowStaged let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff --staged' | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
-nmap <silent> <Bar>S :GitShowStaged<CR>
+command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff '.<q-args> | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
+nmap <silent> <Bar>S :GitShowDiff --staged<CR>
+nmap <silent> <Bar>H :GitShowDiff<CR>
 
 " This contorted, but portable, perl pipe
 " gives rapid feedback including any ansi
@@ -1093,7 +1094,7 @@ elseif &term != '' && &term !~ 'gui' && &term != 'win32'
    set bg=dark
    if &term != 'linux' && &t_Co == '256'
       runtime plugin/guicolorscheme.vim
-      "set bg=light
+      set bg=light
       GuiColorScheme moria
    else
       colorscheme default
