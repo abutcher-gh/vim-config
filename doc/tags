@@ -7,6 +7,9 @@
 :CVSWatchOn	vcscommand.txt	/*:CVSWatchOn*
 :CVSWatchRemove	vcscommand.txt	/*:CVSWatchRemove*
 :CVSWatchers	vcscommand.txt	/*:CVSWatchers*
+:HLT	hilinks.txt	/*:HLT*
+:HLT!	hilinks.txt	/*:HLT!*
+:HLTm	hilinks.txt	/*:HLTm*
 :VCSAdd	vcscommand.txt	/*:VCSAdd*
 :VCSAnnotate	vcscommand.txt	/*:VCSAnnotate*
 :VCSBlame	vcscommand.txt	/*:VCSBlame*
@@ -146,6 +149,13 @@ g:vimwiki_smartCR	vimwiki.txt	/*g:vimwiki_smartCR*
 g:vimwiki_stripsym	vimwiki.txt	/*g:vimwiki_stripsym*
 g:vimwiki_syntax	vimwiki.txt	/*g:vimwiki_syntax*
 g:vimwiki_upper	vimwiki.txt	/*g:vimwiki_upper*
+hilinks	hilinks.txt	/*hilinks*
+hilinks-contents	hilinks.txt	/*hilinks-contents*
+hilinks-copyright	hilinks.txt	/*hilinks-copyright*
+hilinks-history	hilinks.txt	/*hilinks-history*
+hilinks-manual	hilinks.txt	/*hilinks-manual*
+hilinks.txt	hilinks.txt	/*hilinks.txt*
+hlt	hilinks.txt	/*hlt*
 taglist-commands	taglist.txt	/*taglist-commands*
 taglist-configure	taglist.txt	/*taglist-configure*
 taglist-extend	taglist.txt	/*taglist-extend*

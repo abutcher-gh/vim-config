@@ -42,12 +42,11 @@ syn match cdoxyTagOptions    contained /\[[^\]]*\]/
 syn match cdoxyTagBold       contained /[\\@]\(c\|b\|d\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn match cdoxyTagEmph       contained /[\\@]\(e\|t\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
 syn match cdoxyTagWithArg    contained /[\\@]\(al\?\|\(sub\)\?page\|anchor\|ref\|itemref\|t\?param\|class\|struct\|namespace\|fn\|\(sub\)*section\|defgroup\|ingroup\|copyd\(oc\|etail\)\|see\|sa\|throws\)\(\[[^\]]*\]\)\?\s\+\S\+\s*/ contains=cdoxyTag,cdoxyTagOptions
-syn match cdoxyTagWithArg    contained /#\S\+/hs=s+1
 syn region cdoxyBraceTag     contained keepend start=/[\\@]\([A-Za-z_]\+\){/  end=/}/       contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagBold contained keepend start=/[\\@]\(b_\|d_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn region cdoxyBraceTagEmph contained keepend start=/[\\@]\(e_\|t_\){/hs=s+4 end=/}/he=e-1 contains=cdoxyTag,cdoxyTagOptions,cdoxyRepeatedStar
 syn match cdoxyTitle         contained /[\\@]\(\(main\)\?page\|par\>\|section\|\(sub\)\+section\|defgroup\).*$/ contains=cdoxyTagWithArg,cdoxyTagBold,cdoxyTagEmph,cdoxyTag
-syn match cdoxyUrl           contained `\<[a-z0-9]*:/\+\S\+`
+syn match cdoxyUrl           contained `\<[a-z0-9]\+:/\+\S\+`
 syn region cdoxyCommentSpecial contained keepend start=+"+hs=s+1 skip=+\\["\\]+ end=+"+he=e-1 end="\*\+/"me=s-1 contains=@Spell
 syn match cdoxyCommentEmph contained /\([A-Za-z0-9_:][A-Za-z0-9_\-\+=<>!:]*\ze([^)]*)\)/
 syn match cdoxyCommentEmph contained /\([A-Za-z0-9_:][A-Za-z0-9_\-\+=<>!:]*\ze<[^>]*>\)/
