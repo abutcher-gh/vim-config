@@ -10,7 +10,8 @@ syn match makeSpace     /\$\( \|( )\)/              containedin=ALL
 syn match makeSpecial   /\$,/                       containedin=ALL
 syn match makeSpecial   /\$(\(\\[nt0]\|\\nt\|,\))/  containedin=ALL
 
-syn match makeFunc /(call [^,]\+/hs=s+6 containedin=ALLBUT,makeComment
+" this is broken, but better than before
+syn match makeFunc /(call [^,)]\+/hs=s+6 containedin=ALLBUT,makeComment
 
 hi link makeColon Special
 hi link makeSpace DiffAdd
