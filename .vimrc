@@ -799,13 +799,14 @@ set linebreak
 set sidescroll=5
 set sidescrolloff=1
 set listchars+=precedes:«,extends:»
+set encoding=utf-8
 try
    set breakindent
-   set breakindentshift=2
-   set showbreak=
-catch
-   set showbreak=--\ 
+   set breakindentshift=0
 endtry
+scriptencoding latin1 " force single-byte guillemet 
+set showbreak=»»\ 
+scriptencoding
 
 " toggle wrapping modes (real and display)
 " when display wrapping is on make cursor up/down move by
