@@ -165,7 +165,7 @@ hi def link cppNull Constant
 
 " expand \\\ to the start of a documentation section
 "
-iabbr \\\ /**<CR>/<Left>*<C-O>O<BS>
+"iabbr \\\ /**<CR>/<Left>*<C-O>O<BS>
 
 "    vim:tw=75 et ts=4 sw=4 sr ai comments=\:\" formatoptions=croq 
 "
