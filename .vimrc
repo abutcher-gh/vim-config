@@ -898,6 +898,8 @@ if !exists("g:set_error_format")
    let &errorformat
      \ = '%*[^"]"%f"%*\D%l: %m'
      \ . ',%f"%*\D%l: %m'
+     \ . ',%+G%m %f:%l:%c:'
+     \ . ',%+G%m %f:%l:%c\,'
      \ . ',%+G%m %f:%l:'
      \ . ',%+G%m %f:%l\,'
      \ . ',%-G%f:%l: (Each undeclared identifier is reported only once'
