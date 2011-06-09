@@ -803,9 +803,10 @@ set encoding=utf-8
 try
    set breakindent
    set breakindentshift=0
+catch
 endtry
 scriptencoding latin1 " force single-byte guillemet 
-set showbreak=»»\ 
+set showbreak=\ »\ 
 scriptencoding
 
 " toggle wrapping modes (real and display)
