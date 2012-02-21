@@ -40,7 +40,7 @@ function! s:rfcTag()
     let b:backpos = line('.')
     call search(l, 'Ws')
   elseif syn == 'rfcReference'
-    let l = s:get_pattern_at_cursor('\[\w\+\]')
+    let l = s:get_pattern_at_cursor('\[\(\w\|-\)\+\]')
     if l == ''
       " Not found.
       echohl Error
