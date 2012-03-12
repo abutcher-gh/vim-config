@@ -1083,6 +1083,9 @@ endif
 " syntax highlighting on
 syntax on
 
+" always look at least 50 lines back
+syntax sync minlines=50
+
 " best guess at user name
 let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
