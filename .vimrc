@@ -707,12 +707,12 @@ endfunction
 "      5\s will use git-show-output-5
 "      \s, 0\s, 1\s will use git-show-output-1
 "
-command! -range -nargs=1 GitShow let winnum = winnr() | let commit = expand(<q-args>) | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git log --patch-with-stat -n1 '.commit | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
+command! -range -nargs=1 GitShow let winnum = winnr() | let commit = expand(<q-args>) | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git log --patch-with-stat -C -n1 '.commit | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> \s :GitShow <cword><CR>
 nmap <silent> \h :GitShow HEAD<CR>
 command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff '.<q-args> | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
-nmap <silent> <Bar>S :GitShowDiff --staged<CR>
-nmap <silent> <Bar>H :GitShowDiff<CR>
+nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
+nmap <silent> <Bar>H :GitShowDiff -C <CR>
 
 " This contorted, but portable, perl pipe
 " gives rapid feedback including any ansi
