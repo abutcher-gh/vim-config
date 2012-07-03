@@ -118,6 +118,11 @@ syn keyword Keyword	alignof
 syn keyword Type	decltype
 syn keyword Type	constexpr
 
+" C++11 override and final (also highlight 'virtual' as keyword rather than
+" type)
+syn match Keyword "\%([)]\s*\%(\%(const\|volatile\)\s\+\)*\)\@<=\%(override\|final\)"
+syn keyword Keyword	virtual
+
 syn match cppScopeRes "::"
 hi def link cppScopeRes Special
 

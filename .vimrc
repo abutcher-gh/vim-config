@@ -933,7 +933,7 @@ function! SetTerminalHighlighting()
    if &term == 'win32'
       let l:underline = ""
       let l:cunderline = ""
-   endif
+   else
 
    " remove solid background from html highlighting
    let html_my_rendering = 1 
@@ -945,6 +945,8 @@ function! SetTerminalHighlighting()
    \.'| hi htmlUnderline           term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
    \.'| hi htmlUnderlineItalic     term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
    \.'| hi htmlItalic              term=bold cterm=bold gui=bold'                                                 
+
+   endif
 
    " replace solid background of spell/grammar errors in cterm with bright underline
    exe ''
