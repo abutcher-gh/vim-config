@@ -87,18 +87,20 @@ command! -nargs=1 RemovePath  :call RemovePath(<f-args>)
 
 function! AddGccSysPaths()
    
+                           let l:stdopt = '-std=c++11' | let l:dummy = system('echo | '.$CROSS_PREFIX.'g++ -xc++ -E - '.l:stdopt) |
+   if v:shell_error != 0 | let l:stdopt = '-std=c++0x' | let l:dummy = system('echo | '.$CROSS_PREFIX.'g++ -xc++ -E - '.l:stdopt) | endif
+   if v:shell_error != 0 | let l:stdopt = '' | endif
+
    try
 
       if $OS =~ "Windows"
          let &path = &path . "," . system(
-                \'cmd /q/c "set CPLUS_INCLUDE_PATH= && set C_INCLUDE_PATH= && set CPATH= | '.$CROSS_PREFIX.'g++ -Wp,-v -x c++ -E - 2>&1"
-                \| sed -n "/^ /s/^ //p"
-                \| tr "\n" ","
-                \| sed "s/,$//"
+                \'set CPLUS_INCLUDE_PATH= & set C_INCLUDE_PATH= & set CPATH= | '.$CROSS_PREFIX.'g++ '.l:stdopt.' -Wp,-v -x c++ -E - 2>&1
+                \| sed -n "/^ /{s/^ //;s/$/,/;H}; /^End/{x;s/\n//g;p}"
                 \')
       else
          let &path = &path . "," . system(
-                \'echo | CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= CPATH= ${CROSS_PREFIX}g++ -Wp,-v -x c++ -E - 2>&1
+                \'echo | CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= CPATH= ${CROSS_PREFIX}g++ '.l:stdopt.' -Wp,-v -x c++ -E - 2>&1
                 \| sed -n "/^ /s/^ //p"
                 \| tr "\n" ","
                 \| sed "s/,$//"
