@@ -119,6 +119,7 @@ syn keyword Keyword	alignof
 
 syn keyword Type	decltype
 syn keyword Type	constexpr
+syn keyword Type	alignas
 
 " C++11 override and final (also highlight 'virtual' as keyword rather than
 " type)
