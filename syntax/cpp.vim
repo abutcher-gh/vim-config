@@ -110,6 +110,8 @@ syn match Special	"\(->\|[.]\)\s*\zs\(\(Try\|try_\)\?[Ll]\|[Uu]nl\)ock\s*("me=e-
 syn match Special	"\<move\s*("me=e-1
 syn match Special	"\<forward\s*<"me=e-1
 
+syn match Keyword	"\<make_shared\s*<"me=e-1
+
 syn keyword Keyword foreach
 syn keyword Keyword auto_for for_auto
 syn keyword Keyword	thread_local
