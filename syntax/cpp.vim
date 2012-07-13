@@ -116,6 +116,7 @@ syn keyword Keyword foreach
 syn keyword Keyword auto_for for_auto
 syn keyword Keyword	thread_local
 syn keyword Keyword	alignof
+syn keyword Keyword	static_assert
 
 syn keyword Type	decltype
 syn keyword Type	constexpr
