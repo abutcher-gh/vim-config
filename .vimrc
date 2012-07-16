@@ -757,6 +757,7 @@ function! CexLive(cmdline)
 endfun
 
 com! -nargs=* -complete=file Shthis call CexLive("sh ".expand("%")." ".<q-args>)
+com! -nargs=* -complete=file Bashthis call CexLive("bash ".expand("%")." ".<q-args>)
 com! -nargs=* -complete=file Zshthis call CexLive("zsh ".expand("%")." ".<q-args>)
 com! -nargs=* -complete=file Gxxthis call CexLive("g++ ".expand("%")." ".<q-args>)
 com! -nargs=* -complete=file Exec call CexLive(<q-args>." ".expand("%"))
