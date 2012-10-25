@@ -596,12 +596,28 @@ com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
 nmap <silent> \; [{zz
 nmap <silent> \' :call search('{')<CR>zz
 
+" quickfix toggle
+"
+function! ToggleQuickfix()
+  if exists("g:quickfix_bufnr")
+    cclose
+  else
+    execute "copen"
+  endif
+endfunction
+augroup TrackQuickfix
+ autocmd!
+ autocmd BufWinEnter quickfix let g:quickfix_bufnr = bufnr("$")
+ autocmd BufWinLeave * if exists("g:quickfix_bufnr") && expand("<abuf>") == g:quickfix_bufnr | unlet! g:quickfix_bufnr | endif
+augroup END
+
+
 " some function key macros
 "
 " open/close error log and navigate log messages
 "
-nmap <silent> <S-F5> :cclose<CR>
-nmap <silent> <Leader><F5> :cclose<CR>
+nmap <silent> <S-F5> :call ToggleQuickfix()<CR>
+nmap <silent> <Leader><F5> :call ToggleQuickfix()<CR>
 nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>Jzz
 nmap <silent> <S-F6> :cp<CR>:call CondCenterView()<CR>
 nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
