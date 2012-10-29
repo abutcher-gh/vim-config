@@ -1110,6 +1110,14 @@ syntax sync minlines=50
 " best guess at user name
 let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
+" preferred color scheme
+let g:preferred_bg='dark'
+let g:preferred_scheme='moria'
+let g:fallback_bg='light'
+let g:fallback_scheme='default'
+
+runtime prefs
+
 " set colorscheme based on user name and terminal type
 "
 if g:user == 'root' && &term =~ 'gui'
@@ -1119,20 +1127,20 @@ if g:user == 'root' && &term =~ 'gui'
 
 elseif &term != '' && &term !~ 'gui' && &term != 'win32'
 
-   set bg=dark
+   let &bg=g:preferred_bg
    if &term != 'linux' && &t_Co == '256'
       runtime plugin/guicolorscheme.vim
-      set bg=light
-      GuiColorScheme moria
+      let &bg=g:preferred_bg
+      exec "GuiColorScheme ".g:preferred_scheme
    else
-      colorscheme default
-      set bg=dark
+      exec "colorscheme ".g:fallback_scheme
+      let &bg=g:fallback_bg
    endif
 
 else
 
-   colorscheme moria
-   set bg=light
+   exec "colorscheme ".g:fallback_scheme
+   let &bg=g:fallback_bg
 
 endif
 
@@ -1150,11 +1158,11 @@ command! GNUStyle call GNUStyle()
 function! LogView()
    if &term != 'linux' && &t_Co == '256'
       runtime plugin/guicolorscheme.vim
-      set bg=dark
-      GuiColorScheme moria
+      let &bg=g:preferred_bg
+      exec "GuiColorScheme ".g:preferred_scheme
    elseif &term != 'builtin_gui'
-      colorscheme default
-      set bg=dark
+      exec "colorscheme ".g:fallback_scheme
+      let &bg=g:fallback_bg
    endif
    set ft=asm
    set ts=10
