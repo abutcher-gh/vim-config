@@ -6,6 +6,8 @@ if !exists('g:git_bufhidden')
     let g:git_bufhidden = ''
 endif
 
+"test
+
 nnoremap <Leader>gd :GitDiff<Enter>
 nnoremap <Leader>gD :GitDiff --cached<Enter>
 nnoremap <Leader>gs :GitStatus<Enter>
