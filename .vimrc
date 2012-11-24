@@ -178,6 +178,16 @@ command! -nargs=* Font :call Font(<f-args>)
 set thesaurus=~/.wordlists/mthes/mobythes.aur
 set spell
 
+" fix up vim's test diff on some systems by using stdin rather than a
+" temporary file for the first input.
+function! PortableDiff()
+   let opt = ""
+   if &diffopt =~ "icase" | let opt = opt . "-i " | endif
+   if &diffopt =~ "iwhite" | let opt = opt . "-b " | endif
+   silent execute "!diff -a " . opt . " - < " . v:fname_in . " " . v:fname_new .  " > " . v:fname_out
+endfunction
+set diffexpr=PortableDiff()
+
 " if diffing, open the biggest window possible.. AJB: This seems to me
 " like the best way to open a full screen diff window.  But it
 " probably isn't!
