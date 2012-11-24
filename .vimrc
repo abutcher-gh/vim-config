@@ -1117,6 +1117,9 @@ syntax on
 " always look at least 50 lines back
 syntax sync minlines=50
 
+" always use normal slashes for directory separators (rather than backslashes on Windows)
+set shellslash
+
 " best guess at user name
 let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
