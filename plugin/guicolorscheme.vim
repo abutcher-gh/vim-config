@@ -256,13 +256,17 @@ command! -complete=customlist,s:Colorscheme_Complete -nargs=1 GuiColorScheme :ca
 " }}}
 
 function! s:GuiColorScheme(fname)
-    let l:file = s:GetColorschemeFile(a:fname)
+    if filereadable(a:fname)
+        let l:file = a:fname
+    else
+        let l:file = s:GetColorschemeFile(a:fname)
+    endif
     if l:file == ""
         return 1
     endif
 
     if has("gui_running")
-        exec "colorscheme " . l:file
+        exec "colorscheme " . fnamemodify(l:file, ":t:r")
         return 0
     endif
 

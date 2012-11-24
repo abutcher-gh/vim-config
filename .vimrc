@@ -1094,7 +1094,7 @@ if has("autocmd")
 endif " has ("autocmd")
 
 
-if $_ =~ "gvim"
+if $_ == "" || $_ =~ "gvim"
 " show the gui now, if possible (i.e. if running a gui capable vim).
 " some things below depend on overriding defaults provided by default
 " when opening the gui window.
@@ -1124,31 +1124,27 @@ set shellslash
 let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
 " preferred color scheme
-let g:preferred_bg='dark'
+let g:preferred_bg='dark' | if &term =~ 'gui' | let g:preferred_bg='light' | endif
 let g:preferred_scheme='moria'
 let g:fallback_bg='light'
 let g:fallback_scheme='default'
+
+let g:fullcolorterm = &term =~ 'gui' || ( &t_Co == '256' && &term != 'linux' )
 
 runtime prefs
 
 " set colorscheme based on user name and terminal type
 "
-if g:user == 'root' && &term =~ 'gui'
+if g:user == 'root'
 
    colorscheme darkblue
    set bg=dark
 
-elseif &term != '' && &term !~ 'gui' && &term != 'win32'
+elseif g:fullcolorterm
 
+   runtime plugin/guicolorscheme.vim
    let &bg=g:preferred_bg
-   if &term != 'linux' && &t_Co == '256'
-      runtime plugin/guicolorscheme.vim
-      let &bg=g:preferred_bg
-      exec "GuiColorScheme ".g:preferred_scheme
-   else
-      exec "colorscheme ".g:fallback_scheme
-      let &bg=g:fallback_bg
-   endif
+   exec "GuiColorScheme ".g:preferred_scheme
 
 else
 
@@ -1169,11 +1165,11 @@ command! GNUStyle call GNUStyle()
 
 
 function! LogView()
-   if &term != 'linux' && &t_Co == '256'
+   if g:fullcolorterm
       runtime plugin/guicolorscheme.vim
       let &bg=g:preferred_bg
       exec "GuiColorScheme ".g:preferred_scheme
-   elseif &term != 'builtin_gui'
+   else
       exec "colorscheme ".g:fallback_scheme
       let &bg=g:fallback_bg
    endif
