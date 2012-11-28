@@ -1011,9 +1011,8 @@ endfunction
 if has("autocmd")
 
    " disable spell under some conditions
-   autocmd FileType diff setlocal nospell comments=n:###,n:##,n:#,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO
+   autocmd FileType diff,patch setlocal nospell comments=n:###,n:##,n:#,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO
    autocmd FileType git-diff setlocal nospell
-   autocmd FileType patch setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
 
@@ -1024,6 +1023,8 @@ if has("autocmd")
    " output, then use it as quickfix content and center on the first
    " line.
    autocmd StdinReadPost * set nomodified | if getline(1) =~ '^\f\+:\d\+:\(\d\+:\)\?' |:cb|:execute 'normal zz'|:execute 'doautocmd filetypedetect BufRead '.expand('%')|:copen| endif
+
+   autocmd BufReadPost *.patch,*.diff if getline(1) =~ '^From [0-9a-f]\{40\}' | let &ft='git-diff' | normal <CR> | fi
 
    " Set some sensible defaults for editing C-files
    augroup clikeprog
