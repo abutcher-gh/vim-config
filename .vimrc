@@ -791,7 +791,7 @@ com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 
 com! CScopeReset cscope reset
 
-" Cb kept for legacy reasons -- set nomodified is only required to be set when nohidden is set
+" Cb kept for legacy reasons
 com! -nargs=* Cb :cb
 com! -nargs=* GrepParse let oef=&errorformat | let &errorformat='%f:%l:%m' | :cb | let &errorformat=oef
 
@@ -1018,6 +1018,8 @@ if has("autocmd")
    autocmd FileType messages setlocal nospell
 
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
+
+   autocmd StdinReadPost * set nomodified
 
    " Set some sensible defaults for editing C-files
    augroup clikeprog
