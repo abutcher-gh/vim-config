@@ -1019,7 +1019,11 @@ if has("autocmd")
 
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
 
-   autocmd StdinReadPost * set nomodified
+   " Set reads from stdin to be considered unmodified
+   " Also, for convenience, if the first line matches 'grep -n' style
+   " output, then use it as quickfix content and center on the first
+   " line.
+   autocmd StdinReadPost * set nomodified | if getline(1) =~ '^\f\+:\d\+:\(\d\+:\)\?' |:cb|:execute 'normal zz'|:execute 'doautocmd filetypedetect BufRead '.expand('%')|:copen| endif
 
    " Set some sensible defaults for editing C-files
    augroup clikeprog
