@@ -484,7 +484,7 @@ function! ListAssociates( ArgLead, CmdLine, CursorPos )
 
    for [pattern, pathlist, extlist] in g:EATypeList
       
-      if realext =~ pattern
+      if realext =~ '^'.pattern.'$'
          for path in pathlist
             for ext in extlist
 
