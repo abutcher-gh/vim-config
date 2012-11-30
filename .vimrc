@@ -478,6 +478,9 @@ function! ListAssociates( ArgLead, CmdLine, CursorPos )
    
    let rc=""
 
+   " if not suffixed with '!' then stop at first matching extension
+   let stop_at_first_match = a:CmdLine !~ '^\S\+!'
+
    let realext=expand("%:e")
 
    let pwd=getcwd()
@@ -496,6 +499,11 @@ function! ListAssociates( ArgLead, CmdLine, CursorPos )
             endfor
          endfor
       endif
+
+      if stop_at_first_match && !empty(rc)
+         return rc
+      endif
+
    endfor
    
    return rc
@@ -562,6 +570,7 @@ nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> <Bar>? :call SplitEditBase()<CR>
 nmap \<Tab> :EditAssociate<Space>
+nmap <Bar><Tab> :EditAssociate!<Space>
 
 " focus previously focused window
 nmap <silent> <Tab> 
