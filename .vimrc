@@ -1046,6 +1046,7 @@ if has("autocmd")
 
    autocmd BufNewFile,BufRead *.git-diff set ft=git-diff
    autocmd BufNewFile,BufRead *.diff set ft=diff
+   autocmd BufNewFile,BufRead COMMIT_EDITMSG set ft=gitcommit
 
    " Also, support editing of gzip-compressed files. DO NOT REMOVE THIS!
    " This is also used when loading the compressed helpfiles.
