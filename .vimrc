@@ -344,13 +344,21 @@ function! PushInclude(split) range
 
    if !filereadable( l:fullpath )
       if l:fullpath == ''
-         echo "File '" . l:arg . "' not found in search path."
+         try
+            call PushCurrentLocation()
+            cscope find f <cfile>
+         catch
+            " silent pop
+            call remove( g:file_nav_stack, 0, 0 )
+            call remove( g:file_nav_stack, 0, 0 )
+            echo "File '" . l:arg . "' not found in search path."
+         endtry
       else
          echo "File '" . l:fullpath . "' not readable."
       endif
       return
    endif
-   PushCurrentLocation()
+   call PushCurrentLocation()
    try
       if a:split
          sp `=l:fullpath`
@@ -359,6 +367,7 @@ function! PushInclude(split) range
       endif
    catch
       echo "File '" . expand("<cfile>:t") . "' was readable but can't abandon current buffer. (target's full path is '" . l:fullpath . "')"
+      call remove( g:file_nav_stack, 0, 0 )
       call remove( g:file_nav_stack, 0, 0 )
    endtry
 endfunction
@@ -650,6 +659,11 @@ nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
 map <silent> <F8>   :cnf<CR>:call CondCenterView()<CR>
 map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
 " 
+" quickfix history nav
+" 
+nmap <silent> q<Left> :colder<CR>
+nmap <silent> q<Right> :cnewer<CR>
+" 
 " typelist window
 "
 nmap <F10>  :TlistSync<CR>
@@ -808,15 +822,17 @@ com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 com! CScopeReset cscope reset
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 " cscope mappings:
-"   find callers
-"   find includers
-"   find usage of the symbol
-"   reset cscope
+"  \d find declaration
+"  \c find callers
+"  \i find includers
+"  \e find via egrep
+"  \u find usage of the symbol
+"  \r reset cscope
+nmap <silent> \d :call PushCurrentLocation()<CR>:cs find d <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \c :call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \i :call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \e :call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \u :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> <C-@>s :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \r :cscope reset<CR>
 
 " Cb kept for legacy reasons

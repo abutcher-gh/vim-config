@@ -16,6 +16,8 @@ syn match qfNumber  "\<[0-9]\+\>"
 syn match qfError   "[Ee]rror:.*"   contains=qfErrorQuoted,qfSymbol,qfNumber,qfType
 syn match qfWarning "[Ww]arning:.*" contains=qfWarningQuoted,qfSymbol,qfNumber,qfType
 
+syn match qfTagType "<<[^>]*>>"
+
 hi link qfError          WarningMsg
 hi link qfWarning        Type
 hi link qfQuoted         Statement
@@ -24,4 +26,5 @@ hi link qfWarningQuoted  Statement
 hi link qfType           Type
 hi link qfSymbol         Directory
 hi link qfNumber         Comment
+hi link qfTagType        Question
 
