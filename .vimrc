@@ -317,6 +317,15 @@ if !exists("g:file_nav_stack")
    let g:file_nav_stack=[]
 endif
 
+function! PushCurrentLocation()
+   let l:item = expand("%")
+   if l:item == ""
+      let l:item = '!:!' . winbufnr(0)
+   endif
+   call insert( g:file_nav_stack, getpos('.') )
+   call insert( g:file_nav_stack, l:item )
+endfunction
+
 function! PushInclude(split) range
    let l:arg = expand("<cfile>") 
    let l:fullpath = findfile( l:arg )
@@ -341,12 +350,7 @@ function! PushInclude(split) range
       endif
       return
    endif
-   let l:item = expand("%")
-   if l:item == ""
-      let l:item = '!:!' . winbufnr(0)
-   endif
-   call insert( g:file_nav_stack, getpos('.') )
-   call insert( g:file_nav_stack, l:item )
+   PushCurrentLocation()
    try
       if a:split
          sp `=l:fullpath`
@@ -798,7 +802,19 @@ com! -nargs=* -complete=file Gxxthis call CexLive("g++ ".expand("%")." ".<q-args
 com! -nargs=* -complete=file Exec call CexLive(<q-args>." ".expand("%"))
 com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 
+" cscope settings
 com! CScopeReset cscope reset
+set cscopequickfix=s-,c-,d-,i-,t-,e-
+" cscope mappings:
+"   find callers
+"   find includers
+"   find usage of the symbol
+"   reset cscope
+nmap <silent> \c :call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
+nmap <silent> \i :call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
+nmap <silent> \u :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
+nmap <silent> <C-@>s :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
+nmap <silent> \r :cscope reset<CR>
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb
