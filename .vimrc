@@ -387,6 +387,7 @@ function! PopInclude() range
       endtry
       " reposition cursor
       call setpos( '.', l:pos )
+      echo 'Returned to '.l:val.':'.join(l:pos[1:-2],':')
    catch
       echo "No file navigation stack."
    endtry
@@ -570,6 +571,7 @@ nmap <silent> <A-?> :call SplitEditBase()<CR>
 nmap <silent> \\ :call EditParent()<CR>
 nmap <silent> \. :call PushInclude(0)<CR>
 nmap <silent> <Bar>> :call PushInclude(1)<CR>
+nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.get(g:file_nav_stack,0).':'.join(get(g:file_nav_stack,1)[1:-2],':').' ('.len(g:file_nav_stack)/2.' on stack).'<CR>
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> <Bar>? :call SplitEditBase()<CR>
