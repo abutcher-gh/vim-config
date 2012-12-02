@@ -814,6 +814,7 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-
 "   reset cscope
 nmap <silent> \c :call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \i :call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
+nmap <silent> \e :call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \u :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> <C-@>s :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
 nmap <silent> \r :cscope reset<CR>
