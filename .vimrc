@@ -346,6 +346,7 @@ function! PushInclude(split) range
       if l:fullpath == ''
          try
             call PushCurrentLocation()
+            call ProbeAndCacheGitRepo()
             cscope find f <cfile>
          catch
             " silent pop
@@ -829,7 +830,7 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-
 "  \u find usage of the symbol
 "  \r same as \u -- find any reference to the symbol
 "  |R reset cscope
-nmap <silent> \d :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find d <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \d :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \c :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \i :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \e :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
@@ -868,6 +869,8 @@ else
    function! ProbeAndCacheGitRepo()
    endfunction
 endif
+
+com! GenQuickTagsCscope echo 'Generating default tags and cscope database...' | let s:error = system('bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh"') | if !empty(s:error) | echoerr s:error | endif | echo 'Done.'
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb
