@@ -850,9 +850,12 @@ function! OpenQuickfix()
    cd .
 endfunction
 
-" if a loaded file is found to be in a git repo, that repo is added to
-" this list and a cscope entry tested.
+" If a loaded file is found to be in a git repo, that repo is added to
+" this list and a cscope entry tested.  Start with CWD; depending on
+" the patch state of vim, this is sometimes already present; make it
+" on all versions.
 let g:git_repos = {getcwd():1}
+try | execute 'cscope add '.getcwd() | catch | endtry
 
 if executable('git')
    function! ProbeAndCacheGitRepo()
