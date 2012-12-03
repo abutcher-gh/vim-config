@@ -350,8 +350,7 @@ function! PushInclude(split) range
             cscope find f <cfile>
          catch
             " silent pop
-            call remove( g:file_nav_stack, 0, 0 )
-            call remove( g:file_nav_stack, 0, 0 )
+            call remove( g:file_nav_stack, 0, 1 )
             echo "File '" . l:arg . "' not found in search path."
          endtry
       else
@@ -368,39 +367,44 @@ function! PushInclude(split) range
       endif
    catch
       echo "File '" . expand("<cfile>:t") . "' was readable but can't abandon current buffer. (target's full path is '" . l:fullpath . "')"
-      call remove( g:file_nav_stack, 0, 0 )
-      call remove( g:file_nav_stack, 0, 0 )
+      call remove( g:file_nav_stack, 0, 1 )
    endtry
 endfunction
 
 function! PopInclude() range
    try
-      let l:val=get( g:file_nav_stack, 0 )
-      call remove( g:file_nav_stack, 0, 0 )
-
-      let l:pos=get( g:file_nav_stack, 0 )
-      call remove( g:file_nav_stack, 0, 0 )
-
-      if !filereadable( l:val )
-         if match( l:val, '!:!' ) == 0
-            let l:val = l:val[3:]
-         else
-            echo "File '" . l:val . "' not readable, skipped."
-            return
-         endif
+      if JumpToNav(0) < 2
+         call remove( g:file_nav_stack, 0, 1 )
       endif
-      " try existing buffer first
-      try
-         exe "b ".l:val
-      catch
-         e `=l:val`
-      endtry
-      " reposition cursor
-      call setpos( '.', l:pos )
-      echo 'Returned to '.l:val.':'.join(l:pos[1:-2],':')
-   catch
-      echo "No file navigation stack."
    endtry
+endfunction
+
+function! JumpToNav(index) range
+   if len(g:file_nav_stack) < 2
+      echo "No file navigation stack."
+      return 2
+   endif
+
+   let l:file = get( g:file_nav_stack, a:index * 2 )
+   let l:pos  = get( g:file_nav_stack, a:index * 2 + 1 )
+
+   if !filereadable( l:file )
+      if match( l:file, '!:!' ) == 0
+         let l:file = l:file[3:]
+      else
+         echo "File '" . l:file . "' not readable, skipped."
+         return 1
+      endif
+   endif
+   " try existing buffer first
+   try
+      exe "b ".l:file
+   catch
+      e `=l:file`
+   endtry
+   " reposition cursor
+   call setpos( '.', l:pos )
+   echo 'Returned to '.l:file.':'.join(l:pos[1:-2],':')
 endfunction
 
 
@@ -584,6 +588,7 @@ nmap <silent> <Bar>> :call PushInclude(1)<CR>
 nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.get(g:file_nav_stack,0).':'.join(get(g:file_nav_stack,1)[1:-2],':').' ('.len(g:file_nav_stack)/2.' on stack).'<CR>
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
+nmap <silent> \<Space> :call JumpToNav(0)<CR>
 nmap <silent> <Bar>? :call SplitEditBase()<CR>
 nmap \<Tab> :EditAssociate<Space>
 nmap <Bar><Tab> :EditAssociate!<Space>
