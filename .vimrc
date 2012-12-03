@@ -835,13 +835,13 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-
 "  \u find usage of the symbol
 "  \r same as \u -- find any reference to the symbol
 "  |R reset cscope
-nmap <silent> \d :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \c :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \i :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \e :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \u :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \r :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> <Bar>R :call ProbeAndCacheGitRepo()<CR>:cscope reset<CR>
+nmap <silent> \d :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \c :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \i :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \e :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \u :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \r :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> <Bar>R :call :cscope reset<CR>
 
 " for better interoperability with relative and fully-qualified paths
 " disable cscoperelative and manipulate result output and refresh
@@ -850,7 +850,7 @@ try | set nocscoperelative | catch | endtry
 function! OpenQuickfix()
    copen
    set modifiable
-   try | execute '%s¬'.getcwd().'/\?¬¬' | catch | endtry
+   for l:d in keys(g:git_repos) | try | execute '%s¬^'.l:d.'/\?¬¬' | catch | endtry | endfor
    set nomodified
    cd .
 endfunction
@@ -863,8 +863,8 @@ let g:git_repos = {getcwd():1}
 try | execute 'cscope add '.getcwd() | catch | endtry
 
 if executable('git')
-   function! ProbeAndCacheGitRepo()
-      let l:repo = substitute(system('git rev-parse --show-toplevel'), '[\r\n]*', '', 'g')
+   function! ProbeAndCacheGitRepo(dir)
+      let l:repo = substitute(system('cd '.a:dir.' && git rev-parse --show-toplevel'), '[\r\n]*', '', 'g')
       if !empty(l:repo) && !has_key(g:git_repos, l:repo)
          let g:git_repos[l:repo] = 1
          try
