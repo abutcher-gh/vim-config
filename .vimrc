@@ -827,13 +827,47 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-
 "  \i find includers
 "  \e find via egrep
 "  \u find usage of the symbol
-"  \r reset cscope
-nmap <silent> \d :call PushCurrentLocation()<CR>:cs find d <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> \c :call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> \i :call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> \e :call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> \u :call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:copen<CR>:cfirst<CR>
-nmap <silent> \r :cscope reset<CR>
+"  \r same as \u -- find any reference to the symbol
+"  |R reset cscope
+nmap <silent> \d :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find d <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \c :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \i :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \e :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \u :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \r :call ProbeAndCacheGitRepo()<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> <Bar>R :call ProbeAndCacheGitRepo()<CR>:cscope reset<CR>
+
+" for better interoperability with relative and fully-qualified paths
+" disable cscoperelative and manipulate result output and refresh
+" directory in OpenQuickfix below.
+set nocscoperelative
+function! OpenQuickfix()
+   copen
+   set modifiable
+   try | execute '%s¬'.getcwd().'/\?¬¬' | catch | endtry
+   set nomodified
+   cd .
+endfunction
+
+" if a loaded file is found to be in a git repo, that repo is added to
+" this list and a cscope entry tested.
+let g:git_repos = {getcwd():1}
+
+if executable('git')
+   function! ProbeAndCacheGitRepo()
+      let l:repo = substitute(system('git rev-parse --show-toplevel'), '[\r\n]*', '', 'g')
+      if !empty(l:repo) && !has_key(g:git_repos, l:repo)
+         let g:git_repos[l:repo] = 1
+         try
+            execute 'cscope add '.l:repo
+         catch
+         endtry
+      endif
+   endfunction
+else
+   function! ProbeAndCacheGitRepo()
+   endfunction
+endif
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb
