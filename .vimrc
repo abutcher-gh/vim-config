@@ -878,7 +878,24 @@ else
    endfunction
 endif
 
-com! GenQuickTagsCscope echo 'Generating default tags and cscope database...' | let s:error = system('bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh"') | if !empty(s:error) | echoerr s:error | endif | echo 'Done.'
+function DirOf(f)
+   if isdirectory(a:f)
+      return a:f
+   endif
+   return fnamemodify(a:f, ':h')
+endfunction
+
+" GenQuickTagsCscope will generate tags and cscope data for the path
+" pointed to by the current buffer.  It behaves as follows:
+"  - If the buffer points into a git repository, the data is generated
+"    in the root of the repository for the entire repository.
+"  - If the buffer does not point into a git repository, data is
+"    updated in the current working directory (preserving existing
+"    data) for the directory containing the current buffer.
+"  - If <bang> is used i.e. the command is spelled GenQuickTagsCscope!
+"    then the data is generated in the directory of the current buffer
+"    for that directory exclusively. 
+com! -bang GenQuickTagsCscope echo 'Generating default tags and cscope database...' | let s:error = system((len(expand('<bang>'))?'env FORCE_DIR=1 ':'') .'bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh" "'.DirOf(expand('%')).'"') | if !empty(s:error) | echoerr s:error | endif | echo 'Done.'
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb
