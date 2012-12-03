@@ -841,7 +841,7 @@ nmap <silent> <Bar>R :call ProbeAndCacheGitRepo()<CR>:cscope reset<CR>
 " for better interoperability with relative and fully-qualified paths
 " disable cscoperelative and manipulate result output and refresh
 " directory in OpenQuickfix below.
-set nocscoperelative
+try | set nocscoperelative | catch | endtry
 function! OpenQuickfix()
    copen
    set modifiable
