@@ -322,8 +322,7 @@ function! PushCurrentLocation()
    if l:item == ""
       let l:item = '!:!' . winbufnr(0)
    endif
-   call insert( g:file_nav_stack, getpos('.') )
-   call insert( g:file_nav_stack, l:item )
+   call insert( g:file_nav_stack, [l:item, getpos('.')] )
 endfunction
 
 function! PushInclude(split) range
@@ -350,7 +349,7 @@ function! PushInclude(split) range
             cscope find f <cfile>
          catch
             " silent pop
-            call remove( g:file_nav_stack, 0, 1 )
+            call remove( g:file_nav_stack, 0, 0 )
             echo "File '" . l:arg . "' not found in search path."
          endtry
       else
@@ -367,26 +366,33 @@ function! PushInclude(split) range
       endif
    catch
       echo "File '" . expand("<cfile>:t") . "' was readable but can't abandon current buffer. (target's full path is '" . l:fullpath . "')"
-      call remove( g:file_nav_stack, 0, 1 )
+      call remove( g:file_nav_stack, 0, 0 )
    endtry
 endfunction
 
 function! PopInclude() range
    try
       if JumpToNav(0) < 2
-         call remove( g:file_nav_stack, 0, 1 )
+         call remove( g:file_nav_stack, 0, 0 )
       endif
    endtry
 endfunction
 
+function! GetNavLocation(index)
+   if empty(g:file_nav_stack)
+      return ''
+   endif
+   let [l:file, l:pos] = get( g:file_nav_stack, a:index )
+   return l:file . ':' . join(l:pos[1:-2],':')
+endfunction
+
 function! JumpToNav(index) range
-   if len(g:file_nav_stack) < 2
+   if empty(g:file_nav_stack)
       echo "No file navigation stack."
       return 2
    endif
 
-   let l:file = get( g:file_nav_stack, a:index * 2 )
-   let l:pos  = get( g:file_nav_stack, a:index * 2 + 1 )
+   let [l:file, l:pos] = get( g:file_nav_stack, a:index )
 
    if !filereadable( l:file )
       if match( l:file, '!:!' ) == 0
@@ -405,6 +411,16 @@ function! JumpToNav(index) range
    " reposition cursor
    call setpos( '.', l:pos )
    echo 'Returned to '.l:file.':'.join(l:pos[1:-2],':')
+endfunction
+
+function! DumpNavList()
+   if empty(g:file_nav_stack)
+      echo "No file navigation stack."
+      return 2
+   endif
+   for [l:file, l:pos] in g:file_nav_stack
+      echo l:file . ':' . join(l:pos[1:-2],':')
+   endfor
 endfunction
 
 
@@ -585,10 +601,11 @@ nmap <silent> <A-?> :call SplitEditBase()<CR>
 nmap <silent> \\ :call EditParent()<CR>
 nmap <silent> \. :call PushInclude(0)<CR>
 nmap <silent> <Bar>> :call PushInclude(1)<CR>
-nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.get(g:file_nav_stack,0).':'.join(get(g:file_nav_stack,1)[1:-2],':').' ('.len(g:file_nav_stack)/2.' on stack).'<CR>
+nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNavLocation(0).':').' ('.len(g:file_nav_stack).' on stack).'<CR>
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> \<Space> :call JumpToNav(0)<CR>
+nmap <silent> \? :call DumpNavList()<CR>
 nmap <silent> <Bar>? :call SplitEditBase()<CR>
 nmap \<Tab> :EditAssociate<Space>
 nmap <Bar><Tab> :EditAssociate!<Space>
@@ -868,6 +885,7 @@ if executable('git')
       if !empty(l:repo) && !has_key(g:git_repos, l:repo)
          let g:git_repos[l:repo] = 1
          try
+            let &tags = &tags . ','.l:repo.'/tags'
             execute 'cscope add '.l:repo
          catch
          endtry
@@ -878,12 +896,23 @@ else
    endfunction
 endif
 
-function DirOf(f)
+function! DirOf(f)
    if isdirectory(a:f)
       return a:f
    endif
    return fnamemodify(a:f, ':h')
 endfunction
+
+function! DumpSymbolSources()
+   echo "\nCSCOPE DATABASES:\n\n"
+   cscope show
+   echo "\nTAG FILES:\n\n"
+   for l:f in tagfiles()
+      echo l:f
+   endfor
+   echo "\n"
+endfunction
+com! DumpSymbolSources call DumpSymbolSources()
 
 " GenQuickTagsCscope will generate tags and cscope data for the path
 " pointed to by the current buffer.  It behaves as follows:
@@ -895,7 +924,8 @@ endfunction
 "  - If <bang> is used i.e. the command is spelled GenQuickTagsCscope!
 "    then the data is generated in the directory of the current buffer
 "    for that directory exclusively. 
-com! -bang GenQuickTagsCscope echo 'Generating default tags and cscope database...' | let s:error = system((len(expand('<bang>'))?'env FORCE_DIR=1 ':'') .'bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh" "'.DirOf(expand('%')).'"') | if !empty(s:error) | echoerr s:error | endif | echo 'Done.'
+com! -nargs=? -complete=file -bang GenQuickTagsCscope let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | echo "Generating default tags and cscope database for '". s:d ."'..." | let s:error = system((len(expand('<bang>'))?'env FORCE_DIR=1 ':'') .'bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh" "'. s:d .'"') | if !empty(s:error) | echoerr s:error | endif | call ProbeAndCacheGitRepo(s:d) | echo 'Done.'
+com! -nargs=? -complete=file       AddCscopeTagsDir   let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | call ProbeAndCacheGitRepo(s:d)
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb

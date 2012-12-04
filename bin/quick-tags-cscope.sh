@@ -41,7 +41,7 @@ elif [ -z "$NO_GIT" ]; then
       set -- $(cat cscope.files)
    fi
 fi
-ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} $@ || exit $?
-[ -n "$REPO_ROOT" ] || { find $@ -regex '.*\.\([chi]\(pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; } || exit $?
+ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} $@
+[ -n "$REPO_ROOT" ] || { find $@ -regex '.*\.\([chi]\(pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; }
 cscope -u -b -q ${CSCOPE_OPTS}
 
