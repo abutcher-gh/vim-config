@@ -858,7 +858,13 @@ nmap <silent> \i :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentL
 nmap <silent> \e :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \u :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \r :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> <Bar>R :call :cscope reset<CR>
+
+nmap <Bar>E :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find e<Space>
+nmap <Bar>U :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+nmap <Bar>R :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+
+nmap <silent> \<Delete> :cscope reset<CR>
+
 
 " for better interoperability with relative and fully-qualified paths
 " disable cscoperelative and manipulate result output and refresh
