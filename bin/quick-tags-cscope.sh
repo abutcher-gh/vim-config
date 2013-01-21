@@ -37,11 +37,14 @@ elif [ -z "$NO_GIT" ]; then
    if REPO_ROOT=$(cd "$1" && git rev-parse --show-toplevel 2>$NIL); then
       cd "$REPO_ROOT"
       rm -f cscope* tags
+      echo >&2 "Locating files in '$REPO_ROOT' with 'git'..."
       git ls-files '*.c??' '*.c' '*.h' '*.h??' '*.inl' '*.impl' '*.java' | sed "s|^|$PWD/|" > cscope.files
-      set -- $(cat cscope.files)
    fi
 fi
-ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} $@
-[ -n "$REPO_ROOT" ] || { find $@ -regex '.*\.\([chi]\(pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; }
+[ -n "$REPO_ROOT" ] || { echo >&2 "Locating files in '$1' with 'find'..."; find . -regex '.*\.\([chi]\(pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; }
+echo >&2 "Updating tags..."
+ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} -L cscope.files
+echo >&2 "Updating cscope database..."
 cscope -u -b -q ${CSCOPE_OPTS}
+echo >&2 "Done."
 
