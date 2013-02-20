@@ -345,7 +345,7 @@ function! PushInclude(split) range
       if l:fullpath == ''
          try
             call PushCurrentLocation()
-            call ProbeAndCacheGitRepo()
+            call ProbeCscopeAndTags()
             cscope find f <cfile>
          catch
             " silent pop
@@ -852,16 +852,16 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-
 "  \u find usage of the symbol
 "  \r same as \u -- find any reference to the symbol
 "  |R reset cscope
-nmap <silent> \d :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \c :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \i :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \e :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \u :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> \r :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \d :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \c :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \i :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \e :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \u :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> \r :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 
-nmap <Bar>E :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find e<Space>
-nmap <Bar>U :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
-nmap <Bar>R :call ProbeAndCacheGitRepo(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+nmap <Bar>E :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find e<Space>
+nmap <Bar>U :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+nmap <Bar>R :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
 
 nmap <silent> \<Delete> :cscope reset<CR>
 
@@ -873,34 +873,55 @@ try | set nocscoperelative | catch | endtry
 function! OpenQuickfix()
    copen
    set modifiable
-   for l:d in keys(g:git_repos) | try | execute '%s¬^'.l:d.'/\?¬¬' | catch | endtry | endfor
+   for l:d in keys(g:cscope_tags_dir) | try | execute '%s¬^'.l:d.'/\?¬¬' | catch | endtry | endfor
    set nomodified
    cd .
 endfunction
 
-" If a loaded file is found to be in a git repo, that repo is added to
-" this list and a cscope entry tested.  Start with CWD; depending on
-" the patch state of vim, this is sometimes already present; make it
-" on all versions.
-let g:git_repos = {getcwd():1}
-try | execute 'cscope add '.getcwd() | catch | endtry
+let g:cscope_tags_dir = {}
 
-if executable('git')
-   function! ProbeAndCacheGitRepo(dir)
-      let l:repo = substitute(system('cd '.a:dir.' && git rev-parse --show-toplevel'), '[\r\n]*', '', 'g')
-      if !empty(l:repo) && !has_key(g:git_repos, l:repo)
-         let g:git_repos[l:repo] = 1
+let g:vcs_find_top_level = []
+
+if executable('git') | let g:vcs_find_top_level += [ 'git rev-parse --show-toplevel' ] | endif
+if executable('svn') | let g:vcs_find_top_level += [ "svn info | sed -n '/Working Copy/ s/[^:]*: //p'" ] | endif
+
+function! ProbeCscopeAndTags(dir, ...) " second arg is 'force'
+   let l:force = a:0? 1 : 0
+   if !l:force && has_key(g:cscope_tags_dir, a:dir) | return | endif
+   let l:repo = ''
+   for l:find_top_level in g:vcs_find_top_level
+      let l:repo = substitute(system('cd '.a:dir.' && '.l:find_top_level), '[\r\n]*', '', 'g')
+      if empty(l:repo) | continue | endif
+      break
+   endfor
+   if empty(l:repo)
+      let l:repo = a:dir
+      while 1
+         if filereadable(l:repo.'/tags') || filereadable(l:repo.'/cscope.out')
+            break
+         endif
+         let l:oldrepo = l:repo
+         let l:repo = fnamemodify(l:repo, ':h')
+         if l:oldrepo == l:repo
+            unlet l:repo
+            break
+         endif
+      endwhile
+   endif
+   if !empty(l:repo)
+      if a:dir | let g:cscope_tags_dir[a:dir] = l:repo | endif
+      if l:force || !has_key(g:cscope_tags_dir, l:repo)
+         let g:cscope_tags_dir[l:repo] = 1
          try
             let &tags = &tags . ','.l:repo.'/tags'
             execute 'cscope add '.l:repo
          catch
          endtry
       endif
-   endfunction
-else
-   function! ProbeAndCacheGitRepo()
-   endfunction
-endif
+   endif
+endfunction
+
+try | call ProbeCscopeAndTags(getcwd()) | catch | endtry
 
 function! DirOf(f)
    if isdirectory(a:f)
@@ -930,8 +951,8 @@ com! DumpSymbolSources call DumpSymbolSources()
 "  - If <bang> is used i.e. the command is spelled GenQuickTagsCscope!
 "    then the data is generated in the directory of the current buffer
 "    for that directory exclusively. 
-com! -nargs=? -complete=file -bang GenQuickTagsCscope let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | echo "Generating default tags and cscope database for '". s:d ."'..." | let s:error = system((len(expand('<bang>'))?'env FORCE_DIR=1 ':'') .'bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh" "'. s:d .'"') | if !empty(s:error) | echoerr s:error | endif | call ProbeAndCacheGitRepo(s:d) | echo 'Done.'
-com! -nargs=? -complete=file       AddCscopeTagsDir   let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | call ProbeAndCacheGitRepo(s:d)
+com! -nargs=? -complete=file -bang GenQuickTagsCscope let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | echo "Generating default tags and cscope database for '". s:d ."'..." | let s:error = system((len(expand('<bang>'))?'env FORCE_DIR=1 ':'') .'bash "'.get(split(&runtimepath, ','), 0).'/bin/quick-tags-cscope.sh" "'. s:d .'"') | if !empty(s:error) | echoerr s:error | endif | call ProbeCscopeAndTags(s:d, 1) | echo 'Done.'
+com! -nargs=? -complete=file       AddCscopeTagsDir   let s:d = DirOf(empty(<q-args>)? expand('%'): <q-args>) | call ProbeCscopeAndTags(s:d)
 
 " Cb kept for legacy reasons
 com! -nargs=* Cb :cb
