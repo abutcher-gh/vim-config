@@ -843,7 +843,7 @@ com! -nargs=* -complete=file NExec call CexLive(<q-args>)
 
 " cscope settings
 com! CScopeReset cscope reset
-set cscopequickfix=s-,c-,d-,i-,t-,e-
+set cscopequickfix=s-,g-,c-,d-,i-,t-,e-
 " cscope mappings:
 "  \d find declaration
 "  \c find callers
