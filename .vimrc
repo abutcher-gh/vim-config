@@ -921,7 +921,9 @@ function! ProbeCscopeAndTags(dir, ...) " second arg is 'force'
    endif
 endfunction
 
+if ! executable('cygpath') " too slow on cygwin
 try | call ProbeCscopeAndTags(getcwd()) | catch | endtry
+endif
 
 function! DirOf(f)
    if isdirectory(a:f)
