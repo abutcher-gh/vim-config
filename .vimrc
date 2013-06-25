@@ -18,6 +18,9 @@ let html_number_lines=1
 let c_c_vim_compatible = 1
 let c_C99 = 1
 
+let g:windows = $OS =~ "Windows"
+let g:cygwin = g:windows && expand('~') =~ "^/"
+
 " zsh is great but running external commands through it via
 "   execvp( { "zsh", "-c", ... } )
 " as vim does lands you in the wrong directory (pwd is simply '.')
@@ -35,7 +38,7 @@ endif
 
 " some simple printer setting commands
 "
-if $OS =~ "Windows"
+if g:windows
    let s:printfont="DejaVu_Sans_Mono"
 else
    let s:printfont=""
@@ -57,11 +60,14 @@ function! Repath()
    let &path = ""
 
    " stick the C++ include path into Vim's file navigation search path
-   if $OS =~ "Windows"
+   if g:windows
       if $USE_GCC == "1"
          let &path = ".," . substitute($CPATH.';'.$CPLUS_INCLUDE_PATH, ';', ',', 'g') . &path
       else
          let &path = ".," . substitute($INCLUDE, ';', ',', 'g') . &path
+      endif
+      if g:cygwin
+         let &path = substitute(&path,'\(.\):/','/\1/','g')
       endif
    else
       let &path = ".," . substitute($CPATH.':'.$CPLUS_INCLUDE_PATH, ':', ',', 'g') . &path
@@ -93,7 +99,7 @@ function! AddGccSysPaths()
 
    try
 
-      if $OS =~ "Windows"
+      if g:windows
          let &path = &path . "," . system(
                 \'set CPLUS_INCLUDE_PATH= & set C_INCLUDE_PATH= & set CPATH= | '.$CROSS_PREFIX.'g++ '.l:stdopt.' -Wp,-v -x c++ -E - 2>&1
                 \| sed -n "/^ /{s/^ //;s/$/,/;H}; /^End/{x;s/\n//g;p}"
@@ -130,7 +136,7 @@ Repath
 " Opti                   -- http://www.proggyfonts.com/index.php?menu=download
 
 " font names are subtly different in Windows than in X
-if $OS =~ "Windows"
+if g:windows
    let s:font="DejaVu_Sans_Mono:h"
    let s:anonfont="Anonymous:h"
    let s:profont="ProFontWindows:h"
@@ -799,7 +805,7 @@ nmap <silent> <Bar>H :GitShowDiff -C <CR>
 " color sequences but strips any such
 " sequences from the resulting capture
 " that ends up in the quickfix buffer.
-if $OS !~ "Windows"
+if ! g:windows
    let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 else
    for i in split(&rtp,',')
@@ -816,7 +822,7 @@ endif
 " the requested shell command, performs it with the perl filter above
 " and resets it.
 function! CexLive(cmdline)
-   if $OS !~ "Windows"
+   if ! g:windows
       let l:makeprg="echo;echo Executing: ".a:cmdline."; ".a:cmdline
    else
       let l:makeprg=a:cmdline
@@ -921,7 +927,7 @@ function! ProbeCscopeAndTags(dir, ...) " second arg is 'force'
    endif
 endfunction
 
-if ! executable('cygpath') " too slow on cygwin
+if ! g:cygwin " too slow on cygwin
 try | call ProbeCscopeAndTags(getcwd()) | catch | endtry
 endif
 
