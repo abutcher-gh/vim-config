@@ -1333,15 +1333,17 @@ else
 endif
 
 
+function! ShowWhitespaceErrors()
+   highlight default link WSError ErrorMsg
+   syn match WSError / \+\ze\t/
+   syn match WSError /\s\+$/
+endfunction
+call ShowWhitespaceErrors() " always
+
+
 function! GNUError()
    highlight default link GNUError ErrorMsg
-
-   " whitespace errors
-   syn match GNUError / \+\ze\t/
-   syn match GNUError /\s\+$/
-
-   " line length errors
-   syn match GNUError /.\%>81v/
+   let g:line_length_error = matchadd("GNUError", '.\%>81v', 999)
 endfunction
 
 
@@ -1351,6 +1353,7 @@ function! GNUStyle()
    set tabstop=8
    set noexpandtab
    set comments=s:/*,m:\ \ \ ,re:*/,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
+   set tw=80
 
    syn keyword cType tree
 
