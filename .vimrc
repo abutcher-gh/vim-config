@@ -1333,14 +1333,48 @@ else
 endif
 
 
+function! GNUError()
+   highlight default link GNUError ErrorMsg
+
+   " whitespace errors
+   syn match GNUError / \+\ze\t/
+   syn match GNUError /\s\+$/
+
+   " line length errors
+   syn match GNUError /.\%>81v/
+endfunction
+
+
 function! GNUStyle()
    set cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
    set shiftwidth=2
    set tabstop=8
    set noexpandtab
    set comments=s:/*,m:\ \ \ ,re:*/,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
+
+   syn keyword cType tree
+
+   call GNUError()
 endfunction
 command! GNUStyle call GNUStyle()
+
+
+function! LinuxStyle()
+   set tabstop=8
+   set shiftwidth=8
+   set textwidth=80
+   set noexpandtab
+
+   set cindent
+   set formatoptions=tcqlron
+   set cinoptions=:0,l1,t0,g0
+
+   syn keyword cOperator likely unlikely
+   syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64
+
+   call GNUError()
+endfunction
+command! LinuxStyle call LinuxStyle()
 
 
 function! LogView()
