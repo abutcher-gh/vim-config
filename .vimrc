@@ -1219,6 +1219,8 @@ if has("autocmd")
    autocmd BufNewFile,BufRead *.diff set ft=diff
    autocmd BufNewFile,BufRead COMMIT_EDITMSG set ft=gitcommit
 
+   autocmd BufNewFile,BufRead * call ShowWhitespaceErrors()
+
    " Also, support editing of gzip-compressed files. DO NOT REMOVE THIS!
    " This is also used when loading the compressed helpfiles.
    augroup gzip
@@ -1335,10 +1337,9 @@ endif
 
 function! ShowWhitespaceErrors()
    highlight default link WSError ErrorMsg
-   syn match WSError / \+\ze\t/
-   syn match WSError /\s\+$/
+   syn match WSError / \+\ze\t/ containedin=ALL
+   syn match WSError /\s\+$/ containedin=ALL
 endfunction
-call ShowWhitespaceErrors() " always
 
 
 function! GNUError()
