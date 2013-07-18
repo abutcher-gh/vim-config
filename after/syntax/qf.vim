@@ -18,6 +18,8 @@ syn match qfWarning "[Ww]arning:.*" contains=qfWarningQuoted,qfSymbol,qfNumber,q
 
 syn match qfTagType "<<\S*>>"
 
+syn match qfHere /\s\+^/hs=e
+
 hi link qfError          WarningMsg
 hi link qfWarning        Type
 hi link qfQuoted         Statement
@@ -27,4 +29,5 @@ hi link qfType           Type
 hi link qfSymbol         Directory
 hi link qfNumber         Comment
 hi link qfTagType        Question
+hi link qfHere           Constant
 
