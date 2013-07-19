@@ -29,5 +29,5 @@ hi link qfType           Type
 hi link qfSymbol         Directory
 hi link qfNumber         Comment
 hi link qfTagType        Question
-hi link qfHere           Constant
+hi link qfHere           MoreMsg
 
