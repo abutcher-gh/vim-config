@@ -1342,9 +1342,12 @@ function! ShowWhitespaceErrors()
 endfunction
 
 
-function! GNUError()
-   highlight default link GNUError ErrorMsg
-   let g:line_length_error = matchadd("GNUError", '.\%>81v', 999)
+function! ShowOverlongLines()
+   highlight default link OverlongLine Todo
+   if exists('b:line_length_error')
+      call matchdelete(b:line_length_error)
+   endif
+   let b:line_length_error = matchadd("OverlongLine", '.\%>'.(&tw + 1).'v', 999)
 endfunction
 
 
@@ -1358,7 +1361,7 @@ function! GNUStyle()
 
    syn keyword cType tree
 
-   call GNUError()
+   call ShowOverlongLines()
 endfunction
 command! GNUStyle call GNUStyle()
 
@@ -1376,7 +1379,7 @@ function! LinuxStyle()
    syn keyword cOperator likely unlikely
    syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64
 
-   call GNUError()
+   call ShowOverlongLines()
 endfunction
 command! LinuxStyle call LinuxStyle()
 
