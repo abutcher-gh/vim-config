@@ -809,9 +809,9 @@ if ! g:windows
    let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 else
    for i in split(&rtp,',')
-      let wintee = i.'/bin/wintee'
-      if executable(wintee)
-         let &shellpipe='2>&1| "'.wintee.'" '
+      if executable(i.'/bin/wintee')
+         let $PATH = $PATH . ";" . i . '/bin'
+         let &shellpipe='2>&1| wintee '
          break
       endif
    endfor
