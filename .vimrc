@@ -1193,7 +1193,7 @@ if has("autocmd")
    " Also, for convenience, if the first line matches 'grep -n' style
    " output, then use it as quickfix content and center on the first
    " line.
-   autocmd StdinReadPost * set nomodified | if getline(1) =~ '^\f\+:\d\+:\(\d\+:\)\?' |:cb|:execute 'normal zz'|:execute 'doautocmd filetypedetect BufRead '.expand('%')|:copen| endif
+   autocmd StdinReadPost * set nomodified | if getline(1) =~ '^\f\+:\d\+:\(\d\+:\)\?' |:cb|:execute 'normal zz'|:execute 'doautocmd filetypedetect BufRead '.expand('%')|:call ShowWhitespaceErrors()|:copen| endif
 
    autocmd BufReadPost *.patch,*.diff if getline(1) =~ '^From [0-9a-f]\{40\}' | let &ft='git-diff' | normal <CR> | fi
 
