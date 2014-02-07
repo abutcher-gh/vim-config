@@ -248,7 +248,10 @@ else
 endif
 
 " tag search path
-let &tags="./tags;/,tags;/," . substitute($TAG_PATHS, '##', ',', 'g') 
+let &tags="./tags;/,tags;/," . substitute($TAG_PATHS, '##', ',', 'g')
+if g:cygwin
+   let &tags=substitute(&tags, '\(.\):', '/\1', 'g')
+endif
 
 " typelist window configuration
 set updatetime=1000
@@ -805,8 +808,8 @@ nmap <silent> <Bar>H :GitShowDiff -C <CR>
 " color sequences but strips any such
 " sequences from the resulting capture
 " that ends up in the quickfix buffer.
-if ! g:windows
-   let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); $s.=$c; last if ord($c) == 10; }; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
+if ! g:windows || g:cygwin
+   let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); next if ord($c) == 13; $s.=$c; last if ord($c) == 10; }; $s=~s|([A-Za-z]):[\\\\/]|/$1/|; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
 else
    for i in split(&rtp,',')
       if executable(i.'/bin/wintee')
