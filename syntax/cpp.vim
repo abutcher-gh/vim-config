@@ -112,15 +112,21 @@ syn match Special	"\<forward\s*<"me=e-1
 
 syn match Keyword	"\<make_shared\s*<"me=e-1
 
+syn region  cppString     start=/\(u8\|u\|U\|L\)\="/ skip=/\\\\\|\\"/ end=/"/ contains=cSpecial,cFormat,@Spell
+syn match   cppRawString  /\%(u8\|u\|U\|L\)\=R"\([[:alnum:]_{}[\]#<>%:;.?*+\-/\^&|~!=,"']\{,16}\)(\_.\{-})\1"/ contains=cSpecial,cFormat,@Spell
+hi def link cppRawString cppString
+hi def link cppString String
+
 syn keyword Keyword foreach
 syn keyword Keyword auto_for for_auto
 syn keyword Keyword	thread_local
-syn keyword Keyword	alignof
+syn keyword Keyword	alignof alignas
 syn keyword Keyword	static_assert
 
 syn keyword Type	decltype
 syn keyword Type	constexpr
-syn keyword Type	alignas
+syn keyword Type	concept
+syn keyword Type	requires
 
 " C++11 override and final (also highlight 'virtual' as keyword rather than
 " type)
