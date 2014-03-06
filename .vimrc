@@ -695,6 +695,7 @@ map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
 " 
 nmap <silent> q<Left> :colder<CR>
 nmap <silent> q<Right> :cnewer<CR>
+nmap <silent> qe :cclose<CR>:cw<CR>:set modifiable<CR>:vg/\cerror/d<CR>:cb<CR>
 " 
 " typelist window
 "
