@@ -690,13 +690,13 @@ nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
 nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
 map <silent> <F8>   :cnf<CR>:call CondCenterView()<CR>
 map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
-" 
+"
 " quickfix history nav
-" 
+"
 nmap <silent> q<Left> :colder<CR>
 nmap <silent> q<Right> :cnewer<CR>
-nmap <silent> qe :cclose<CR>:cw<CR>:set modifiable<CR>:vg/\cerror/d<CR>:cb<CR>
-" 
+nmap <silent> qe :cclose<CR>:cw<CR>:set modifiable<CR>:vg/\c\(entering\\|leaving\\|error\)/d<CR>:%s/^\|\| /<CR>:set nomodified<CR>:cb<CR>
+"
 " typelist window
 "
 nmap <F10>  :TlistSync<CR>
@@ -1070,6 +1070,10 @@ function! ToggleTextWrap()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""
+" text shuffling
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+
+""""""""""""""""""""""""""""""""""""""""""""""""
 
 " don't save backups
 set nobackup
@@ -1142,22 +1146,22 @@ function! SetTerminalHighlighting()
    " remove solid background from html highlighting
    let html_my_rendering = 1 
    exe ''
-   \.'  hi htmlBold                term=bold cterm=bold gui=bold'                                                 
-   \.'| hi htmlBoldUnderline       term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline    
-   \.'| hi htmlBoldItalic          term=bold cterm=bold gui=bold'                                                 
-   \.'| hi htmlBoldUnderlineItalic term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline    
-   \.'| hi htmlUnderline           term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
-   \.'| hi htmlUnderlineItalic     term='.l:underline.' cterm='.l:underline.' gui='.l:underline                   
-   \.'| hi htmlItalic              term=bold cterm=bold gui=bold'                                                 
+   \.'  hi htmlBold                term=bold cterm=bold gui=bold'
+   \.'| hi htmlBoldUnderline       term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline
+   \.'| hi htmlBoldItalic          term=bold cterm=bold gui=bold'
+   \.'| hi htmlBoldUnderlineItalic term=bold'.l:cunderline.' cterm=bold'.l:cunderline.' gui=bold'.l:cunderline
+   \.'| hi htmlUnderline           term='.l:underline.' cterm='.l:underline.' gui='.l:underline
+   \.'| hi htmlUnderlineItalic     term='.l:underline.' cterm='.l:underline.' gui='.l:underline
+   \.'| hi htmlItalic              term=bold cterm=bold gui=bold'
 
    endif
 
    " replace solid background of spell/grammar errors in cterm with bright underline
    exe ''
-   \.'  hi SpellBad   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=1 gui=undercurl guisp=Red'
-   \.'| hi SpellCap   term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=4 gui=undercurl guisp=Blue'
-   \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=6 gui=undercurl guisp=Cyan'
-   \.'| hi SpellRare  term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=5 gui=undercurl guisp=Magenta'
+   \.'  hi SpellBad   term=bold cterm='.l:underline.' ctermbg=none ctermfg=174 gui=undercurl guisp=Red'
+   \.'| hi SpellCap   term=bold cterm='.l:underline.' ctermbg=none ctermfg=32  gui=undercurl guisp=Blue'
+   \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=42  gui=undercurl guisp=Cyan'
+   \.'| hi SpellRare  term=bold cterm=bold ctermbg=none ctermfg=206 gui=undercurl guisp=Magenta'
 
    if exists(':Hreload')
       Hreload
