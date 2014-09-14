@@ -1,12 +1,41 @@
 
+if isdirectory(expand('~/.vim/bundle/Vundle.vim/.git'))
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                        Vundle                          "
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+
+Plugin 'Valloric/YouCompleteMe'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+let g:ycm_key_invoke_completion = '<C-@>'
+let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
+let g:ycm_always_populate_location_list = 1
+
+"                        Vundle                          "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+else
+filetype plugin indent on
+endif
+
 let g:initial = " "
 let g:lead = " "
 
 let g:intellisense_vimfiles = $VIM . '/vimfiles'
 
 set sessionoptions=blank,buffers,curdir,folds,help,options,tabpages,winsize,winpos,resize
-
-filetype plugin on
 
 " attributes used by the file-to-html converter
 "
