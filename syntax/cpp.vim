@@ -114,7 +114,7 @@ syn match Keyword	"\<make_shared\s*<"me=e-1
 
 syn region  cppString     start=/\(u8\|u\|U\|L\)\="/ skip=/\\\\\|\\"/ end=/"/ contains=cSpecial,cFormat,@Spell
 syn match   cppRawString  /\%(u8\|u\|U\|L\)\=R"\([[:alnum:]_{}[\]#<>%:;.?*+\-/\^&|~!=,"']\{,16}\)(\_.\{-})\1"/ contains=cSpecial,cFormat,@Spell
-hi def link cppRawString cppString
+hi def link cppRawString Define
 hi def link cppString String
 
 syn keyword Keyword foreach
