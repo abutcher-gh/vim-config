@@ -1,5 +1,3 @@
-
-if isdirectory(expand('~/.vim/bundle/Vundle.vim/.git'))
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                        Vundle                          "
 set nocompatible              " be iMproved, required
@@ -15,20 +13,18 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'terryma/vim-multiple-cursors'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 
+"                        Vundle                          "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 let g:ycm_key_invoke_completion = '<C-@>'
 let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
-
-"                        Vundle                          "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-else
-filetype plugin indent on
-endif
 
 let g:initial = " "
 let g:lead = " "
