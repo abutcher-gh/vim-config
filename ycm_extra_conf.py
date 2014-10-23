@@ -38,7 +38,6 @@ flags = [
 '-W',
 '-Wall',
 '-Wextra',
-'-Werror',
 '-Wno-long-long',
 '-Wno-variadic-macros',
 '-fexceptions',
@@ -61,8 +60,7 @@ flags = [
 '/usr/include',
 '-isystem',
 '/usr/local/include',
-'-isystem',
-'-stdlib=libc++',
+'-stdlib=libstdc++',
 ]
 
 
