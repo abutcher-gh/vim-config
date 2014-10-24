@@ -1346,6 +1346,7 @@ let g:fallback_scheme='default'
 let g:fullcolorterm = &term =~ 'gui' || ( &t_Co == '256' && &term != 'linux' )
 
 runtime prefs
+if filereadable(expand("~/.vim-prefs")) | source ~/.vim-prefs | endif
 
 " set colorscheme based on user name and terminal type
 "
@@ -1442,4 +1443,6 @@ hi SpecialKey guifg=gray
 " file; this file should be placed in ~/.vim/ on unix or personal or
 " system-wide vimfiles on windows.
 runtime vimrc-overrides
+" alternatively, place in HOME.
+if filereadable(expand("~/.vimrc-overrides")) | source ~/.vimrc-overrides | endif
 
