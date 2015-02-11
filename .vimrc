@@ -25,6 +25,12 @@ filetype plugin indent on    " required
 let g:ycm_key_invoke_completion = '<C-@>'
 let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
+let g:ycm_complete_in_comments = 1
+let g:ycm_warning_symbol = 'âš '
+let g:ycm_error_symbol = 'â€¼â€¼'
+
+hi link YcmWarningSign Delimiter
+hi link YcmErrorSign WarningMsg
 
 let g:initial = " "
 let g:lead = " "
@@ -908,7 +914,7 @@ try | set nocscoperelative | catch | endtry
 function! OpenQuickfix()
    copen
    set modifiable
-   for l:d in keys(g:cscope_tags_dir) | try | execute '%s¬^'.l:d.'/\?¬¬' | catch | endtry | endfor
+   for l:d in keys(g:cscope_tags_dir) | try | execute '%sÂ¬^'.l:d.'/\?Â¬Â¬' | catch | endtry | endfor
    set nomodified
    cd .
 endfunction
@@ -1027,16 +1033,14 @@ set nowrap " off by default
 set linebreak
 set sidescroll=5
 set sidescrolloff=1
-set listchars+=precedes:«,extends:»
+set listchars+=precedes:Â«,extends:Â»
 set encoding=utf-8
 try
    set breakindent
    set breakindentshift=0
 catch
 endtry
-scriptencoding latin1 " force single-byte guillemet 
-set showbreak=\ »\ 
-scriptencoding
+set showbreak=\ Â»\ 
 
 " toggle wrapping modes (real and display)
 " when display wrapping is on make cursor up/down move by
@@ -1198,15 +1202,17 @@ endfunction
 " (now called from change event autocmd)
 function! ResetCursor()
 
-   hi clear CursorLine
-   hi clear CursorColumn
-   
-   hi CursorLine   guibg=lightgray
-   hi CursorColumn guibg=lightgray
-   
-   "hi Cursor		  guifg=bg	guibg=#305080
-   hi wCursor		  guifg=bg	guibg=#FF1020
-   hi oCursor		  guifg=bg	guibg=#CC20FF
+   if &term =~ 'gui'
+      hi clear CursorLine
+      hi clear CursorColumn
+
+      hi CursorLine   guibg=lightgray ctermbg=235
+      hi CursorColumn guibg=lightgray ctermbg=235
+
+      "hi Cursor		  guifg=bg	guibg=#305080
+      hi wCursor		  guifg=bg	guibg=#FF1020
+      hi oCursor		  guifg=bg	guibg=#CC20FF
+   endif
 
 endfunction
 
