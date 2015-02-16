@@ -1406,15 +1406,24 @@ endfunction
 command! GNUStyle call GNUStyle()
 
 
-function! LinuxStyle()
+function! Tab84()
    set tabstop=8
-   set shiftwidth=8
+   set shiftwidth=4
    set textwidth=80
    set noexpandtab
 
    set cindent
    set formatoptions=tcqlron
    set cinoptions=:0,l1,t0,g0
+
+   call ShowOverlongLines()
+endfunction
+command! Tab84 call Tab84()
+
+
+function! LinuxStyle()
+   call Tab84()
+   set shiftwidth=8
 
    syn keyword cOperator likely unlikely
    syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64
