@@ -739,8 +739,8 @@ nmap <F11>  :Tlist<CR>
 " tag traversal -- forward, backward and list-matches
 " holding shift when stepping in opens a new window
 "
-nmap <silent> \] :exec 'ltag '.expand('<cword>')<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>
-nmap <silent> <Bar>} :split<CR>:try<CR>:exec 'ltag '.expand('<cword>')<CR>:catch<CR>:endtry<CR>:if empty(getloclist(0))<CR>:q<CR>:else<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>:endif<CR>
+nmap <silent> \] :call TagJump(expand('<cword>'))<CR>
+nmap <silent> <Bar>} :call TagJump(expand('<cword>'), 'split')<CR>
 nmap \[ <C-T>
 nmap \# :ts<CR>
 nmap \= :tn<CR>
@@ -748,7 +748,31 @@ nmap \- :tp<CR>
 "
 " Push current taglist into quickfix window.
 "
-nmap <silent> \l :try<CR>:ltag<CR>:catch<CR>:endtry<CR>:if !empty(getloclist(0))<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>:endif<CR>
+nmap <silent> \l :call TagJump('')<CR>
+"
+" Traverse into tag and open multiple matches in quickfix window
+"
+function! TagJump(tag, ...)
+   let split = a:0
+   if split
+      split
+   endif
+   try
+   exec 'ltag '.a:tag
+   catch
+   endtry
+   let c = len(getloclist(0))
+   if c <= 1 && split
+      q
+   endif
+   if c > 1
+      call setqflist(getloclist(0))
+      call OpenQuickfix()
+      cfirst
+   elseif split
+      exec 'tag '.a:tag
+   endif
+endfunction
 "
 " Launch viewtex on the current file (only makes sense in an
 " environment which can show the resulting document graphically; e.g. 
