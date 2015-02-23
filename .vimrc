@@ -734,16 +734,14 @@ nmap <F10>  :TlistSync<CR>
 nmap <F11>  :Tlist<CR>
 "
 " tag traversal -- forward, backward and list-matches
+" holding shift when stepping in opens a new window
 "
-nmap \] <C-]>
+nmap <silent> \] :exec 'ltag '.expand('<cword>')<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> <Bar>} :split<CR>:try<CR>:exec 'ltag '.expand('<cword>')<CR>:catch<CR>:endtry<CR>:if empty(getloclist(0))<CR>:q<CR>:else<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>:endif<CR>
 nmap \[ <C-T>
 nmap \# :ts<CR>
 nmap \= :tn<CR>
 nmap \- :tp<CR>
-"
-" holding shift when stepping in opens a new window
-"
-nmap <Bar>} <C-w><C-]>
 "
 " Launch viewtex on the current file (only makes sense in an
 " environment which can show the resulting document graphically; e.g. 
