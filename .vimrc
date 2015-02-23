@@ -743,6 +743,10 @@ nmap \# :ts<CR>
 nmap \= :tn<CR>
 nmap \- :tp<CR>
 "
+" Push current taglist into quickfix window.
+"
+nmap <silent> \l :try<CR>:ltag<CR>:catch<CR>:endtry<CR>:if !empty(getloclist(0))<CR>:call setqflist(getloclist(0))<CR>:call OpenQuickfix()<CR>:cfirst<CR>:endif<CR>
+"
 " Launch viewtex on the current file (only makes sense in an
 " environment which can show the resulting document graphically; e.g. 
 " over an X11 connection or on windows).  Arguments given are
