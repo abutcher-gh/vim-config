@@ -31,6 +31,7 @@ let g:ycm_warning_symbol = '⚠'
 let g:ycm_error_symbol = '‼‼'
 
 let g:ctrlp_user_command = 'git ls-files %s'
+let g:ctrlp_by_filename = 1
 
 hi link YcmWarningSign Delimiter
 hi link YcmErrorSign WarningMsg
