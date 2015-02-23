@@ -38,16 +38,16 @@ if [ -z "$NO_GIT" ]; then
       else SRC_DIR="$REPO_ROOT"
       fi
       echo >&2 "Locating files in '$SRC_DIR' with 'git'..."
-      (cd "$SRC_DIR" && git ls-files --full-name '*.c??' '*.c' '*.h' '*.h??' '*.inl' '*.impl' '*.java') | sed "s|^|$REPO_ROOT/|" > "$REPO_ROOT"/cscope.files
+      (cd "$SRC_DIR" && git ls-files --full-name '*.c??' '*.c' '*.cc' '*.h' '*.hh' '*.h??' '*.inl' '*.impl' '*.java') | sed "s|^|$REPO_ROOT/|" > "$REPO_ROOT"/cscope.files
       cd $REPO_ROOT
    fi
 elif [ -n "$FORCE_DIR" ]; then
    cd "$1"
    rm -f cscope* tags
 fi
-[ -n "$REPO_ROOT" ] || { echo >&2 "Locating files in '$1' with 'find'..."; find . -regex '.*\.\([chi]\(pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; }
+[ -n "$REPO_ROOT" ] || { echo >&2 "Locating files in '$1' with 'find'..."; find . -regex '.*\.\([chi]\(c\|h\|pp\|xx\|\+\+\)?\|inl\|impl\|java\)' ${FIND_LINK_OPTS[@]} > cscope.files; }
 echo >&2 "Updating tags..."
-ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} -L cscope.files
+ctags -a -R ${CTAGS_LINK_OPTS[@]} -h '.h.H.hh.hpp.hxx.h++.inl' --langmap=c++:.c.cc.cpp.cxx.c++.h.hpp.hxx.h++.inl.impl ${CTAGS_OPTS} -L cscope.files
 echo >&2 "Updating cscope database..."
 cscope -u -b -q ${CSCOPE_OPTS}
 echo >&2 "Done."
