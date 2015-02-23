@@ -14,6 +14,7 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
+Plugin 'kien/ctrlp.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -28,6 +29,8 @@ let g:ycm_always_populate_location_list = 1
 let g:ycm_complete_in_comments = 1
 let g:ycm_warning_symbol = '⚠'
 let g:ycm_error_symbol = '‼‼'
+
+let g:ctrlp_user_command = 'git ls-files %s'
 
 hi link YcmWarningSign Delimiter
 hi link YcmErrorSign WarningMsg
