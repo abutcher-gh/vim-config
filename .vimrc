@@ -233,7 +233,7 @@ set diffexpr=PortableDiff()
 " like the best way to open a full screen diff window.  But it
 " probably isn't!
 if &diff
-   set lines=1000 columns=1000
+   set lines=64 columns=250
    " turn off spelling in terminal (it can't do underlining and
    " background highlighting confuses the diff)
    if &term !~ "gui" 
