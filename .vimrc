@@ -15,7 +15,7 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'kien/ctrlp.vim'
-Plugin 'rhysd/vim-clang-format'
+Plugin 'abutcher-gh/vim-clang-format'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
