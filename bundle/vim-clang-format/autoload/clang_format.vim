@@ -152,7 +152,7 @@ endfunction
 " }}}
 
 " replace buffer {{{
-function! clang_format#replace(line1, line2)
+function! clang_format#replace(line1, line2, ...)
 
     call s:verify_command()
 
@@ -160,6 +160,7 @@ function! clang_format#replace(line1, line2)
     let sel_save = &l:selection
     let &l:selection = "inclusive"
     let [save_g_reg, save_g_regtype] = [getreg('g'), getregtype('g')]
+    let insert_mode = a:0 > 0 && a:1 == 'insert_mode'
 
     try
         let formatted = clang_format#format(a:line1, a:line2)
@@ -183,9 +184,22 @@ function! clang_format#replace(line1, line2)
                     throw "fallback"
                 endif
 
-                call setreg('g', formatted[i+1:], 'V')
-                undojoin | silent normal! 2gg"_dG
-                silent put g
+                " Get current content and compare to reformatted text.
+                " If they are equal there is nothing to do.
+                " Otherwise, store an undo point (if in insert mode)
+                " and replace.
+                if join(getline(2,'$'),"\n") != formatted[i+1:]
+                    if insert_mode
+                        let &undolevels = &undolevels
+                        silent normal! ix
+                        silent normal! "_x
+                    else
+                        undojoin
+                    endif
+                    call setreg('g', formatted[i+1:], 'V')
+                    silent normal! 2gg"_dG
+                    silent put g
+                endif
             catch
                 " Fallback:
                 " The previous way.  It lets the cursor move to the first line
@@ -193,7 +207,7 @@ function! clang_format#replace(line1, line2)
                 call setreg('g', formatted, 'V')
                 silent keepjumps normal! ggVG"gp
             endtry
-        else
+        elseif !insert_mode
             call s:error_message(formatted)
         endif
     finally
@@ -211,7 +225,7 @@ function! s:format_inserted_area()
     let pos = getpos('.')
     " When in the same buffer
     if &modified && ! empty(s:pos_on_insertenter) && s:pos_on_insertenter[0] == pos[0]
-        call clang_format#replace(s:pos_on_insertenter[1], line('.'))
+        call clang_format#replace(s:pos_on_insertenter[1], line('.'), 'insert_mode')
         let s:pos_on_insertenter = []
     endif
 endfunction
@@ -220,7 +234,7 @@ function! clang_format#enable_format_on_insert()
     augroup plugin-clang-format-auto-format-insert
         autocmd!
         autocmd InsertEnter <buffer> let s:pos_on_insertenter = getpos('.')
-        autocmd InsertLeave <buffer> let &undolevels = &undolevels | execute ":normal ix" | execute ":normal x" | call s:format_inserted_area()
+        autocmd InsertLeave <buffer> call s:format_inserted_area()
     augroup END
 endfunction
 
