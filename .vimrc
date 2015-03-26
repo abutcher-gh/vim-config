@@ -15,6 +15,7 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'kien/ctrlp.vim'
+Plugin 'rhysd/vim-clang-format'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -35,6 +36,39 @@ let g:ctrlp_by_filename = 1
 
 hi link YcmWarningSign Delimiter
 hi link YcmErrorSign WarningMsg
+
+let g:clang_format#style_options = {
+            \ "BasedOnStyle" : "WebKit",
+            \ "Standard" : "C++11",
+            \ "IndentWidth" : 3,
+            \ "TabWidth" : 3,
+            \ "ContinuationIndentWidth" : 4,
+            \ "ConstructorInitializerIndentWidth" : 1,
+            \ "UseTab" : "Never",
+            \ "AccessModifierOffset" : -3,
+            \ "AlwaysBreakTemplateDeclarations" : "true",
+            \ "AllowShortCaseLabelsOnASingleLine" : "true",
+            \ "AllowShortFunctionsOnASingleLine" : "Inline",
+            \ "AllowShortIfStatementsOnASingleLine" : "false",
+            \ "AllowShortLoopsOnASingleLine" : "false",
+            \ "BreakBeforeBraces" : "Allman",
+            \ "ConstructorInitializerAllOnOneLineOrOnePerLine" : "true",
+            \ "DerivePointerAlignment" : "false",
+            \ "PointerAlignment" : "Left",
+            \ "NamespaceIndentation" : "None",
+            \ "SpaceAfterCStyleCast" : "true",
+            \ "SpaceBeforeParens" : "false",
+            \ "SpacesInCStyleCastParentheses" : "false",
+            \ "SpacesInParentheses" : "true",
+            \ "SpacesInSquareBrackets" : "false",
+            \ "SpaceInEmptyParentheses" : "false",
+            \ }
+
+let g:clang_format#auto_format_on_insert_leave = 0
+nmap <Bar>F :call clang_format#toggle_format_on_insert()<CR>
+
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
 
 let g:initial = " "
 let g:lead = " "
@@ -1031,24 +1065,12 @@ com! -nargs=? -complete=file       AddCscopeTagsDir   let s:d = DirOf(empty(<q-a
 com! -nargs=* Cb :cb
 com! -nargs=* GrepParse let oef=&errorformat | let &errorformat='%f:%l:%m' | :cb | let &errorformat=oef
 
-" allow modified buffers to be hidden
-set hidden
 
-" default tab of 3 and use spaces instead of literal tabs
-set ts=3
-set expandtab
-
-" default backspace like normal
-set bs=2
-
-"""""""""""""""""""""""""""""""""""""""""""""""""
-
+set hidden        " allow modified buffers to be hidden
+set bs=2          " default backspace like normal
 set ai            " auto-indent ALWAYS
 set si            " smart-indent
 set cin           " C-aware indent
-set sw=3          " Indent width
-
-
 set vb            " visible bell rather than beep
 
 set linespace=1 "pixel
@@ -1461,6 +1483,15 @@ function! LinuxStyle()
    call ShowOverlongLines()
 endfunction
 command! LinuxStyle call LinuxStyle()
+
+
+function! DefaultStyle()
+   set tabstop=3
+   set shiftwidth=3
+   set expandtab
+endfunction
+command! DefaultStyle call DefaultStyle()
+call DefaultStyle()
 
 
 function! LogView()
