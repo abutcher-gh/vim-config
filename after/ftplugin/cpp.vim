@@ -1,1 +1,1 @@
-setlocal cindent cinoptions=j1
+setlocal cindent cinoptions=j1,(0,Ws

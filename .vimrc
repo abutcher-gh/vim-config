@@ -46,6 +46,7 @@ let g:clang_format#style_options = {
             \ "ConstructorInitializerIndentWidth" : 1,
             \ "UseTab" : "Never",
             \ "AccessModifierOffset" : -3,
+            \ "AlignAfterOpenBracket" : "true",
             \ "AlwaysBreakTemplateDeclarations" : "true",
             \ "AllowShortCaseLabelsOnASingleLine" : "true",
             \ "AllowShortFunctionsOnASingleLine" : "Inline",
@@ -65,10 +66,10 @@ let g:clang_format#style_options = {
             \ }
 
 let g:clang_format#auto_format_on_insert_leave = 0
-nmap <Bar>F :call clang_format#toggle_format_on_insert()<CR>
+nmap <Bar>X :call clang_format#toggle_format_on_insert()<CR>
 
-autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>x :<C-u>.ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>x :ClangFormat<CR>
 
 let g:initial = " "
 let g:lead = " "
