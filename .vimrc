@@ -42,7 +42,7 @@ let g:clang_format#style_options = {
             \ "Standard" : "C++11",
             \ "IndentWidth" : 3,
             \ "TabWidth" : 3,
-            \ "ContinuationIndentWidth" : 4,
+            \ "ContinuationIndentWidth" : 3,
             \ "ConstructorInitializerIndentWidth" : 1,
             \ "UseTab" : "Never",
             \ "AccessModifierOffset" : -3,
