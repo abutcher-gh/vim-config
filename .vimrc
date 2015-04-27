@@ -58,6 +58,7 @@ let g:clang_format#style_options = {
             \ "ExperimentalAutoDetectBinPacking" : "true",
             \ "DerivePointerAlignment" : "false",
             \ "PointerAlignment" : "Left",
+            \ "MaxEmptyLinesToKeep" : 1,
             \ "NamespaceIndentation" : "None",
             \ "SpaceAfterCStyleCast" : "true",
             \ "SpaceBeforeParens" : "false",
