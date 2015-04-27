@@ -63,6 +63,11 @@ flags = [
 '-stdlib=libstdc++',
 ]
 
+for p in os.environ['CPATH'].split(':'):
+  flags.extend(['-I', p])
+
+for p in os.environ['CPLUS_INCLUDE_PATH'].split(':'):
+  flags.extend(['-isystem', p])
 
 flags.extend(os.popen("run wx-config --cxxflags").read().split());
 
