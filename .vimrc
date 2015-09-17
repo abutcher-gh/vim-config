@@ -32,6 +32,8 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_warning_symbol = '⚠'
 let g:ycm_error_symbol = '‼‼'
 
+nmap \q :YcmCompleter FixIt<C-M>
+
 let g:ctrlp_user_command = 'git ls-files %s'
 let g:ctrlp_by_filename = 1
 
