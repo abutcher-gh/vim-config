@@ -10,13 +10,17 @@ call vundle#begin()
 "call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
+Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'kien/ctrlp.vim'
 Plugin 'abutcher-gh/vim-clang-format'
 Plugin 'AndrewRadev/linediff.vim'
+Plugin 'NLKNguyen/papercolor-theme'
+Plugin 'jonathanfilip/vim-lucius'
+Plugin 'digitaltoad/vim-jade'
+Plugin 'airblade/vim-gitgutter'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -1307,11 +1311,12 @@ if has("autocmd")
      autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent noautoindent comments&
      autocmd BufNewFile,BufRead *.gpp set filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead *.impl set filetype=cpp
-     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
+     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
      autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i set filetype=asm tabstop=14 formatoptions=croql cindent comments=";"
      autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
    augroup END
+   autocmd BufNewFile,BufRead *.js,*.html,*.jade,*.xml set ts=2 sw=2
 
    autocmd BufNewFile,BufRead *.git-diff set ft=git-diff
    autocmd BufNewFile,BufRead *.diff set ft=diff

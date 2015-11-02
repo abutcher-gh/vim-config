@@ -69,7 +69,7 @@ for p in os.environ['CPATH'].split(':'):
 for p in os.environ['CPLUS_INCLUDE_PATH'].split(':'):
   flags.extend(['-isystem', p])
 
-flags.extend(os.popen("run wx-config --cxxflags").read().split());
+flags.extend(os.popen("NO_STATUS_FILES=1 run wx-config --cxxflags").read().split());
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
