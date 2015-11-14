@@ -21,6 +21,7 @@ Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'wavded/vim-stylus'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
