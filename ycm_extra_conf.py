@@ -63,10 +63,10 @@ flags = [
 '-stdlib=libstdc++',
 ]
 
-for p in os.environ['CPATH'].split(':'):
+for p in os.getenv('CPATH', '').split(':'):
   flags.extend(['-I', p])
 
-for p in os.environ['CPLUS_INCLUDE_PATH'].split(':'):
+for p in os.getenv('CPLUS_INCLUDE_PATH', '').split(':'):
   flags.extend(['-isystem', p])
 
 flags.extend(os.popen("NO_STATUS_FILES=1 run wx-config --cxxflags").read().split());
