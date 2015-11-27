@@ -1519,6 +1519,7 @@ function! LogView()
    set ft=asm
    set ts=10
    set nospell
+   set ve=all
    normal \m
 endfunction
 command! LogView call LogView()
