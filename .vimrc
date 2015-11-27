@@ -1520,6 +1520,7 @@ function! LogView()
    set ts=10
    set nospell
    set ve=all
+   let g:match_maps = 0
    normal \m
 endfunction
 command! LogView call LogView()
