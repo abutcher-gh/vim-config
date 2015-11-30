@@ -14,7 +14,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'abutcher-gh/vim-clang-format'
 Plugin 'AndrewRadev/linediff.vim'
 Plugin 'NLKNguyen/papercolor-theme'
@@ -39,7 +39,15 @@ let g:ycm_error_symbol = '‼‼'
 
 nmap \q :YcmCompleter FixIt<C-M>
 
-let g:ctrlp_user_command = 'git ls-files %s'
+" let s:ctrlp_fallback = 'find %s -type f'
+let s:ctrlp_fallback = 'echo "Not a VCS directory"'
+let g:ctrlp_user_command = {
+   \ 'types': {
+      \ 1: ['.git', 'git -C %s ls-files'],
+      \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+      \ },
+   \ 'fallback': s:ctrlp_fallback
+   \ }
 let g:ctrlp_by_filename = 1
 
 hi link YcmWarningSign Delimiter
