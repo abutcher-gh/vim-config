@@ -1449,7 +1449,7 @@ endif
 
 
 function! ShowWhitespaceErrors()
-   highlight default link WSError ErrorMsg
+   highlight default link WSError Error
    syn match WSError / \+\ze\t/ containedin=ALL
    syn match WSError /\s\+$/ containedin=ALL
 endfunction
