@@ -12,6 +12,16 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+" allow overriding plugins without changing this, possibly, version controlled
+" file; this file should be placed in ~/.vim/ on unix or personal or
+" system-wide vimfiles on windows.
+runtime vimrc-vundle-plugins
+" alternatively, place a dot-prefixed version in HOME.
+if filereadable(expand("~/.vimrc-vundle-plugins")) | source ~/.vimrc-vundle-plugins | endif
+
+" the above script may set g:no_default_plugins to completely
+" override the plugin set.
+if !exists('g:no_default_plugins') || !g:no_default_plugins
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'ctrlpvim/ctrlp.vim'
@@ -22,6 +32,7 @@ Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'wavded/vim-stylus'
+endif
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -48,7 +59,7 @@ let g:ctrlp_user_command = {
       \ },
    \ 'fallback': s:ctrlp_fallback
    \ }
-let g:ctrlp_by_filename = 1
+" let g:ctrlp_by_filename = 1
 
 hi link YcmWarningSign Delimiter
 hi link YcmErrorSign WarningMsg
@@ -1542,6 +1553,5 @@ hi SpecialKey guifg=gray
 " file; this file should be placed in ~/.vim/ on unix or personal or
 " system-wide vimfiles on windows.
 runtime vimrc-overrides
-" alternatively, place in HOME.
+" alternatively, place a dot-prefixed version in HOME.
 if filereadable(expand("~/.vimrc-overrides")) | source ~/.vimrc-overrides | endif
-
