@@ -266,6 +266,7 @@ if s:is_dark " DARK VARIANT
   let s:comment      = ['#8a8a8a', '244']
   let s:todo         = ['#ff8700', '208']
   let s:cursorline   = ['#303030', '235']
+  let s:cursorlinenr = ['#ffff00', '226']
   let s:cursorcolumn = ['#303030', '235']
   let s:error        = ['#5f0000', '52']
   let s:matchparen   = ['#4e4e4e', '239']
@@ -282,6 +283,15 @@ if s:is_dark " DARK VARIANT
   let s:tabline_active_bg   = ['#00afaf', '37']
   let s:tabline_inactive_fg = ['#c6c6c6', '250']
   let s:tabline_inactive_bg = ['#585858', '240']
+
+  " BufTabLine:
+  let s:buftabline_bg          = ['#3a3a3a', '235']
+  let s:buftabline_current_fg  = ['#1c1c1c', '233']
+  let s:buftabline_current_bg  = ['#00afaf', '37']
+  let s:buftabline_active_fg   = ['#1c1c1c', '233']
+  let s:buftabline_active_bg   = ['#00afaf', '37']
+  let s:buftabline_inactive_fg = ['#c6c6c6', '250']
+  let s:buftabline_inactive_bg = ['#585858', '240']
 
   " Statusline:
   let s:statusline_active_fg   = ['#1c1c1c', '233']
@@ -300,6 +310,10 @@ if s:is_dark " DARK VARIANT
   " Folded:
   let s:folded_fg = ['#afdf00', '148']
   let s:folded_bg = ['#444444', '237']
+
+  " WildMenu:
+  let s:wildmenu_fg  = s:background
+  let s:wildmenu_bg  = ['#afdf00', '148']
 
   " Diff:
   let s:diffadd_fg    = ['#000000', '16']
@@ -346,6 +360,7 @@ else " LIGHT VARIANT
   let s:comment      = ['#878787', '102']
   let s:todo         = ['#00af5f', '35']
   let s:cursorline   = ['#e4e4e4', '254']
+  let s:cursorlinenr = ['#af0000', '124']
   let s:cursorcolumn = ['#e4e4e4', '254']
   let s:error        = ['#ffafdf', '218']
   let s:matchparen   = ['#c6c6c6', '251']
@@ -362,6 +377,16 @@ else " LIGHT VARIANT
   let s:tabline_active_bg   = s:window
   let s:tabline_inactive_fg = s:background
   let s:tabline_inactive_bg = s:aqua
+
+  " BufTabLine:
+  let s:buftabline_bg          = s:navy
+  let s:buftabline_current_fg  = s:foreground
+  let s:buftabline_current_bg  = s:window
+  let s:buftabline_active_fg   = s:background
+  let s:buftabline_active_bg   = s:blue
+  let s:buftabline_inactive_fg = s:background
+  let s:buftabline_inactive_bg = s:aqua
+
 
   " Statusline:
   let s:statusline_active_fg   = s:window
@@ -380,6 +405,10 @@ else " LIGHT VARIANT
   " Folded:
   let s:folded_fg = s:navy
   let s:folded_bg = ['#afdfff', '153']
+
+  " WildMenu:
+  let s:wildmenu_fg  = s:foreground
+  let s:wildmenu_bg  = ['#ffff00', '226']
 
   " Diff:
   let s:diffadd_fg    = []
@@ -423,6 +452,12 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
   call s:HL("TabLine", s:tabline_inactive_fg, s:tabline_inactive_bg, "None")
   call s:HL("TabLineFill", "", s:tabline_bg, "None")
   call s:HL("TabLineSel", s:tabline_active_fg, s:tabline_active_bg, "None")
+
+  call s:HL("BufTabLineCurrent", s:buftabline_current_fg, s:buftabline_current_bg, "None")
+  call s:HL("BufTabLineActive", s:buftabline_active_fg, s:buftabline_active_bg, "None")
+  call s:HL("BufTabLineHidden", s:buftabline_inactive_fg, s:buftabline_inactive_bg, "None")
+  call s:HL("BufTabLineFill", "", s:buftabline_bg, "None")
+
   call s:HL("StatusLine", s:statusline_active_fg, s:statusline_active_bg, "bold")
   call s:HL("StatusLineNC", s:statusline_inactive_fg, s:statusline_inactive_bg, "None")
   call s:HL("VertSplit", s:divider, s:background, "none")
@@ -436,12 +471,14 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
   call s:HL("MatchParen", "", s:matchparen, "")
   call s:HL("Folded", s:folded_fg, s:folded_bg, "")
   call s:HL("FoldColumn", "", s:background, "")
+  call s:HL("WildMenu", s:wildmenu_fg, s:wildmenu_bg, "bold")
   if version >= 700
     call s:HL("CursorLine", "", s:cursorline, "none")
+    call s:HL("CursorLineNr", s:cursorlinenr, "", "none")
     call s:HL("CursorColumn", "", s:cursorcolumn, "none")
     call s:HL("PMenu", s:foreground, s:selection, "none")
     call s:HL("PMenuSel", s:foreground, s:selection, "reverse")
-    call s:HL("SignColumn", "", s:background, "none")
+    call s:HL("SignColumn", s:green, s:background, "none")
   end
   if version >= 703
     call s:HL("ColorColumn", "", s:cursorcolumn, "none")
@@ -460,7 +497,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
   call s:HL("Identifier", s:navy, "", "")
   call s:HL("Function", s:foreground, "", "")
 
-  call s:HL("Statement", s:pink, "", "")
+  call s:HL("Statement", s:pink, "", "none")
   call s:HL("Conditional", s:purple, "", "bold")
   call s:HL("Repeat", s:purple, "", "bold")
   call s:HL("Label", s:blue, "", "")
@@ -517,6 +554,16 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
   call s:HL("vimNotation", s:aqua, "", "")
   call s:HL("vimOper", s:foreground, "", "")
   call s:HL("vimOperParen", s:foreground, "", "")
+  call s:HL("vimSynType", s:purple, "", "none")
+  call s:HL("vimSynReg", s:pink, "", "none")
+  call s:HL("vimSynKeyRegion", s:green, "", "")
+  call s:HL("vimSynRegOpt", s:blue, "", "")
+  call s:HL("vimSynMtchOpt", s:blue, "", "")
+  call s:HL("vimSynContains", s:pink, "", "")
+  call s:HL("vimGroupName", s:foreground, "", "")
+  call s:HL("vimGroupList", s:foreground, "", "")
+  call s:HL("vimHiGroup", s:foreground, "", "")
+  call s:HL("vimGroup", s:navy, "", "bold")
 
   " Makefile Highlighting
   call s:HL("makeIdent", s:blue, "", "")
@@ -688,10 +735,19 @@ call s:HL("cssDimensionProp", s:foreground, "", "")
 call s:HL("cssClassName", s:pink, "", "")
 
   " Markdown Highlighting
+  call s:HL("markdownHeadingRule", s:pink, "", "bold")
   call s:HL("markdownH1", s:pink, "", "bold")
+  call s:HL("markdownH2", s:orange, "", "bold")
   call s:HL("markdownBlockquote", s:pink, "", "")
-  call s:HL("markdownCodeBlock", s:purple, "", "bold")
+  call s:HL("markdownCodeBlock", s:olive, "", "")
+  call s:HL("markdownCode", s:olive, "", "")
   call s:HL("markdownLink", s:blue, "", "bold")
+  call s:HL("markdownUrl", s:blue, "", "")
+  call s:HL("markdownLinkText", s:pink, "", "")
+  call s:HL("markdownLinkTextDelimiter", s:purple, "", "")
+  call s:HL("markdownLinkDelimiter", s:purple, "", "")
+  call s:HL("markdownCodeDelimiter", s:blue, "", "")
+
   call s:HL("mkdCode", s:olive, "", "none")
   call s:HL("mkdLink", s:blue, "", "bold")
   call s:HL("mkdURL", s:comment, "", "none")
@@ -700,6 +756,16 @@ call s:HL("cssClassName", s:pink, "", "")
   call s:HL("mkdLinkTitle", s:pink, "", "none")
   call s:HL("mkdDelimiter", s:aqua, "", "")
   call s:HL("mkdRule", s:pink, "", "")
+
+  " reStructuredText Highlighting
+  call s:HL("rstSections", s:pink, "", "bold")
+  call s:HL("rstDelimiter", s:pink, "", "bold")
+  call s:HL("rstExplicitMarkup", s:pink, "", "bold")
+  call s:HL("rstDirective", s:blue, "", "")
+  call s:HL("rstHyperlinkTarget", s:green, "", "")
+  call s:HL("rstExDirective", s:foreground, "", "")
+  call s:HL("rstInlineLiteral", s:olive, "", "")
+  call s:HL("rstInterpretedTextOrHyperlinkReference", s:blue, "", "")
 
   " Python Highlighting
   call s:HL("pythonImport", s:pink, "", "bold")
@@ -735,7 +801,8 @@ call s:HL("cssClassName", s:pink, "", "")
   call s:HL("javaClassDecl", s:aqua, "", "bold")
   call s:HL("javaScopeDecl", s:blue, "", "bold")
   call s:HL("javaStorageClass", s:navy, "", "bold")
-  call s:HL("javaBoolean", s:navy, "", "")
+  call s:HL("javaBoolean", s:green, "", "bold")
+  call s:HL("javaConstant", s:blue, "", "")
   call s:HL("javaCommentTitle", s:wine, "", "")
   call s:HL("javaDocTags", s:aqua, "", "")
   call s:HL("javaDocComment", s:comment, "", "")
@@ -744,16 +811,19 @@ call s:HL("cssClassName", s:pink, "", "")
   " JavaScript Highlighting
   call s:HL("javaScriptBraces", s:blue, "", "")
   call s:HL("javaScriptParens", s:blue, "", "")
-  call s:HL("javaScriptIdentifier", s:navy, "", "bold")
-  call s:HL("javaScriptFunction", s:pink, "", "bold")
+  call s:HL("javaScriptIdentifier", s:pink, "", "")
+  call s:HL("javaScriptFunction", s:blue, "", "bold")
   call s:HL("javaScriptConditional", s:purple, "", "bold")
   call s:HL("javaScriptRepeat", s:purple, "", "bold")
-  call s:HL("javaScriptBoolean", s:orange, "", "")
-  " call s:HL("javaScriptNumber", s:orange, "", "")
+  call s:HL("javaScriptBoolean", s:green, "", "bold")
+  call s:HL("javaScriptNumber", s:orange, "", "")
   call s:HL("javaScriptMember", s:navy, "", "")
-  " call s:HL("javascriptNull", s:orange, "", "")
-  " call s:HL("javascriptGlobal", s:blue, "", "")
-  " call s:HL("javascriptStatement", s:pink, "", "")
+  call s:HL("javaScriptReserved", s:navy, "", "")
+  call s:HL("javascriptNull", s:comment, "", "bold")
+  call s:HL("javascriptGlobal", s:foreground, "", "")
+  call s:HL("javascriptStatement", s:pink, "", "")
+  call s:HL("javaScriptMessage", s:foreground, "", "")
+  call s:HL("javaScriptMember", s:foreground, "", "")
 
   " @target https://github.com/pangloss/vim-javascript
   call s:HL("jsFuncParens", s:blue, "", "")
@@ -952,6 +1022,16 @@ call s:HL("cssClassName", s:pink, "", "")
   call s:HL("perlSubName", s:aqua, "", "bold")
   call s:HL("perlSpecialString", s:olive, "", "bold")
 
+  " Pascal Highlighting
+  call s:HL("pascalType", s:pink, "", "bold")
+  call s:HL("pascalStatement", s:blue, "", "bold")
+  call s:HL("pascalPredefined", s:pink, "", "")
+  call s:HL("pascalFunction", s:foreground, "", "")
+  call s:HL("pascalStruct", s:navy, "", "bold")
+  call s:HL("pascalOperator", s:aqua, "", "bold")
+  call s:HL("pascalPreProc", s:green, "", "")
+  call s:HL("pascalAcces", s:navy, "", "bold")
+
   " Lua Highlighting
   call s:HL("luaFunc", s:foreground, "", "")
   call s:HL("luaIn", s:blue, "", "bold")
@@ -1041,11 +1121,57 @@ call s:HL("cssClassName", s:pink, "", "")
   call s:HL("xmlEqual", s:orange, "", "")
   call s:HL("xmlAttrib", s:navy, "", "")
   call s:HL("xmlAttribPunct", s:pink, "", "")
-  call s:HL("xmlTag", s:wine, "", "")
-  call s:HL("xmlTagName", s:wine, "", "")
-  call s:HL("xmlEndTag", s:wine, "", "")
-  call s:HL("xmlNamespace", s:blue, "", "")
+  call s:HL("xmlTag", s:blue, "", "")
+  call s:HL("xmlTagName", s:blue, "", "")
+  call s:HL("xmlEndTag", s:blue, "", "")
+  call s:HL("xmlNamespace", s:orange, "", "")
 
+  " Exlixir Highlighting
+  " @target https://github.com/elixir-lang/vim-elixir
+  call s:HL("elixirAlias", s:blue, "", "bold")
+  call s:HL("elixirAtom", s:navy, "", "")
+  call s:HL("elixirVariable", s:navy, "", "")
+  call s:HL("elixirUnusedVariable", s:comment, "", "")
+  call s:HL("elixirInclude", s:purple, "", "")
+  call s:HL("elixirStringDelimiter", s:olive, "", "")
+  call s:HL("elixirKeyword", s:purple, "", "bold")
+  call s:HL("elixirFunctionDeclaration", s:foreground, "", "bold")
+  call s:HL("elixirBlockDefinition", s:pink, "", "")
+  call s:HL("elixirDefine", s:pink, "", "")
+  call s:HL("elixirStructDefine", s:pink, "", "")
+  call s:HL("elixirPrivateDefine", s:pink, "", "")
+  call s:HL("elixirModuleDefine", s:pink, "", "")
+  call s:HL("elixirProtocolDefine", s:pink, "", "")
+  call s:HL("elixirImplDefine", s:pink, "", "")
+
+  " Erlang Highlighting
+  call s:HL("erlangBIF", s:purple, "", "bold,")
+  call s:HL("erlangBracket", s:pink, "", "")
+  call s:HL("erlangLocalFuncCall", s:foreground, "", "")
+  call s:HL("erlangVariable", s:foreground, "", "")
+  call s:HL("erlangAtom", s:navy, "", "")
+  call s:HL("erlangAttribute", s:blue, "", "bold")
+  call s:HL("erlangRecordDef", s:blue, "", "bold")
+  call s:HL("erlangRecord", s:blue, "", "")
+  call s:HL("erlangRightArrow", s:blue, "", "bold")
+  call s:HL("erlangStringModifier", s:olive, "", "bold")
+  call s:HL("erlangInclude", s:blue, "", "bold")
+  call s:HL("erlangKeyword", s:pink, "", "")
+  call s:HL("erlangGlobalFuncCall", s:foreground, "", "")
+
+  " Cucumber Highlighting
+  call s:HL("cucumberFeature", s:blue, "", "bold")
+  call s:HL("cucumberBackground", s:pink, "", "bold")
+  call s:HL("cucumberScenario", s:pink, "", "bold")
+  call s:HL("cucumberGiven", s:orange, "", "")
+  call s:HL("cucumberGivenAnd", s:blue, "", "")
+  call s:HL("cucumberThen", s:orange, "", "")
+  call s:HL("cucumberThenAnd", s:blue, "", "")
+  call s:HL("cucumberWhen", s:purple, "", "bold")
+  call s:HL("cucumberScenarioOutline", s:pink, "", "bold")
+  call s:HL("cucumberExamples", s:aqua, "", "")
+  call s:HL("cucumberTags", s:aqua, "", "")
+  call s:HL("cucumberPlaceholder", s:aqua, "", "")
   " }}}
 
   " Plugin: Netrw
@@ -1068,8 +1194,12 @@ call s:HL("cssClassName", s:pink, "", "")
   call s:HL("NERDTreeHelp", s:foreground, "", "")
   call s:HL("NERDTreeToggleOff", s:red, "", "")
   call s:HL("NERDTreeToggleOn", s:green, "", "")
-  call s:HL("NERDTreeDir", s:aqua, "", "bold")
+  call s:HL("NERDTreeDir", s:blue, "", "bold")
+  call s:HL("NERDTreeDirSlash", s:pink, "", "")
+  call s:HL("NERDTreeFile", s:foreground, "", "")
   call s:HL("NERDTreeExecFile", s:green, "", "")
+  call s:HL("NERDTreeOpenable", s:pink, "", "bold")
+  call s:HL("NERDTreeClosable", s:pink, "", "")
 
   " Plugin: Tagbar
   call s:HL("TagbarHelpTitle", s:blue, "", "bold")
@@ -1119,9 +1249,6 @@ call s:HL("cssClassName", s:pink, "", "")
   " call s:HL("ShowMarksHLm", s:aqua, s:background, "none")
 
 
-  " " Cucumber Highlighting
-  " call s:HL("cucumberGiven", s:blue, "", "")
-  " call s:HL("cucumberGivenAnd", s:blue, "", "")
 
 
 

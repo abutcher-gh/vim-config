@@ -45,8 +45,8 @@ let g:ycm_key_invoke_completion = '<C-@>'
 let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_complete_in_comments = 1
-let g:ycm_warning_symbol = '⚠'
-let g:ycm_error_symbol = '‼‼'
+" let g:ycm_warning_symbol = '⚠'
+" let g:ycm_error_symbol = '‼‼'
 
 nmap \q :YcmCompleter FixIt<C-M>
 
