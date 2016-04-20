@@ -63,6 +63,12 @@ flags = [
 '-stdlib=libstdc++',
 ]
 
+for p in os.popen(':| \
+    CPATH= CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= \
+    ${CROSS_PREFIX}g++ -std=c++14 -Wp,-v -x c++ -E - 2>&1 | \
+    sed -n "1,/^#/d; /^ / s/.//p "').read().split():
+  flags.extend(['-isystem', p]);
+
 for p in os.getenv('CPATH', '').split(':'):
   flags.extend(['-I', p])
 
