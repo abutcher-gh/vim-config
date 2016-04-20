@@ -1161,8 +1161,8 @@ endfunction
 
 " text wrapping - on by default
 
-let g:default_textwidth = 70
-let &textwidth = g:default_textwidth
+let g:default_textwidth = 78
+let &textwidth = 0
 
 nmap <silent> <F3> :call ToggleTextWrap()<CR>
 imap <silent> <F3> <C-O><F3><C-O>:sleep 300m<CR>
