@@ -49,6 +49,7 @@ let g:ycm_complete_in_comments = 1
 " let g:ycm_error_symbol = '‼‼'
 
 nmap \q :YcmCompleter FixIt<C-M>
+nmap \? :YcmShowDetailedDiagnostic<C-M>
 
 " let s:ctrlp_fallback = 'find %s -type f'
 let s:ctrlp_fallback = 'echo "Not a VCS directory"'
@@ -714,7 +715,6 @@ nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNav
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> \<Space> :call JumpToNav(0)<CR>
-nmap <silent> \? :call DumpNavList()<CR>
 nmap <silent> <Bar>? :call SplitEditBase()<CR>
 nmap \<Tab> :EditAssociate<Space>
 nmap <Bar><Tab> :EditAssociate!<Space>
