@@ -32,6 +32,7 @@ Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'wavded/vim-stylus'
+Plugin 'mbbill/undotree'
 endif
 
 " All of your Plugins must be added before the following line
@@ -40,6 +41,8 @@ filetype plugin indent on    " required
 
 "                        Vundle                          "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:undotree_DiffCommand = "diff"
 
 let g:ycm_key_invoke_completion = '<C-@>'
 let g:ycm_global_ycm_extra_conf = '~/.vim/ycm_extra_conf.py'
