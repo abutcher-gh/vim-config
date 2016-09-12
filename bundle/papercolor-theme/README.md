@@ -1,5 +1,8 @@
 PaperColor Theme
 ===================
+[![license](https://img.shields.io/github/license/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/blob/master/LICENSE) [![](https://img.shields.io/github/issues-raw/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/issues) [![](https://img.shields.io/github/issues-closed-raw/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/issues) [![GitHub release](https://img.shields.io/github/release/NLKNguyen/papercolor-theme.svg)](https://github.com/NLKNguyen/papercolor-theme/releases) [![Travis CI Build Status](https://travis-ci.org/NLKNguyen/papercolor-theme.svg?branch=master)](https://travis-ci.org/NLKNguyen/papercolor-theme)
+
+
 Light & Dark color schemes for **Vim** terminal editor and **gVim**
 
 Inspired by Google's Material Design
@@ -48,7 +51,8 @@ set number
 set laststatus=2
 ```
 
-##Highlighting Customization
+## Highlighting Customization
+
 Some elements have default highlighting color that may not fit everyone, and you can customize their HEX color code in your .vimrc file.
 Refer to 256-color table when choosing color.
 
@@ -105,7 +109,7 @@ There are syntax highlighting enhancement plugins that improve upon Vim built-in
 
 To set [vim-airline](https://github.com/bling/vim-airline) theme:
 
-    let g:airline_theme='PaperColor'
+    let g:airline_theme='papercolor'
 
 To set [lightline](https://github.com/itchyny/lightline.vim) theme:
 
