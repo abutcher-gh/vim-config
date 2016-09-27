@@ -41,7 +41,7 @@ let s:themes['default'].light = {
       \       'color08' : ['#bcbcbc', '250'],
       \       'color09' : ['#d70000', '160'], 
       \       'color10' : ['#d70087', '162'],
-      \       'color11' : ['#875fd7', '98'],
+      \       'color11' : ['#8700af', '91'],
       \       'color12' : ['#d75f00', '166'], 
       \       'color13' : ['#d75f00', '166'],
       \       'color14' : ['#005faf', '25'],
@@ -69,7 +69,7 @@ let s:themes['default'].light = {
       \       'todo_fg' : ['#00af5f', '35'],
       \       'todo_bg' : ['#eeeeee', '255'],
       \       'error_fg' : ['#af0000', '124'],
-      \       'error_bg' : ['#ffafd7', '218'],
+      \       'error_bg' : ['#ffd7ff', '225'],
       \       'matchparen_bg' : ['#c6c6c6', '251'],
       \       'matchparen_fg' : ['#005f87', '24'],
       \       'visual_fg' : ['#eeeeee', '255'],
@@ -109,8 +109,8 @@ let s:themes['default'].dark = {
       \     'TEST_256_COLOR_CONSISTENCY' : 1,
       \     'palette' : {
       \       'color00' : ['#1c1c1c', '234'],
-      \       'color01' : ['#ff0087', '198'], 
-      \       'color02' : ['#5fd700', '76'],
+      \       'color01' : ['#af005f', '125'], 
+      \       'color02' : ['#5faf00', '70'],
       \       'color03' : ['#d7af5f', '179'], 
       \       'color04' : ['#5fafd7', '74'],
       \       'color05' : ['#808080', '244'],
@@ -146,14 +146,14 @@ let s:themes['default'].dark = {
       \       'statusline_inactive_bg' : ['#3a3a3a', '237'],
       \       'todo_fg' : ['#ff8700', '208'],
       \       'todo_bg' : ['#1c1c1c', '234'],
-      \       'error_fg' : ['#1c1c1c', '234'],
+      \       'error_fg' : ['#af005f', '125'],
       \       'error_bg' : ['#5f0000', '52'],
       \       'matchparen_bg' : ['#4e4e4e', '239'],
       \       'matchparen_fg' : ['#c6c6c6', '251'],
       \       'visual_fg' : ['#000000', '16'],
       \       'visual_bg' : ['#8787af', '103'],
-      \       'folded_fg' : ['#afd700', '148'],
-      \       'folded_bg' : ['#444444', '238'],
+      \       'folded_fg' : ['#d787ff', '177'],
+      \       'folded_bg' : ['#5f005f', '53'],
       \       'wildmenu_fg': ['#1c1c1c', '234'],
       \       'wildmenu_bg': ['#afd700', '148'],
       \       'tabline_bg':          ['#262626', '235'],
@@ -165,14 +165,14 @@ let s:themes['default'].dark = {
       \       'spellcap':   ['#5f005f', '53'],
       \       'spellrare':  ['#005f00', '22'],
       \       'spelllocal': ['#00005f', '17'],
-      \       'diffadd_fg':    ['#000000', '16'],
-      \       'diffadd_bg':    ['#5faf00', '70'],
-      \       'diffdelete_fg': ['#000000', '16'],
+      \       'diffadd_fg':    ['#87d700', '112'],
+      \       'diffadd_bg':    ['#005f00', '22'],
+      \       'diffdelete_fg': ['#af005f', '125'],
       \       'diffdelete_bg': ['#5f0000', '52'],
-      \       'difftext_fg':   ['#000000', '16'],
-      \       'difftext_bg':   ['#ffd75f', '221'],
-      \       'diffchange_fg': ['#000000', '16'],
-      \       'diffchange_bg': ['#d7af00', '178']
+      \       'difftext_fg':   ['#5fffff', '87'],
+      \       'difftext_bg':   ['#008787', '30'],
+      \       'diffchange_fg': ['#d0d0d0', '252'],
+      \       'diffchange_bg': ['#005f5f', '23']
       \     }
       \   }
 
@@ -550,8 +550,9 @@ let s:to_HEX = {
 let s:MODE_16_COLOR = 0
 let s:MODE_256_COLOR = 1
 let s:MODE_TRUE_COLOR = 2
-let s:MODE_TRUE_OR_256_COLOR = 3
-if has("gui_running") 
+let s:MODE_TRUE_OR_256_COLOR = 3 " for code generation purpose, not for theme usage
+
+if has("gui_running")  || has('termguicolors') && &termguicolors || has('nvim') && $NVIM_TUI_ENABLE_TRUE_COLOR
   let s:mode = s:MODE_TRUE_COLOR
 elseif (&t_Co == 256)
   let s:mode = s:MODE_256_COLOR
@@ -731,6 +732,7 @@ endfun
 
 fun! s:set_highlightings_variable()
   let s:highlightings = []
+  " Normal group should be executed first. Other parts assume that.
   call s:HL("Normal", s:foreground, s:background, "")
 
   call s:HL("Cursor", s:cursor_fg, s:cursor_bg, "")
@@ -860,6 +862,7 @@ fun! s:set_highlightings_variable()
   call s:HL("vimGroupList", s:foreground, "", "")
   call s:HL("vimHiGroup", s:foreground, "", "")
   call s:HL("vimGroup", s:navy, "", s:bold)
+  call s:HL("vimOnlyOption", s:blue, "", "")
 
   " Makefile Highlighting
   call s:HL("makeIdent", s:blue, "", "")
@@ -1302,6 +1305,7 @@ fun! s:set_highlightings_variable()
   call s:HL("phpMemberSelector", s:blue, "", "")
   call s:HL("phpStorageClass", s:purple, "", s:bold)
   call s:HL("phpDefine", s:navy, "", "")
+  call s:HL("phpIntVar", s:navy, "",s:bold)
 
   " Perl Highlighting
   call s:HL("perlFiledescRead", s:green, "", "")
@@ -1563,14 +1567,24 @@ endfun
 " APPLY SYNTAX HIGHLIGHTING: {{{
 
 fun! s:apply_highlightings()
-  " let l:content = []
-  for h in s:highlightings
-    " call add(l:content, 'hi ' . h[0] . h[1])
+  " Handle background switching right after `Normal` group because of
+  " God-know-why reason. It's assumed that the first group in the list
+  " is `Normal` group.
+  let l:normal = s:highlightings[0]
+  exec 'hi ' . l:normal[0] . l:normal[1]
+
+  " Switching between dark & light variant through `set background`
+  if s:is_dark " DARK VARIANT
+    set background=dark
+  else " LIGHT VARIANT
+    set background=light
+  endif
+
+  " The rest of syntax highlighting groups 
+  for h in s:highlightings[1:]
     exec 'hi ' . h[0] . h[1]
   endfor
-  " exec join(l:content, "\n")
 
-  " call s:writeToFile(l:content, "highlightings.vim")
 endfun
 
 "}}}
