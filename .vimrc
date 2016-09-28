@@ -33,6 +33,7 @@ Plugin 'digitaltoad/vim-jade'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
+Plugin 'skywind3000/asyncrun.vim'
 endif
 
 " All of your Plugins must be added before the following line
@@ -41,6 +42,8 @@ filetype plugin indent on    " required
 
 "                        Vundle                          "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let $GCCFILT_NO_COLOR = 1
 
 let g:undotree_DiffCommand = "diff"
 
@@ -858,7 +861,7 @@ function! ViewTeX(...)
    elseif a != ''
       let g:viewtexargs = a
    endif
-   call CexLive("viewtex --verbose ".g:viewtexargs." ".expand("%"))
+   call CexLive('', "viewtex --verbose ".g:viewtexargs." %")
 endfunction
 command! -nargs=* ViewTeX call ViewTeX(<f-args>)
 
@@ -933,52 +936,21 @@ command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('
 nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
 nmap <silent> <Bar>H :GitShowDiff -C <CR>
 
-" This contorted, but portable, perl pipe
-" gives rapid feedback including any ansi
-" color sequences but strips any such
-" sequences from the resulting capture
-" that ends up in the quickfix buffer.
-if ! g:windows || g:cygwin
-   let &shellpipe="2>&1| perl -e '$|=1; open OUT, \"> ${ARGV[0]}\"; use IO::Handle; OUT->autoflush(); STDOUT->autoflush(); while(!eof(STDIN)) { my $s; while(true) { $c=getc(); next if ord($c) == 13; $s.=$c; last if ord($c) == 10; }; $s=~s|([A-Za-z]):[\\\\/]|/$1/|; print $s; $s=~s/[^m]*m//g; print OUT $s; }; close OUT;' "
-else
-   for i in split(&rtp,',')
-      if executable(i.'/bin/wintee')
-         let $PATH = $PATH . ";" . i . '/bin'
-         let &shellpipe='2>&1| wintee '
-         break
-      endif
-   endfor
-endif
+let g:asyncrun_bell = 1
 
-" This used to :cex tee'd through a system-specific pipe to show live
-" output (hence the name).  Now it temporarily reassigns makeprg to
-" the requested shell command, performs it with the perl filter above
-" and resets it.
-function! CexLive(cmdline)
-   if ! g:windows
-      let l:makeprg="echo;echo Executing: ".a:cmdline."; ".a:cmdline
-   else
-      let l:makeprg=a:cmdline
-   endif
-   let l:makeprg=substitute(l:makeprg,'\\','\\\\','g')
-   let l:makeprg=substitute(l:makeprg,'	','\\t','g')
-   let l:makeprg=substitute(l:makeprg,'|','\\|','g')
-   let l:oldmakeprg=&makeprg
-   try
-      let &makeprg=l:makeprg
-      echo l:makeprg
-      make
-   catch
-   endtry
-   let &makeprg=l:oldmakeprg
+function! CexLive(bang, cmdline)
+   let l:w = winnr()
+   execute 'AsyncRun'.a:bang.' '.expand(a:cmdline)
+   execute 'copen'
+   silent exec ''.l:w.'wincmd w'
 endfun
 
-com! -nargs=* -complete=file Shthis call CexLive("sh ".expand("%")." ".<q-args>)
-com! -nargs=* -complete=file Bashthis call CexLive("bash ".expand("%")." ".<q-args>)
-com! -nargs=* -complete=file Zshthis call CexLive("zsh ".expand("%")." ".<q-args>)
-com! -nargs=* -complete=file Gxxthis call CexLive("g++ ".expand("%")." ".<q-args>)
-com! -nargs=* -complete=file Exec call CexLive(<q-args>." ".expand("%"))
-com! -nargs=* -complete=file NExec call CexLive(<q-args>)
+com! -bang -nargs=* -complete=file Shthis call CexLive('<bang>', 'sh % '.<q-args>)
+com! -bang -nargs=* -complete=file Bashthis call CexLive('<bang>','bash % '.<q-args>)
+com! -bang -nargs=* -complete=file Zshthis call CexLive('<bang>','zsh % '.<q-args>)
+com! -bang -nargs=* -complete=file Gxxthis call CexLive('<bang>','g++ % '.<q-args>)
+com! -bang -nargs=* -complete=file Exec call CexLive('<bang>',<q-args>.' %'))
+com! -bang -nargs=* -complete=file NExec call CexLive('<bang>',<q-args>)
 
 " cscope settings
 com! CScopeReset cscope reset
