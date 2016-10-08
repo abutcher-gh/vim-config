@@ -1520,6 +1520,58 @@ endfunction
 command! LogView call LogView()
 
 
+function! RediffWithoutNumbers()
+   let l:oldv = winsaveview()
+   let l:oldw = winnr()
+   let l:pat = exists('g:numbers_pat')? g:numbers_pat :
+            \ '0x[0-9a-fA-F]\+\|\<[0-9]\+\>'
+   if exists('g:numbers_extra_pat')
+      let l:pat = l:pat . '\|' . g:numbers_extra_pat
+   endif
+   wincmd w
+   while 1
+      if type(getbufvar(winbufnr(0), 'differ')) == v:t_dict
+         let l:modified = &modified
+         let l:modifiable = &modifiable
+         let &modifiable = 1
+         if search(l:pat) > 0
+            call feedkeys("i\<C-G>u", 'intx')
+            exec 'silent noautocmd %s/'.l:pat.'//g'
+            let b:numsubst = 1
+         else
+            unlet b:numsubst
+         endif
+         let &modified = l:modified
+         let &modifiable = l:modifiable
+      endif
+      if winnr() == l:oldw
+         break
+      endif
+      wincmd w
+   endwhile
+   noautocmd diffupdate
+   wincmd w
+   while 1
+      if type(getbufvar(winbufnr(0), 'differ')) == v:t_dict
+               \ && exists('b:numsubst')
+         let l:modified = &modified
+         let l:modifiable = &modifiable
+         let &modifiable = 1
+         exec 'silent noautocmd undo'
+         unlet b:numsubst
+         let &modified = l:modified
+         let &modifiable = l:modifiable
+      endif
+      if winnr() == l:oldw
+         break
+      endif
+      wincmd w
+   endwhile
+   call winrestview(l:oldv)
+endfunction
+command! RediffWithoutNumbers call RediffWithoutNumbers()
+
+
 " lighten up control characters
 hi SpecialKey guifg=gray
 
