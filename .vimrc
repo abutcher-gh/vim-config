@@ -1530,7 +1530,7 @@ function! RediffWithoutNumbers()
    endif
    wincmd w
    while 1
-      if type(getbufvar(winbufnr(0), 'differ')) == v:t_dict
+      if &diff
          let l:modified = &modified
          let l:modifiable = &modifiable
          let &modifiable = 1
@@ -1552,8 +1552,7 @@ function! RediffWithoutNumbers()
    noautocmd diffupdate
    wincmd w
    while 1
-      if type(getbufvar(winbufnr(0), 'differ')) == v:t_dict
-               \ && exists('b:numsubst')
+      if &diff && exists('b:numsubst')
          let l:modified = &modified
          let l:modifiable = &modifiable
          let &modifiable = 1
