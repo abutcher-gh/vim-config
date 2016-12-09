@@ -34,6 +34,8 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
+Plugin 'othree/yajs.vim'
+Plugin 'othree/es.next.syntax.vim'
 endif
 
 " All of your Plugins must be added before the following line
