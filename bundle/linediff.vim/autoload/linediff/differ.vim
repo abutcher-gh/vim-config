@@ -99,18 +99,22 @@ function! linediff#differ#CreateDiffBuffer(edit_command) dict
 
   if g:linediff_buffer_type == 'tempfile'
     let temp_file = tempname()
-
+    call writefile(lines, temp_file)
     silent exe a:edit_command . " " . temp_file
-    call append(0, lines)
-    silent $delete _
-
-    set nomodified
     normal! gg
   else " g:linediff_buffer_type == 'scratch'
     silent exe a:edit_command
 
+    if v:version > 704 || v:version == 704 && has("patch73")
+      setlocal undolevels=-1
+    endif
+
     call append(0, lines)
     silent $delete _
+
+    if v:version > 704 || v:version == 704 && has("patch73")
+      setlocal undolevels<
+    endif
 
     setlocal buftype=acwrite
     setlocal bufhidden=wipe

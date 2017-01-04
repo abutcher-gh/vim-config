@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last change: 2016.11.8
+" Last change: 2016.12.23
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -113,7 +113,7 @@ if !exists('g:asyncrun_last')
 endif
 
 if !exists('g:asyncrun_timer')
-	let g:asyncrun_timer = 100
+	let g:asyncrun_timer = 25
 endif
 
 if !exists('g:asyncrun_code')
@@ -144,6 +144,15 @@ if !exists('g:asyncrun_auto')
 	let g:asyncrun_auto = ''
 endif
 
+if !exists('g:asyncrun_shell')
+	let g:asyncrun_shell = ''
+endif
+
+if !exists('g:asyncrun_shellflag')
+	let g:asyncrun_shellflag = ''
+endif
+
+
 
 "----------------------------------------------------------------------
 "- Internal Functions
@@ -160,6 +169,13 @@ endfunc
 function! s:NotSupport()
 	let msg = "required: +timers +channel +job +reltime and vim >= 7.4.1829"
 	call s:ErrorMsg(msg)
+endfunc
+
+" run autocmd
+function! s:AutoCmd(name)
+	if has('autocmd')
+		exec 'silent doautocmd User AsyncRun'.a:name
+	endif
 endfunc
 
 let s:asyncrun_windows = 0
@@ -200,6 +216,7 @@ let s:async_debug = 0
 let s:async_quick = 0
 let s:async_scroll = 0
 let s:async_hold = 0
+let s:async_congest = 0
 let s:async_efm = &errorformat
 
 " check :cbottom available, cursor in quick need to hold ?
@@ -209,6 +226,12 @@ if s:async_nvim == 0
 else
 	let s:async_quick = 0
 	let s:async_hold = 1
+endif
+
+" check if we have vim 8.0.100
+if s:async_nvim == 0 && v:version >= 800
+	let s:async_congest = has('patch-8.0.100')? 1 : 0
+	let s:async_congest = 0
 endif
 
 " scroll quickfix down
@@ -234,8 +257,8 @@ endfunc
 function! s:AsyncRun_Job_AutoScroll()
 	if s:async_quick == 0
 		let l:winnr = winnr()			
-		windo call s:AsyncRun_Job_Scroll()
-		silent exec ''.l:winnr.'wincmd w'
+		noautocmd windo call s:AsyncRun_Job_Scroll()
+		noautocmd silent exec ''.l:winnr.'wincmd w'
 	else
 		cbottom
 	endif
@@ -257,8 +280,8 @@ function! s:AsyncRun_Job_QuickReset()
 		call s:AsyncRun_Job_ViewReset()
 	else
 		let l:winnr = winnr()
-		windo call s:AsyncRun_Job_ViewReset()
-		silent exec ''.l:winnr.'wincmd w'
+		noautocmd windo call s:AsyncRun_Job_ViewReset()
+		noautocmd silent! exec ''.l:winnr.'wincmd w'
 	endif
 endfunc
 
@@ -276,8 +299,8 @@ function! s:AsyncRun_Job_CheckScroll()
 	elseif g:asyncrun_last == 1
 		let s:async_check_last = 1
 		let l:winnr = winnr()
-		windo call s:AsyncRun_Job_Cursor()
-		silent exec ''.l:winnr.'wincmd w'
+		noautocmd windo call s:AsyncRun_Job_Cursor()
+		noautocmd silent! exec ''.l:winnr.'wincmd w'
 		return s:async_check_last
 	elseif g:asyncrun_last == 2
 		return 1
@@ -351,22 +374,34 @@ endfunc
 function! s:AsyncRun_Job_AutoCmd(mode, auto)
 	if !has('autocmd') | return | endif
 	let name = (a:auto == '')? g:asyncrun_auto : a:auto
-	if name !~ '^\w\+' || name == 'NONE' || name == '<NONE>'
+	if name !~ '^\w\+$' || name == 'NONE' || name == '<NONE>'
 		return
 	endif
 	if a:mode == 0
-		exec 'silent doautocmd QuickFixCmdPre '. name
+		silent exec 'doautocmd QuickFixCmdPre '. name
 	else
-		exec 'silent doautocmd QuickFixCmdPost '. name
+		silent exec 'doautocmd QuickFixCmdPost '. name
 	endif
 endfunc
 
 " invoked on timer
 function! g:AsyncRun_Job_OnTimer(id)
-	if exists('s:async_job')
-		call job_status(s:async_job)
+	let limit = (g:asyncrun_timer < 10)? 10 : g:asyncrun_timer
+	" check on command line window
+	if &ft == 'vim' && &buftype == 'nofile'
+		return
 	endif
-	call s:AsyncRun_Job_Update(5 + g:asyncrun_timer)
+	if s:async_nvim == 0
+		if exists('s:async_job')
+			call job_status(s:async_job)
+		endif
+	endif
+	call s:AsyncRun_Job_Update(limit)
+	if and(s:async_state, 7) == 7
+		if s:async_head == s:async_tail
+			call s:AsyncRun_Job_OnFinish()
+		endif
+	endif
 endfunc
 
 " invoked on "callback" when job output
@@ -379,27 +414,17 @@ function! s:AsyncRun_Job_OnCallback(channel, text)
 	endif
 	let s:async_output[s:async_head] = a:text
 	let s:async_head += 1
-	if g:asyncrun_timer <= 0
+	if s:async_congest != 0 
 		call s:AsyncRun_Job_Update(-1)
 	endif
 endfunc
 
 " because exit_cb and close_cb are disorder, we need OnFinish to guarantee
 " both of then have already invoked
-function! s:AsyncRun_Job_OnFinish(what)
+function! s:AsyncRun_Job_OnFinish()
 	" caddexpr '(OnFinish): '.a:what.' '.s:async_state
 	if s:async_state == 0
 		return -1
-	endif
-	if a:what == 0
-		let s:async_state = or(s:async_state, 2)
-	elseif a:what == 1
-		let s:async_state = or(s:async_state, 4)
-	else
-		let s:async_state = 7
-	endif
-	if and(s:async_state, 7) != 7
-		return -2
 	endif
 	if exists('s:async_job')
 		unlet s:async_job
@@ -432,8 +457,6 @@ function! s:AsyncRun_Job_OnFinish(what)
 	if g:asyncrun_bell != 0
 		exec "norm! \<esc>"
 	endif
-	redrawstatus!
-	redraw
 	if s:async_info.post != ''
 		exec s:async_info.post
 		let s:async_info.post = ''
@@ -442,6 +465,9 @@ function! s:AsyncRun_Job_OnFinish(what)
 		exec g:asyncrun_exit
 	endif
 	call s:AsyncRun_Job_AutoCmd(1, s:async_info.auto)
+	call s:AutoCmd('Stop')
+	redrawstatus!
+	redraw
 endfunc
 
 " invoked on "close_cb" when channel closed
@@ -449,8 +475,9 @@ function! s:AsyncRun_Job_OnClose(channel)
 	" caddexpr "[close]"
 	let s:async_debug = 1
 	let l:limit = 128
+	let l:options = {'timeout':0}
 	while ch_status(a:channel) == 'buffered'
-		let l:text = ch_read(a:channel)
+		let l:text = ch_read(a:channel, l:options)
 		if l:text == '' " important when child process is killed
 			let l:limit -= 1
 			if l:limit < 0 | break | endif
@@ -459,18 +486,17 @@ function! s:AsyncRun_Job_OnClose(channel)
 		endif
 	endwhile
 	let s:async_debug = 0
-	call s:AsyncRun_Job_Update(-1)
-	call s:AsyncRun_Job_OnFinish(1)
 	if exists('s:async_job')
 		call job_status(s:async_job)
 	endif
+	let s:async_state = or(s:async_state, 4)
 endfunc
 
 " invoked on "exit_cb" when job exited
 function! s:AsyncRun_Job_OnExit(job, message)
 	" caddexpr "[exit]: ".a:message." ".type(a:message)
 	let s:async_code = a:message
-	call s:AsyncRun_Job_OnFinish(0)
+	let s:async_state = or(s:async_state, 2)
 endfunc
 
 " invoked on neovim when stderr/stdout/exit
@@ -483,12 +509,11 @@ function! s:AsyncRun_Job_NeoVim(job_id, data, event)
 			let s:async_head += 1
 			let l:index += 1
 		endwhile
-		call s:AsyncRun_Job_Update(-1)
 	elseif a:event == 'exit'
 		if type(a:data) == type(1)
 			let s:async_code = a:data
 		endif
-		call s:AsyncRun_Job_OnFinish(2)
+		let s:async_state = or(s:async_state, 6)
 	endif
 endfunc
 
@@ -529,12 +554,21 @@ function! s:AsyncRun_Job_Start(cmd)
 		call s:ErrorMsg("empty arguments")
 		return -3
 	endif
-	if !executable(&shell)
-		let l:text = "invalid config in &shell and &shellcmdflag"
-		call s:ErrorMsg(l:text . ", &shell must be an executable.")
-		return -4
+	if g:asyncrun_shell == ''
+		if !executable(&shell)
+			let l:text = "invalid config in &shell and &shellcmdflag"
+			call s:ErrorMsg(l:text . ", &shell must be an executable.")
+			return -4
+		endif
+		let l:args = [&shell, &shellcmdflag]
+	else
+		if !executable(g:asyncrun_shell)
+			let l:text = "invalid config in g:asyncrun_shell"
+			call s:ErrorMsg(l:text . ", it must be an executable.")
+			return -4
+		endif
+		let l:args = [g:asyncrun_shell, g:asyncrun_shellflag]
 	endif
-	let l:args = [&shell, &shellcmdflag]
 	let l:name = []
 	if type(a:cmd) == 1
 		let l:name = a:cmd
@@ -567,6 +601,7 @@ function! s:AsyncRun_Job_Start(cmd)
 		let l:name = join(l:vector, ', ')
 	endif
 	let s:async_efm = &errorformat
+	call s:AutoCmd('Pre')
 	if s:async_nvim == 0
 		let l:options = {}
 		let l:options['callback'] = function('s:AsyncRun_Job_OnCallback')
@@ -608,11 +643,8 @@ function! s:AsyncRun_Job_Start(cmd)
 		endif
 		call setqflist([{'text':l:arguments}], 'a')
 		let s:async_start = float2nr(reltimefloat(reltime()))
-		if g:asyncrun_timer > 0 && s:async_nvim == 0
-			let l:options = {'repeat':-1}
-			let l:name = 'g:AsyncRun_Job_OnTimer'
-			let s:async_timer = timer_start(100, l:name, l:options)
-		endif
+		let l:name = 'g:AsyncRun_Job_OnTimer'
+		let s:async_timer = timer_start(100, l:name, {'repeat':-1})
 		let s:async_state = 1
 		let g:asyncrun_status = "running"
 		let s:async_info.post = s:async_info.postsave
@@ -620,11 +652,13 @@ function! s:AsyncRun_Job_Start(cmd)
 		let s:async_info.postsave = ''
 		let s:async_info.autosave = ''
 		let g:asyncrun_text = s:async_info.text
-		redrawstatus!
 		call s:AsyncRun_Job_AutoCmd(0, s:async_info.auto)
+		call s:AutoCmd('Start')
+		redrawstatus!
 	else
 		unlet s:async_job
 		call s:ErrorMsg("Background job start failed '".a:cmd."'")
+		redrawstatus!
 		return -5
 	endif
 	return 0
@@ -638,6 +672,10 @@ function! s:AsyncRun_Job_Stop(how)
 		call s:NotSupport()
 		return -1
 	endif
+	while s:async_head > s:async_tail
+		let s:async_head -= 1
+		unlet s:async_output[s:async_head]
+	endwhile
 	if exists('s:async_job')
 		if s:async_nvim == 0
 			if job_status(s:async_job) == 'run'
@@ -869,8 +907,12 @@ function! asyncrun#run(bang, opts, args)
 		let s:async_info.postsave = opts.post
 		let s:async_info.autosave = opts.auto
 		let s:async_info.text = opts.text
-		call s:AsyncRun_Job_Start(l:command)
+		if s:AsyncRun_Job_Start(l:command) != 0
+			call s:AutoCmd('Error')
+		endif
 	elseif l:mode <= 1 && has('quickfix')
+		call s:AutoCmd('Pre')
+		call s:AutoCmd('Start')
 		let l:makesave = &l:makeprg
 		let l:script = s:ScriptWrite(l:command, 0)
 		if s:asyncrun_windows != 0
@@ -893,28 +935,51 @@ function! asyncrun#run(bang, opts, args)
 		if opts.post != ''
 			exec opts.post
 		endif
+		call s:AutoCmd('Stop')
 	elseif l:mode <= 2
-		exec '!'. l:command
+		call s:AutoCmd('Pre')
+		call s:AutoCmd('Start')
+		exec '!'. escape(l:command, '%#')
 		let g:asyncrun_text = opts.text
 		if opts.post != ''
 			exec opts.post
 		endif
+		call s:AutoCmd('Stop')
 	elseif l:mode == 3
 		if s:asyncrun_windows != 0 && has('python')
 			let l:script = s:ScriptWrite(l:command, 0)
-			python import vim, subprocess
-			python x = [vim.eval('l:script')]
-			python m = subprocess.PIPE
-			python n = subprocess.STDOUT
-			python s = True
-			python p = subprocess.Popen(x, shell = s, stdout = m, stderr = n)
-			python t = p.stdout.read()
-			python p.stdout.close()
-			python p.wait()
-			python t = t.replace('\\', '\\\\').replace('"', '\\"')
-			python t = t.replace('\n', '\\n').replace('\r', '\\r')
-			python vim.command('let l:text = "%s"'%t)
-			let l:retval = l:text
+			py import subprocess, vim
+			py argv = {'args': vim.eval('l:script'), 'shell': True}
+			py argv['stdout'] = subprocess.PIPE
+			py argv['stderr'] = subprocess.STDOUT
+			py p = subprocess.Popen(**argv)
+			py text = p.stdout.read()
+			py p.stdout.close()
+			py p.wait()
+			if has('patch-7.4.145')
+				let l:retval = pyeval('text')
+			else
+				py text = text.replace('\\', '\\\\').replace('"', '\\"')
+				py text = text.replace('\n', '\\n').replace('\r', '\\r')
+				py vim.command('let l:retval = "%s"'%text)
+			endif
+		elseif s:asyncrun_windows != 0 && has('python3')
+			let l:script = s:ScriptWrite(l:command, 0)
+			py3 import subprocess, vim
+			py3 argv = {'args': vim.eval('l:script'), 'shell': True}
+			py3 argv['stdout'] = subprocess.PIPE
+			py3 argv['stderr'] = subprocess.STDOUT
+			py3 p = subprocess.Popen(**argv)
+			py3 text = p.stdout.read()
+			py3 p.stdout.close()
+			py3 p.wait()
+			if has('patch-7.4.145')
+				let l:retval = py3eval('text')
+			else
+				py3 text = text.replace('\\', '\\\\').replace('"', '\\"')
+				py3 text = text.replace('\n', '\\n').replace('\r', '\\r')
+				py3 vim.command('let l:retval = "%s"'%text)
+			endif
 		else
 			let l:retval = system(l:command)
 		endif
@@ -933,7 +998,7 @@ function! asyncrun#run(bang, opts, args)
 			redraw
 		else
 			if l:mode == 4
-				exec '!' . l:command
+				exec '!' . escape(l:command, '%#')
 			else
 				call system(l:command . ' &')
 			endif
