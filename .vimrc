@@ -59,6 +59,11 @@ let g:ycm_complete_in_comments = 1
 nmap \q :YcmCompleter FixIt<C-M>
 nmap \? :YcmShowDetailedDiagnostic<C-M>
 
+" Allow for ESC to switch mode with multiple cursors active.  ESC in NORMAL
+" exits multi-cursor mode.
+let g:multi_cursor_exit_from_visual_mode = 0
+let g:multi_cursor_exit_from_insert_mode = 0
+
 " let s:ctrlp_fallback = 'find %s -type f'
 let s:ctrlp_fallback = 'echo "Not a VCS directory"'
 let g:ctrlp_user_command = {
@@ -1308,7 +1313,7 @@ if has("autocmd")
      autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent noautoindent comments&
      autocmd BufNewFile,BufRead *.gpp set filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead *.impl set filetype=cpp
-     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
+     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.cs set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
      autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i set filetype=asm tabstop=14 formatoptions=croql cindent comments=";"
      autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
