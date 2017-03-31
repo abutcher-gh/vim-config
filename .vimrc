@@ -1508,14 +1508,8 @@ call DefaultStyle()
 
 
 function! LogView()
-   if g:fullcolorterm
-      runtime plugin/guicolorscheme.vim
-      let &bg=g:preferred_bg
-      exec "GuiColorScheme ".g:preferred_scheme
-   else
-      exec "colorscheme ".g:fallback_scheme
-      let &bg=g:fallback_bg
-   endif
+   colorscheme lucius
+   set bg=light
    set ft=asm
    set ts=10
    set nospell
