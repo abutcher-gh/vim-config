@@ -2,7 +2,6 @@ PaperColor Theme
 ===================
 [![license](https://img.shields.io/github/license/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/blob/master/LICENSE) [![](https://img.shields.io/github/issues-raw/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/issues) [![](https://img.shields.io/github/issues-closed-raw/NLKNguyen/papercolor-theme.svg?maxAge=2592000)](https://github.com/NLKNguyen/papercolor-theme/issues) [![GitHub release](https://img.shields.io/github/release/NLKNguyen/papercolor-theme.svg)](https://github.com/NLKNguyen/papercolor-theme/releases) [![Travis CI Build Status](https://travis-ci.org/NLKNguyen/papercolor-theme.svg?branch=master)](https://travis-ci.org/NLKNguyen/papercolor-theme)
 
-*Note*: The current document has not been updated for the current stage of the project. Some information apply only for version 0.7 and earlier.
 
 Light & Dark color schemes for **Vim** terminal editor and **gVim**
 
@@ -52,17 +51,65 @@ set number
 set laststatus=2
 ```
 
-## Highlighting Customization
+## User-config Options
 
-Some elements have default highlighting color that may not fit everyone, and you can customize their HEX color code in your .vimrc file.
-Refer to 256-color table when choosing color.
+This theme currently provides theme options and language-specific options. All config options can be stored in global variable `g:PaperColor_Theme_Options` which can be set in your `.vimrc` 
 
-Example of currently available options:
+### Theme Options
+
+Within section `theme`, options for each theme can be specified under the theme name. The original PaperColor theme is `default`. For example:
 
 ```VimL
-let g:PaperColor_Dark_Override = { 'background' : '#1c1c1c', 'cursorline' : '#abcdef', 'matchparen' : '#3a3a3a', 'comment' : '#5f875f' }
+let g:PaperColor_Theme_Options = {
+  \   'theme': {
+  \     'default': {
+  \       'transparent_background': 1
+  \     }
+  \   }
+  \ }
+```
 
-let g:PaperColor_Light_Override = { 'background' : '#abcdef', 'cursorline' : '#dfdfff', 'matchparen' : '#d6d6d6' , 'comment' : '#8e908c' }
+Or if you want to specify options only for a variant (dark or light) of a theme, you can specify using this pattern `[theme name].light` or `[theme name].dark`. For example:
+
+```VimL
+let g:PaperColor_Theme_Options = {
+  \   'theme': {
+  \     'default.dark': {
+  \       'transparent_background': 1
+  \     }
+  \   }
+  \ }
+```
+**Note**: if the same option is provided in both a theme and a theme's variant, the value in the theme's variant options will take precedence. 
+
+#### Currently available theme options
+
+`transparent_background` set to 1 to use terminal background. Default is 0, use theme background
+
+
+
+### Language-specific options
+
+In general, for each language, built-in functions and constants are not highlighted.
+This is intentional; the vim syntax file often lags behind actual language development.
+To override the default behavior, optionally place a language section in `g:PaperColor_Theme_Options`.
+An example configuration is available below, and will be updated as new languages are supported.
+
+
+```VimL
+let g:PaperColor_Theme_Options = {
+  \   'language': {
+  \     'python': {
+  \       'highlight_builtins' : 1
+  \     },
+  \     'cpp': {
+  \       'highlight_standard_library': 1
+  \     },
+  \     'c': {
+  \       'highlight_builtins' : 1
+  \     }
+  \   }
+  \ }
 ```
 
 ## Syntax Highlighting Plugins Target
@@ -88,6 +135,8 @@ There are syntax highlighting enhancement plugins that improve upon Vim built-in
 
 ## Screenshots
 
+**Default Light**
+
 ![Sample Ruby code](https://nlknguyen.files.wordpress.com/2015/05/ruby1.png)
 
 ![Sample DTrace code](https://nlknguyen.files.wordpress.com/2015/05/dtrace1.png)
@@ -96,7 +145,9 @@ There are syntax highlighting enhancement plugins that improve upon Vim built-in
 
 ![Sample Assembly code](https://nlknguyen.files.wordpress.com/2015/05/asm.png)
 
-*Note*: The background of the dark color scheme was brightened a bit to reduce contrast after these following screenshots were taken.
+![Sample Vimdiff w/ git tool](https://cloud.githubusercontent.com/assets/4667129/24315492/9410c372-10a4-11e7-84c7-8846984bdca0.png)
+
+**Default Dark**
 
 ![Sample Ruby code](https://nlknguyen.files.wordpress.com/2015/05/ruby-dark.png)
 
@@ -105,6 +156,13 @@ There are syntax highlighting enhancement plugins that improve upon Vim built-in
 ![Sample JavaScript code](https://nlknguyen.files.wordpress.com/2015/05/javascript-dark2.png)
 
 ![Sample C code](https://nlknguyen.files.wordpress.com/2015/05/c-dark-split.png)
+
+![Sample Vimdiff w/ git tool](https://cloud.githubusercontent.com/assets/4667129/24315493/94122816-10a4-11e7-8d3f-f5d92a064a14.png)
+
+
+**Have screenshots to contribute?** Use [this thread](https://github.com/NLKNguyen/papercolor-theme/issues/90) to upload images and get direct links.
+
+----
 
 ![Vim-airline support](https://nlknguyen.files.wordpress.com/2015/05/gifrecord_2015-05-31_010251.gif)
 

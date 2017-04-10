@@ -1,10 +1,15 @@
 :Linediff	linediff.txt	/*:Linediff*
+:LinediffAdd	linediff.txt	/*:LinediffAdd*
+:LinediffLast	linediff.txt	/*:LinediffLast*
+:LinediffMerge	linediff.txt	/*:LinediffMerge*
+:LinediffPick	linediff.txt	/*:LinediffPick*
 :LinediffReset	linediff.txt	/*:LinediffReset*
+:LinediffShow	linediff.txt	/*:LinediffShow*
 g:linediff_buffer_type	linediff.txt	/*g:linediff_buffer_type*
 g:linediff_diffopt	linediff.txt	/*g:linediff_diffopt*
 g:linediff_first_buffer_command	linediff.txt	/*g:linediff_first_buffer_command*
+g:linediff_further_buffer_command	linediff.txt	/*g:linediff_further_buffer_command*
 g:linediff_indent	linediff.txt	/*g:linediff_indent*
-g:linediff_second_buffer_command	linediff.txt	/*g:linediff_second_buffer_command*
 linediff	linediff.txt	/*linediff*
 linediff-commands	linediff.txt	/*linediff-commands*
 linediff-contents	linediff.txt	/*linediff-contents*

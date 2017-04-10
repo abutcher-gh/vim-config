@@ -5,6 +5,7 @@ function! linediff#differ#New(sign_name, sign_number)
         \ 'original_buffer':    -1,
         \ 'original_bufhidden': '',
         \ 'diff_buffer':        -1,
+        \ 'index':              -1,
         \ 'filetype':           '',
         \ 'from':               -1,
         \ 'to':                 -1,
@@ -12,20 +13,28 @@ function! linediff#differ#New(sign_name, sign_number)
         \ 'sign_number':        a:sign_number,
         \ 'sign_text':          a:sign_number.'-',
         \ 'is_blank':           1,
-        \ 'other_differ':       {},
+        \ 'other_differs':      [],
+        \ 'is_merge':           0,
+        \ 'merge_from':         -1,
+        \ 'merge_to':           -1,
+        \ 'label':              '',
         \
-        \ 'Init':                      function('linediff#differ#Init'),
-        \ 'IsBlank':                   function('linediff#differ#IsBlank'),
-        \ 'Reset':                     function('linediff#differ#Reset'),
-        \ 'CloseAndReset':             function('linediff#differ#CloseAndReset'),
-        \ 'Lines':                     function('linediff#differ#Lines'),
-        \ 'Indent':                    function('linediff#differ#Indent'),
-        \ 'CreateDiffBuffer':          function('linediff#differ#CreateDiffBuffer'),
-        \ 'SetupDiffBuffer':           function('linediff#differ#SetupDiffBuffer'),
-        \ 'CloseDiffBuffer':           function('linediff#differ#CloseDiffBuffer'),
-        \ 'UpdateOriginalBuffer':      function('linediff#differ#UpdateOriginalBuffer'),
-        \ 'PossiblyUpdateOtherDiffer': function('linediff#differ#PossiblyUpdateOtherDiffer'),
-        \ 'SetupSigns':                function('linediff#differ#SetupSigns')
+        \ 'Init':                       function('linediff#differ#Init'),
+        \ 'IsBlank':                    function('linediff#differ#IsBlank'),
+        \ 'IsMergeDiff':                function('linediff#differ#IsMergeDiff'),
+        \ 'Reset':                      function('linediff#differ#Reset'),
+        \ 'CloseAndReset':              function('linediff#differ#CloseAndReset'),
+        \ 'Lines':                      function('linediff#differ#Lines'),
+        \ 'Indent':                     function('linediff#differ#Indent'),
+        \ 'CreateDiffBuffer':           function('linediff#differ#CreateDiffBuffer'),
+        \ 'SetupDiffBuffer':            function('linediff#differ#SetupDiffBuffer'),
+        \ 'SetupUpdateAutocommands':    function('linediff#differ#SetupUpdateAutocommands'),
+        \ 'CloseDiffBuffer':            function('linediff#differ#CloseDiffBuffer'),
+        \ 'UpdateOriginalBuffer':       function('linediff#differ#UpdateOriginalBuffer'),
+        \ 'PossiblyUpdateOtherDiffers': function('linediff#differ#PossiblyUpdateOtherDiffers'),
+        \ 'UpdateOtherDiffer':          function('linediff#differ#UpdateOtherDiffer'),
+        \ 'SetupSigns':                 function('linediff#differ#SetupSigns'),
+        \ 'ReplaceMerge':               function('linediff#differ#ReplaceMerge'),
         \ }
 
   exe "sign define ".differ.sign_name." text=".differ.sign_text." texthl=Search"
@@ -35,13 +44,19 @@ endfunction
 
 " Sets up the Differ with data from the argument list and from the current
 " file.
-function! linediff#differ#Init(from, to) dict
+function! linediff#differ#Init(from, to, options) dict
   let self.original_buffer    = bufnr('%')
   let self.original_bufhidden = &bufhidden
 
   let self.filetype = &filetype
   let self.from     = a:from
   let self.to       = a:to
+
+  for k in keys(a:options)
+    if has_key(self, k)
+      let self[k] = a:options[k]
+    endif
+  endfor
 
   call self.SetupSigns()
 
@@ -66,12 +81,16 @@ function! linediff#differ#Reset() dict
   let self.filetype           = ''
   let self.from               = -1
   let self.to                 = -1
-  let self.other_differ       = {}
+  let self.other_differs      = []
 
   exe "sign unplace ".self.sign_number."1"
   exe "sign unplace ".self.sign_number."2"
 
   let self.is_blank = 1
+  let self.is_merge = 0
+  let self.merge_from = -1
+  let self.merge_to = -1
+  let self.label    = ''
 
   if exists('g:linediff_original_diffopt')
     let &diffopt = g:linediff_original_diffopt
@@ -94,7 +113,7 @@ endfunction
 
 " Creates the buffer used for the diffing and connects it to this differ
 " object.
-function! linediff#differ#CreateDiffBuffer(edit_command) dict
+function! linediff#differ#CreateDiffBuffer(edit_command, index) dict
   let lines = self.Lines()
 
   if g:linediff_buffer_type == 'tempfile'
@@ -121,7 +140,9 @@ function! linediff#differ#CreateDiffBuffer(edit_command) dict
   endif
 
   let self.diff_buffer = bufnr('%')
+  let self.index = a:index
   call self.SetupDiffBuffer()
+  call self.SetupUpdateAutocommands()
   call self.Indent()
 
   diffthis
@@ -146,22 +167,39 @@ endfunction
 function! linediff#differ#SetupDiffBuffer() dict
   let b:differ = self
 
+  if self.label == ''
+    let label = ''
+  else
+    let label = ' ('.self.label.')'
+  endif
+
+  let description = printf('[%s:%s-%s%s]',
+        \ bufname(self.original_buffer),
+        \ self.from,
+        \ self.to,
+        \ label)
+
   if g:linediff_buffer_type == 'tempfile'
-    let statusline = printf('[%s:%%{b:differ.from}-%%{b:differ.to}]', bufname(self.original_buffer))
     if &statusline =~ '%[fF]'
-      let statusline = substitute(&statusline, '%[fF]', escape(statusline, '\'), '')
+      let statusline = substitute(&statusline, '%[fF]', escape(description, '\'), '')
+    else
+      let statusline = description
     endif
     let &l:statusline = statusline
     exe "set filetype=" . self.filetype
     setlocal bufhidden=wipe
-
-    autocmd BufWrite <buffer> silent call b:differ.UpdateOriginalBuffer()
   else " g:linediff_buffer_type == 'scratch'
-    let description = printf('[%s:%s-%s]', bufname(self.original_buffer), self.from, self.to)
-    silent exec 'keepalt file ' . escape(description, '[')
+    silent exec 'keepalt file ' . escape(description, '[ ')
     exe "set filetype=" . self.filetype
     set nomodified
+  endif
+endfunction
 
+" Note: should only be called when the buffer is initialized.
+function! linediff#differ#SetupUpdateAutocommands()
+  if g:linediff_buffer_type == 'tempfile'
+    autocmd BufWrite <buffer> silent call b:differ.UpdateOriginalBuffer()
+  else " g:linediff_buffer_type == 'scratch'
     autocmd BufWriteCmd <buffer> silent call b:differ.UpdateOriginalBuffer()
   endif
 endfunction
@@ -177,8 +215,10 @@ function! linediff#differ#SetupSigns() dict
   exe "sign unplace ".self.sign_number."1"
   exe "sign unplace ".self.sign_number."2"
 
-  exe printf("sign place %d1 name=%s line=%d buffer=%d", self.sign_number, self.sign_name, self.from, self.original_buffer)
-  exe printf("sign place %d2 name=%s line=%d buffer=%d", self.sign_number, self.sign_name, self.to,   self.original_buffer)
+  silent! exe printf("sign place %d1 name=%s line=%d buffer=%d",
+        \ self.sign_number, self.sign_name, self.from, self.original_buffer)
+  silent! exe printf("sign place %d2 name=%s line=%d buffer=%d",
+        \ self.sign_number, self.sign_name, self.to, self.original_buffer)
 endfunction
 
 " Updates the original buffer after saving the temporary one. It might also
@@ -196,12 +236,10 @@ function! linediff#differ#UpdateOriginalBuffer() dict
   " ones, switch back to the diff buffer.
   set bufhidden=hide
   call linediff#util#SwitchBuffer(self.original_buffer)
-  let saved_original_buffer_view = winsaveview()
   call cursor(self.from, 1)
   exe "silent! ".(self.to - self.from + 1)."foldopen!"
   exe "normal! ".(self.to - self.from + 1)."dd"
   call append(self.from - 1, new_lines)
-  call winrestview(saved_original_buffer_view)
   call linediff#util#SwitchBuffer(self.diff_buffer)
   set bufhidden=wipe
 
@@ -214,7 +252,7 @@ function! linediff#differ#UpdateOriginalBuffer() dict
   call self.SetupDiffBuffer()
   call self.SetupSigns()
 
-  call self.PossiblyUpdateOtherDiffer(new_line_count - line_count)
+  call self.PossiblyUpdateOtherDiffers(new_line_count - line_count)
   call winrestview(saved_diff_buffer_view)
 endfunction
 
@@ -223,15 +261,46 @@ endfunction
 " would result in a line shift.
 "
 " a:delta is the change in the number of lines.
-function! linediff#differ#PossiblyUpdateOtherDiffer(delta) dict
-  let other = self.other_differ
-
-  if self.original_buffer == other.original_buffer
-        \ && self.to <= other.from
-        \ && a:delta != 0
-    let other.from = other.from + a:delta
-    let other.to   = other.to   + a:delta
-
-    call other.SetupSigns()
+function! linediff#differ#PossiblyUpdateOtherDiffers(delta) dict
+  if a:delta == 0
+    return
   endif
+  for other in self.other_differs
+    call self.UpdateOtherDiffer(a:delta, other)
+  endfor
+endfunction
+
+function! linediff#differ#UpdateOtherDiffer(delta, other) dict
+  if self.original_buffer == a:other.original_buffer
+        \ && self.to <= a:other.from
+    let a:other.from = a:other.from + a:delta
+    let a:other.to   = a:other.to   + a:delta
+
+    call a:other.SetupSigns()
+  endif
+  if self.is_merge && a:other.is_merge
+    let a:other.merge_to = a:other.merge_to + a:delta
+  endif
+endfunction
+
+" Was this buffer created from a merge area?
+function! linediff#differ#IsMergeDiff() dict
+  return self.is_merge
+endfunction
+
+" Replace the saved merge area with the contents of this buffer
+function! linediff#differ#ReplaceMerge() dict
+  " Save real buffer range
+  let [real_from, real_to] = [self.from, self.to]
+
+  try
+    " Set the buffer range to the merge area in order to replace the whole thing
+    let self.from = self.merge_from
+    let self.to   = self.merge_to
+
+    call self.UpdateOriginalBuffer()
+  finally
+    " Restore the real buffer range
+    let [self.from, self.to] = [real_from, real_to]
+  endtry
 endfunction
