@@ -1289,6 +1289,7 @@ if has("autocmd")
    autocmd FileType git-diff setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
+   autocmd FileType __Tag_List__ setlocal nospell
 
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
 
@@ -1304,7 +1305,7 @@ if has("autocmd")
    augroup clikeprog
      " Remove all cprog autocommands
      au!
-   
+
      " When starting to edit a file:
      "   For *.c and *.h files set formatting of comments and set C-indenting on.
      "   For other files switch it off.
