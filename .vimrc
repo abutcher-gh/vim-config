@@ -1289,7 +1289,7 @@ if has("autocmd")
    autocmd FileType git-diff setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
-   autocmd FileType __Tag_List__ setlocal nospell
+   autocmd BufNewFile __Tag_List__ setlocal nospell
 
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
 
