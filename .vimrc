@@ -1,10 +1,16 @@
+let g:windows = $OS =~ "Windows"
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                        Vundle                          "
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
+if g:windows
+set rtp+=~/vimfiles/bundle/Vundle.vim
+else
 set rtp+=~/.vim/bundle/Vundle.vim
+endif
 call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
@@ -131,7 +137,6 @@ let html_number_lines=1
 let c_c_vim_compatible = 1
 let c_C99 = 1
 
-let g:windows = $OS =~ "Windows"
 let g:cygwin = g:windows && expand('~') =~ "^/"
 
 " zsh is great but running external commands through it via
@@ -1097,8 +1102,8 @@ set nowrap " off by default
 set linebreak
 set sidescroll=5
 set sidescrolloff=1
-set listchars+=precedes:«,extends:»
 set encoding=utf-8
+set listchars+=precedes:«,extends:»
 try
    set breakindent
    set breakindentshift=0
