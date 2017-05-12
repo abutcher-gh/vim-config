@@ -63,10 +63,9 @@ let g:ycm_complete_in_comments = 1
 nmap \q :YcmCompleter FixIt<C-M>
 nmap \? :YcmShowDetailedDiagnostic<C-M>
 
-" Allow for ESC to switch mode with multiple cursors active.  ESC in NORMAL
-" exits multi-cursor mode.
-let g:multi_cursor_exit_from_visual_mode = 0
-let g:multi_cursor_exit_from_insert_mode = 0
+" Allow for ESC to switch mode with multiple cursors active.
+" Use backtick to exit multi-cursor mode quickly without ESC wait.
+let g:multi_cursor_quit_key = '`'
 
 " let s:ctrlp_fallback = 'find %s -type f'
 let s:ctrlp_fallback = 'echo "Not a VCS directory"'
