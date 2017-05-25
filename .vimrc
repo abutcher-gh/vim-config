@@ -945,18 +945,20 @@ command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('
 nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
 nmap <silent> <Bar>H :GitShowDiff -C <CR>
 command! -bang -range -nargs=* GitGrep :call GitGrep(<bang>, <f-args>)
-vmap <silent> <Bar>G :call GitGrep('', GetVisual())<CR>
-nmap <silent> <Bar>G :call GitGrep('', expand('<cword>'))<CR>
+vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
+nmap <silent> <Bar>G :call GitGrep('p', expand('<cword>'))<CR>
 
-function! GitGrep(bang, ...)
+function! GitGrep(modifier, ...)
    let l:args = a:000
-   if a:bang != '!'
+   if a:modifier == 'p'
+      call PushCurrentLocation()
+   endif
+   if a:modifier != '!'
       let l:args = []
       for l:arg in a:000
          call add(l:args, shellescape(l:arg))
       endfor
    endif
-   echo 'git grep -n '.join(l:args)
    call CexLiveNoExpand('', 'git grep -n '.join(l:args))
 endfun
 
