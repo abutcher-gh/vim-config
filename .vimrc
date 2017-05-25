@@ -944,12 +944,43 @@ nmap <silent> \h :GitShow HEAD<CR>
 command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff '.<q-args> | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
 nmap <silent> <Bar>H :GitShowDiff -C <CR>
+command! -bang -range -nargs=* GitGrep :call GitGrep(<bang>, <f-args>)
+vmap <silent> <Bar>G :call GitGrep('', GetVisual())<CR>
+nmap <silent> <Bar>G :call GitGrep('', expand('<cword>'))<CR>
+
+function! GitGrep(bang, ...)
+   let l:args = a:000
+   if a:bang != '!'
+      let l:args = []
+      for l:arg in a:000
+         call add(l:args, shellescape(l:arg))
+      endfor
+   endif
+   echo 'git grep -n '.join(l:args)
+   call CexLiveNoExpand('', 'git grep -n '.join(l:args))
+endfun
+
+function! GetVisual()
+   let reg_save = getreg('"')
+   let regtype_save = getregtype('"')
+   let cb_save = &clipboard
+   set clipboard&
+   normal! ""gvy
+   let selection = getreg('"')
+   call setreg('"', reg_save, regtype_save)
+   let &clipboard = cb_save
+   return selection
+endfun
 
 let g:asyncrun_bell = 1
 
 function! CexLive(bang, cmdline)
+   call CexLiveNoExpand(a:bang, expand(a:cmdline))
+endfun
+
+function! CexLiveNoExpand(bang, cmdline)
    let l:w = winnr()
-   execute 'AsyncRun'.a:bang.' '.expand(a:cmdline)
+   execute 'AsyncRun'.a:bang.' '.a:cmdline
    execute 'copen'
    silent exec ''.l:w.'wincmd w'
 endfun
