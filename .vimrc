@@ -944,9 +944,9 @@ nmap <silent> \h :GitShow HEAD<CR>
 command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff '.<q-args> | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
 nmap <silent> <Bar>H :GitShowDiff -C <CR>
-command! -bang -range -nargs=* GitGrep :call GitGrep(<bang>, <f-args>)
+command! -bang -range -nargs=* GitGrep :call GitGrep('<bang>', <f-args>)
 vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
-nmap <silent> <Bar>G :call GitGrep('p', expand('<cword>'))<CR>
+nmap <silent> <Bar>G :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
 
 function! GitGrep(modifier, ...)
    let l:args = a:000
