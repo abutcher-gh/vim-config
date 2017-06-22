@@ -41,6 +41,7 @@ Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
 Plugin 'pangloss/vim-javascript'
+Plugin 'embear/vim-localvimrc'
 endif
 
 " All of your Plugins must be added before the following line
