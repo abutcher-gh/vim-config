@@ -960,7 +960,14 @@ function! GitGrep(modifier, ...)
          call add(l:args, shellescape(l:arg))
       endfor
    endif
+   if exists('b:current_compiler')
+      let l:restore_compiler = 'compiler '.b:current_compiler
+   else
+      let l:restore_compiler = 'unlet b:current_compiler'
+   endif
+   compiler gcc
    call CexLiveNoExpand('', 'git grep -n '.join(l:args))
+   exec l:restore_compiler 
 endfun
 
 function! GetVisual()
