@@ -86,10 +86,13 @@ function! CtrlPToggleSubmodules()
     let l:cmd = g:ctrlp_user_command['types'][1][1]
     if l:cmd =~ 'submodules'
         let l:cmd = substitute(l:cmd, ' --recurse-submodules', '', '')
+        echo 'Submodules will NOT be included in CtrlP tree search.'
     else
         let l:cmd = l:cmd . ' --recurse-submodules'
+        echo 'Submodules will be included in CtrlP tree search.'
     endif
     let g:ctrlp_user_command['types'][1][1] = l:cmd
+    CtrlPClearCache
 endfun
 
 hi link YcmWarningSign Delimiter
