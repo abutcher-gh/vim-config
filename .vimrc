@@ -1,6 +1,12 @@
 let g:windows = $OS =~ "Windows"
 let g:cygwin = g:windows && expand('~') =~ "^/"
 
+if $PROFILE_VIM_STARTUP == 1
+   profile start vim-startup-profile.log
+   profile func *
+   profile file *
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                        Vundle                          "
 set nocompatible              " be iMproved, required
@@ -36,7 +42,9 @@ Plugin 'AndrewRadev/linediff.vim'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
+if ! g:windows " too slow on windows
 Plugin 'airblade/vim-gitgutter'
+endif
 Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
@@ -1092,7 +1100,7 @@ function! ProbeCscopeAndTags(dir, ...) " second arg is 'force'
    endif
 endfunction
 
-if ! g:cygwin " too slow on cygwin
+if ! g:windows " too slow on windows
 try | call ProbeCscopeAndTags(getcwd()) | catch | endtry
 endif
 
@@ -1650,3 +1658,12 @@ hi SpecialKey guifg=gray
 runtime vimrc-overrides
 " alternatively, place a dot-prefixed version in HOME.
 if filereadable(expand("~/.vimrc-overrides")) | source ~/.vimrc-overrides | endif
+
+if $PROFILE_VIM_STARTUP == 1
+   profdel *
+endif
+if $PROFILE_VIM_POST_STARTUP == 1
+   profile start vim-post-startup-profile.log
+   profile func *
+   profile file *
+endif
