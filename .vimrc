@@ -1573,10 +1573,11 @@ call DefaultStyle()
 function! LogView()
    colorscheme lucius
    set bg=light
-   set ft=asm
    set ts=10
    set nospell
    set ve=all
+   syn clear
+   runtime syntax/logfile.vim
    let g:match_maps = 0
    normal \m
 endfunction
