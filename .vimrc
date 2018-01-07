@@ -183,17 +183,26 @@ if g:windows
 else
    let s:printfont=""
 endif
+let s:printfontsize=7
 function! PrintFont(...)
-   let &printfont = s:printfont . a:1
+   let l:n = len(a:000)
+   if l:n == 1 && a:1 =~ '[0-9]\+'
+      let s:printfontsize=a:1
+   elseif l:n == 1
+      let s:printfont=a:1
+   elseif l:n >= 2
+      let s:printfont=a:1
+      let s:printfontsize=a:2
+   endif
+   let &printfont = s:printfont . ':h' . s:printfontsize
 endfunc
-command! -nargs=1 PrintFont :call PrintFont(<f-args>)
+command! -nargs=* PrintFont :call PrintFont(<f-args>)
 command! CodePrintLandscape set printoptions=paper:A4,number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
 command! CodePrintPortrait  set printoptions=paper:A4,number:y,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
 command! TextPrintLandscape set printoptions=paper:A4,number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
 command! TextPrintPortrait  set printoptions=paper:A4,number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:y
-command! ColorPrinter set printdevice=xcpx5
-command! BlackPrinter set printdevice=xcpm1
-PrintFont :h7
+command! TextPrintLandscapeA5 set printoptions=paper:A5,number:n,left:5mm,right:5mm,top:12mm,bottom:12mm,portrait:n
+PrintFont
 
 function! Repath()
  
