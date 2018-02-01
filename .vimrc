@@ -60,6 +60,9 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let $GCCFILT_NO_COLOR = 1
+if g:cygwin
+   let $GCCFILT_CYGWINIZE = 1
+endif
 
 let g:undotree_DiffCommand = "diff"
 
