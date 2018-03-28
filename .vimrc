@@ -52,6 +52,8 @@ Plugin 'pangloss/vim-javascript'
 Plugin 'embear/vim-localvimrc'
 endif
 
+if filereadable(expand("~/.vimrc-extra-vundle-plugins")) | source ~/.vimrc-extra-vundle-plugins | endif
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
