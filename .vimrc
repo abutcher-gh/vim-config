@@ -91,16 +91,25 @@ let g:ctrlp_user_command = {
    \ }
 " let g:ctrlp_by_filename = 1
 
-" List submodule files in CTRL-P output (or not).
-command! ToggleSubmodules :call CtrlPToggleSubmodules()
-function! CtrlPToggleSubmodules()
+" List submodule files in CTRL-P and GitGrep output (or not).
+command! ToggleSubmodules :call ToggleSubmodules()
+nmap <silent> \` :ToggleSubmodules<CR>
+function! ToggleSubmodules()
+    " GitGrep
+    if g:git_grep_submodule_opt == ''
+        let g:git_grep_submodule_opt = ' --recurse-submodules'
+    else
+        let g:git_grep_submodule_opt = ''
+    endif
+
+    " CTRL-P command
     let l:cmd = g:ctrlp_user_command['types'][1][1]
     if l:cmd =~ 'submodules'
         let l:cmd = substitute(l:cmd, ' --recurse-submodules', '', '')
-        echo 'Submodules will NOT be included in CtrlP tree search.'
+        echo 'Submodules will NOT be included in CtrlP or GitGrep search.'
     else
         let l:cmd = l:cmd . ' --recurse-submodules'
-        echo 'Submodules will be included in CtrlP tree search.'
+        echo 'Submodules will be included in CtrlP or GitGrep search.'
     endif
     let g:ctrlp_user_command['types'][1][1] = l:cmd
     CtrlPClearCache
@@ -984,6 +993,7 @@ command! -bang -range -nargs=* GitGrep :call GitGrep('<bang>', <f-args>)
 vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
 nmap <silent> <Bar>G :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
 
+let g:git_grep_submodule_opt = ''
 function! GitGrep(modifier, ...)
    let l:args = a:000
    if a:modifier == 'p'
@@ -995,8 +1005,8 @@ function! GitGrep(modifier, ...)
          call add(l:args, shellescape(l:arg))
       endfor
    endif
-   let l:oef=&errorformat | let &errorformat='%f:%l:%m' 
-   call CexLiveNoExpand('', 'git grep --no-color -n '.join(l:args))
+   let l:oef=&errorformat | let &errorformat='%f:%l:%m'
+   call CexLiveNoExpand('', 'git grep --no-color -n '.g:git_grep_submodule_opt.' '.join(l:args))
    let &errorformat=l:oef
 endfun
 
