@@ -1335,10 +1335,19 @@ function! SetTerminalHighlighting()
 
    endif
 
+   " Rendering undercurl over X11 over SSH is painfully slow.
+   " Underline seems OK.
+   if $SSH_CONNECTION != ''
+      let l:under = 'underline'
+   else
+      let l:under = 'undercurl'
+   endif
+
+
    " replace solid background of spell/grammar errors in cterm with bright underline
    exe ''
-   \.'  hi SpellBad   term=bold cterm='.l:underline.' ctermbg=none ctermfg=174 gui=undercurl guisp=Red'
-   \.'| hi SpellCap   term=bold cterm='.l:underline.' ctermbg=none ctermfg=32  gui=undercurl guisp=Blue'
+   \.'  hi SpellBad   term=bold cterm='.l:underline.' ctermbg=none ctermfg=174 gui='.l:under.' guisp=Red'
+   \.'| hi SpellCap   term=bold cterm='.l:underline.' ctermbg=none ctermfg=32  gui='.l:under.' guisp=Blue'
    \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=42  gui=undercurl guisp=Cyan'
    \.'| hi SpellRare  term=bold cterm=bold ctermbg=none ctermfg=206 gui=undercurl guisp=Magenta'
 
