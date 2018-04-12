@@ -175,6 +175,14 @@ let c_c_vim_compatible = 1
 let c_C99 = 1
 
 
+" Latest vim swap file default location has moved from local directory
+" of the file being edited to the ~/.vim/swap directory.  If sharing a
+" vim config on a multi-user system, this is not generally writeable.
+" Add the original default back in (but still use ~/.vim/swap if
+" possible).
+set directory+=.
+
+
 " zsh is great but running external commands through it via
 "   execvp( { "zsh", "-c", ... } )
 " as vim does lands you in the wrong directory (pwd is simply '.')
