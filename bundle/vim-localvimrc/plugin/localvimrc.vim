@@ -1,5 +1,5 @@
 " Name:    localvimrc.vim
-" Version: 2.5.0
+" Version: 2.7.0
 " Author:  Markus Braun <markus.braun@krawel.de>
 " Summary: Vim plugin to search local vimrc files and load them.
 " Licence: This program is free software: you can redistribute it and/or modify
@@ -28,11 +28,16 @@ if version < 702
   finish
 endif
 
+" define default "localvimrc_enable" {{{2
+let s:localvimrc_enable = 1
+if (exists("g:localvimrc_enable") && type(g:localvimrc_enable) == type(0))
+  let s:localvimrc_enable = g:localvimrc_enable
+endif
+
 " define default "localvimrc_name" {{{2
 " copy to script local variable to prevent .lvimrc modifying the name option.
-if (!exists("g:localvimrc_name"))
-  let s:localvimrc_name = [ ".lvimrc" ]
-else
+let s:localvimrc_name = [ ".lvimrc" ]
+if (exists("g:localvimrc_name"))
   if type(g:localvimrc_name) == type("")
     let s:localvimrc_name = [ g:localvimrc_name ]
   elseif type(g:localvimrc_name) == type([])
@@ -41,105 +46,103 @@ else
 endif
 
 " define default "localvimrc_event" {{{2
-" copy to script local variable to prevent .lvimrc modifying the name option.
-if (!exists("g:localvimrc_event") || !(type(g:localvimrc_event) == type([])))
-  let s:localvimrc_event = [ "BufWinEnter" ]
-else
+" copy to script local variable to prevent .lvimrc modifying the event option.
+let s:localvimrc_event = [ "BufWinEnter" ]
+if (exists("g:localvimrc_event") && type(g:localvimrc_event) == type([]))
   let s:localvimrc_event = g:localvimrc_event
 endif
 
-" define default "localvimrc_reverse" {{{2
-" copy to script local variable to prevent .lvimrc modifying the reverse
+" define default "localvimrc_event_pattern" {{{2
+" copy to script local variable to prevent .lvimrc modifying the event pattern
 " option.
-if (!exists("g:localvimrc_reverse"))
-  let s:localvimrc_reverse = 0
-else
+let s:localvimrc_event_pattern = "*"
+if (exists("g:localvimrc_event_pattern") && type(g:localvimrc_event_pattern) == type(""))
+  let s:localvimrc_event_pattern = g:localvimrc_event_pattern
+endif
+
+" define default "localvimrc_reverse" {{{2
+" copy to script local variable to prevent .lvimrc modifying the reverse option.
+let s:localvimrc_reverse = 0
+if (exists("g:localvimrc_reverse") && type(g:localvimrc_reverse) == type(0))
   let s:localvimrc_reverse = g:localvimrc_reverse
 endif
 
 " define default "localvimrc_count" {{{2
 " copy to script local variable to prevent .lvimrc modifying the count option.
-if (!exists("g:localvimrc_count"))
-  let s:localvimrc_count = -1
-else
+let s:localvimrc_count = -1
+if (exists("g:localvimrc_count") && type(g:localvimrc_count) == type(0))
   let s:localvimrc_count = g:localvimrc_count
 endif
 
 " define default "localvimrc_file_directory_only" {{{2
 " copy to script local variable to prevent .lvimrc modifying the file
 " directory only option.
-if (!exists("g:localvimrc_file_directory_only"))
-  let s:localvimrc_file_directory_only = 0
-else
+let s:localvimrc_file_directory_only = 0
+if (exists("g:localvimrc_file_directory_only") && type(g:localvimrc_file_directory_only) == type(0))
   let s:localvimrc_file_directory_only = g:localvimrc_file_directory_only
 endif
 
 " define default "localvimrc_sandbox" {{{2
-" copy to script local variable to prevent .lvimrc disabling the sandbox
-" again.
-if (!exists("g:localvimrc_sandbox"))
-  let s:localvimrc_sandbox = 1
-else
+" copy to script local variable to prevent .lvimrc disabling the sandbox again.
+let s:localvimrc_sandbox = 1
+if (exists("g:localvimrc_sandbox") && type(g:localvimrc_sandbox) == type(0))
   let s:localvimrc_sandbox = g:localvimrc_sandbox
 endif
 
 " define default "localvimrc_ask" {{{2
 " copy to script local variable to prevent .lvimrc modifying the ask option.
-if (!exists("g:localvimrc_ask"))
-  let s:localvimrc_ask = 1
-else
+let s:localvimrc_ask = 1
+if (exists("g:localvimrc_ask") && type(g:localvimrc_ask) == type(0))
   let s:localvimrc_ask = g:localvimrc_ask
 endif
 
 " define default "localvimrc_whitelist" {{{2
 " copy to script local variable to prevent .lvimrc modifying the whitelist.
-if (!exists("g:localvimrc_whitelist"))
-  let s:localvimrc_whitelist = [ "^$" ] " this never matches a file
-else
+let s:localvimrc_whitelist = [ "^$" ] " this never matches a file
+if (exists("g:localvimrc_whitelist"))
   if type(g:localvimrc_whitelist) == type("")
     let s:localvimrc_whitelist = [ g:localvimrc_whitelist ]
-  else
+  elseif type(g:localvimrc_whitelist) == type([])
     let s:localvimrc_whitelist = g:localvimrc_whitelist
   endif
 endif
 
 " define default "localvimrc_blacklist" {{{2
 " copy to script local variable to prevent .lvimrc modifying the blacklist.
-if (!exists("g:localvimrc_blacklist"))
-  let s:localvimrc_blacklist = [ "^$" ] " this never matches a file
-else
+let s:localvimrc_blacklist = [ "^$" ] " this never matches a file
+if (exists("g:localvimrc_blacklist"))
   if type(g:localvimrc_blacklist) == type("")
     let s:localvimrc_blacklist = [ g:localvimrc_blacklist ]
-  else
+  elseif type(g:localvimrc_blacklist) == type([])
     let s:localvimrc_blacklist = g:localvimrc_blacklist
   endif
 endif
 
 " define default "localvimrc_persistent" {{{2
-" make decisions persistent over multiple vim runs
-if (!exists("g:localvimrc_persistent"))
-  let s:localvimrc_persistent = 0
-else
+" copy to script local variable to prevent .lvimrc modifying the persistent
+" option.
+let s:localvimrc_persistent = 0
+if (exists("g:localvimrc_persistent") && type(g:localvimrc_persistent) == type(0))
   let s:localvimrc_persistent = g:localvimrc_persistent
 endif
 
 " define default "localvimrc_persistence_file" {{{2
-" file where to store persistence information
-if (!exists("g:localvimrc_persistence_file"))
-  if has("win16") || has("win32") || has("win64") || has("win95")
-    let s:localvimrc_persistence_file = expand('$HOME') . "/_localvimrc_persistent"
-  else
-    let s:localvimrc_persistence_file = expand('$HOME') . "/.localvimrc_persistent"
-  endif
+" copy to script local variable to prevent .lvimrc modifying the persistence
+" file.
+if has("win16") || has("win32") || has("win64") || has("win95")
+  let s:localvimrc_persistence_file = expand('$HOME') . "/_localvimrc_persistent"
 else
+  let s:localvimrc_persistence_file = expand('$HOME') . "/.localvimrc_persistent"
+endif
+if (exists("g:localvimrc_persistence_file") && type(g:localvimrc_persistence_file) == type(""))
   let s:localvimrc_persistence_file = g:localvimrc_persistence_file
 endif
 
 " define default "localvimrc_autocmd" {{{2
-" enable emitting of autocommands before and after sourcing a .lvimrc file
-if (!exists("g:localvimrc_autocmd"))
-  let s:localvimrc_autocmd = 1
-else
+" copy to script local variable to prevent .lvimrc modifying the autocommand
+" option.
+let s:localvimrc_autocmd = 1
+if (exists("g:localvimrc_autocmd") && type(g:localvimrc_autocmd) == type(0))
   let s:localvimrc_autocmd = g:localvimrc_autocmd
 endif
 
@@ -175,7 +178,7 @@ if has("autocmd")
 
     for event in s:localvimrc_event
       " call s:LocalVimRC() when creating or reading any file
-      exec "autocmd ".event." * call s:LocalVimRC()"
+      exec "autocmd ".event." ".s:localvimrc_event_pattern." call s:LocalVimRC()"
     endfor
   augroup END
 endif
@@ -194,13 +197,18 @@ function! s:LocalVimRC()
   " print version
   call s:LocalVimRCDebug(1, "localvimrc.vim " . g:loaded_localvimrc)
 
+  " finish immediately if localvimrc is disabled
+  if s:localvimrc_enable == 0
+    return
+  endif
+
   " read persistent information
   call s:LocalVimRCReadPersistent()
 
   " only consider normal buffers (skip especially CommandT's GoToFile buffer)
   " NOTE: in general the buftype is not set for new buffers (BufWinEnter),
   "       e.g. for help files via plugins (pydoc)
-  if (&buftype != "")
+  if !empty(&buftype)
     call s:LocalVimRCDebug(1, "not a normal buffer, exiting")
     return
   endif
@@ -247,6 +255,7 @@ function! s:LocalVimRC()
   let s:localvimrc_finish = 0
   let l:answer = ""
   let l:sandbox_answer = ""
+  let l:sourced_files = []
   for l:rcfile_dict in l:rcfiles
     " get values from dictionary
     let l:rcfile = l:rcfile_dict["resolved"]
@@ -280,7 +289,7 @@ function! s:LocalVimRC()
 
       " reset answers if checksum changed
       if (!l:checksum_is_same)
-        call s:LocalVimRCDebug(2, "checksum mismatch, no answer reuse")
+        call s:LocalVimRCDebug(2, "checksum mismatch, not reusing answer")
         let l:stored_answer = ""
         let l:stored_sandbox_answer = ""
       else
@@ -434,8 +443,7 @@ function! s:LocalVimRC()
 
         " emit an autocommand before sourcing
         if (s:localvimrc_autocmd == 1)
-          silent doautocmd User LocalVimRCPre
-          call s:LocalVimRCDebug(1, "pre sourcing autocommand emitted")
+          call s:LocalVimRCUserAutocommand('LocalVimRCPre')
         endif
 
         " add 'sandbox' if requested
@@ -513,9 +521,10 @@ function! s:LocalVimRC()
 
         " emit an autocommands after sourcing
         if (s:localvimrc_autocmd == 1)
-          silent doautocmd User LocalVimRCPost
-          call s:LocalVimRCDebug(1, "post sourcing autocommand emitted")
+          call s:LocalVimRCUserAutocommand('LocalVimRCPost')
         endif
+
+        call add(l:sourced_files, l:rcfile)
 
         " remove global variables again
         unlet g:localvimrc_file
@@ -544,11 +553,40 @@ function! s:LocalVimRC()
     endif
   endfor
 
+  " store information about source local vimrc files in buffer local variable
+  if exists("b:localvimrc_sourced_files")
+    call extend(l:sourced_files, b:localvimrc_sourced_files)
+  endif
+  if exists("*uniq")
+    call uniq(sort(l:sourced_files))
+  else
+    let l:sourced_files_uniq = {}
+    for l:file in l:sourced_files
+      let l:sourced_files_uniq[l:file] = 1
+    endfor
+    let l:sourced_files = sort(keys(l:sourced_files_uniq))
+  endif
+  let b:localvimrc_sourced_files = l:sourced_files
+
   " make information persistent
   call s:LocalVimRCWritePersistent()
 
   " end marker
   call s:LocalVimRCDebug(1, "==================================================")
+endfunction
+
+
+" Function: s:LocalVimRCUserAutocommand(event) {{{2
+"
+function! s:LocalVimRCUserAutocommand(event)
+  if exists('#User#'.a:event)
+    call s:LocalVimRCDebug(1, 'executing User autocommand '.a:event)
+    if v:version >= 704 || (v:version == 703 && has('patch442'))
+      exec 'doautocmd <nomodeline> User ' . a:event
+    else
+      exec 'doautocmd User ' . a:event
+    endif
+  endif
 endfunction
 
 " Function: s:LocalVimRCMatchAny(str, patterns) {{{2
@@ -748,9 +786,32 @@ function! s:LocalVimRCClear()
   endif
 endfunction
 
+" Function: LocalVimRCEnable() {{{2
+"
+" enable processing of local vimrc files
+"
+function! s:LocalVimRCEnable()
+  " if this call really enables the plugin load the local vimrc files for the
+  " current buffer
+  if s:localvimrc_enable == 0
+    call s:LocalVimRCDebug(1, "enable processing of local vimrc files")
+    let s:localvimrc_enable = 1
+    call s:LocalVimRC()
+  endif
+endfunction
+
+" Function: LocalVimRCDisable() {{{2
+"
+" disable processing of local vimrc files
+"
+function! s:LocalVimRCDisable()
+  call s:LocalVimRCDebug(1, "disable processing of local vimrc files")
+  let s:localvimrc_enable = 0
+endfunction
+
 " Function: LocalVimRCFinish() {{{2
 "
-" finish processing local vimrc files
+" finish processing of local vimrc files
 "
 function! LocalVimRCFinish()
   call s:LocalVimRCDebug(1, "will finish sourcing files after this file")
@@ -775,8 +836,43 @@ function! s:LocalVimRCDebug(level, text)
   endif
 endfunction
 
+" Function: s:LocalVimRCEdit() {{{2
+"
+" open the local vimrc file for the current buffer in an split window for
+" editing. If more than one local vimrc file has been sourced, the user
+" can decide which file to edit.
+"
+function! s:LocalVimRCEdit()
+  if exists("b:localvimrc_sourced_files")
+    let l:items = len(b:localvimrc_sourced_files)
+    if l:items == 0
+      call s:LocalVimRCError("No local vimrc file has been sourced")
+    elseif l:items == 1
+      " edit the only sourced file
+      let l:file = b:localvimrc_sourced_files[0]
+    elseif l:items > 1
+      " build message for asking the user
+      let l:message = [ "Select local vimrc file to edit:" ]
+      call extend(l:message, map(copy(b:localvimrc_sourced_files), 'v:key+1 . " " . v:val'))
+
+      " ask the user which one should be edited
+      let l:answer = inputlist(l:message)
+      if l:answer =~ '^\d\+$' && l:answer > 0 && l:answer <= l:items
+        let l:file = b:localvimrc_sourced_files[l:answer-1]
+      endif
+    endif
+
+    if exists("l:file")
+      execute 'silent! split ' . fnameescape(l:file)
+    endif
+  endif
+endfunction
+
 " Section: Commands {{{1
-command! LocalVimRC      call s:LocalVimRC()
-command! LocalVimRCClear call s:LocalVimRCClear()
+command! LocalVimRC        call s:LocalVimRC()
+command! LocalVimRCClear   call s:LocalVimRCClear()
+command! LocalVimRCEdit    call s:LocalVimRCEdit()
+command! LocalVimRCEnable  call s:LocalVimRCEnable()
+command! LocalVimRCDisable call s:LocalVimRCDisable()
 
 " vim600: foldmethod=marker foldlevel=0 :

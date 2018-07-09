@@ -7,6 +7,9 @@ Contents ~
  2. Commands                                              |localvimrc-commands|
   1. The |LocalVimRC| command
   2. The |LocalVimRCClear| command
+  3. The |LocalVimRCEdit| command
+  4. The |LocalVimRCEnable| command
+  5. The |LocalVimRCDisable| command
  3. Functions                                            |localvimrc-functions|
   1. The |LocalVimRCFinish| command
  4. Variables                                            |localvimrc-variables|
@@ -19,19 +22,21 @@ Contents ~
   7. The |g:localvimrc_sourced_once| variable
   8. The |g:localvimrc_sourced_once_for_file| setting
  5. Settings                                              |localvimrc-settings|
-  1. The |g:localvimrc_name| setting
-  2. The |g:localvimrc_event| setting
-  3. The |g:localvimrc_reverse| setting
-  4. The |g:localvimrc_count| setting
-  5. The |g:localvimrc_file_directory_only| setting
-  6. The |g:localvimrc_sandbox| setting
-  7. The |g:localvimrc_ask| setting
-  8. The |g:localvimrc_persistent| setting
-  9. The |g:localvimrc_persistence_file| setting
-  10. The |g:localvimrc_whitelist| setting
-  11. The |g:localvimrc_blacklist| setting
-  12. The |g:localvimrc_autocmd| setting
-  13. The |g:localvimrc_debug| setting
+  1. The |g:localvimrc_enable| setting
+  2. The |g:localvimrc_name| setting
+  3. The |g:localvimrc_event| setting
+  4. The |g:localvimrc_event_pattern| setting
+  5. The |g:localvimrc_reverse| setting
+  6. The |g:localvimrc_count| setting
+  7. The |g:localvimrc_file_directory_only| setting
+  8. The |g:localvimrc_sandbox| setting
+  9. The |g:localvimrc_ask| setting
+  10. The |g:localvimrc_persistent| setting
+  11. The |g:localvimrc_persistence_file| setting
+  12. The |g:localvimrc_whitelist| setting
+  13. The |g:localvimrc_blacklist| setting
+  14. The |g:localvimrc_autocmd| setting
+  15. The |g:localvimrc_debug| setting
  6. Autocommands                                      |localvimrc-autocommands|
   1. The |LocalVimRCPre| autocommand
   2. The |LocalVimRCPost| autocommand
@@ -74,6 +79,33 @@ The *LocalVimRCClear* command
 
 Clear all stored decisions made in the past, when the plugin asked about
 sourcing a local vimrc file.
+
+-------------------------------------------------------------------------------
+The *LocalVimRCEdit* command
+
+Open the local vimrc file for the current buffer in an split window for
+editing. If more than one local vimrc file has been sourced, the user can
+decide which file to edit.
+
+-------------------------------------------------------------------------------
+The *LocalVimRCEnable* command
+
+Globally enable the loading of local vimrc files if loading has been disabled
+by |LocalVimRCDisable| or by setting |g:localvimrc_enable| to '0' during
+startup.
+
+Enabling local vimrc using this command will trigger loading of local vimrc
+files for the currently active buffer. It will _not_ load the local vimrc files
+for any other buffer. This will be done by an autocommand later when another
+buffer gets active and the configured |g:localvimrc_event| autocommand gets
+active. This is the case for the default |BufWinEnter|.
+
+-------------------------------------------------------------------------------
+The *LocalVimRCDisable* command
+
+Globally disable the loading of local vimrc files if loading has been disabled
+by |LocalVimRCEnable| or by setting |g:localvimrc_enable| to '1' during
+startup.
 
 ===============================================================================
                                                          *localvimrc-functions*
@@ -183,6 +215,17 @@ file.
   let g:option_name=option_value
 <
 -------------------------------------------------------------------------------
+The *g:localvimrc_enable* setting
+
+Globally enable/disable loading of local vimrc files globally. The behavior can
+be changed during runtime using the commands |LocalVimRCEnable| and
+|LocalVimRCDisable|.
+
+- Value '0': Disable loading of any local vimrc files.
+- Value '1': Enable loading of local vimrc files.
+- Default: '1'
+
+-------------------------------------------------------------------------------
 The *g:localvimrc_name* setting
 
 List of filenames of local vimrc files. The given name can include a directory
@@ -200,6 +243,8 @@ List of autocommand events that trigger local vimrc file loading.
 
 - Default: '[ "BufWinEnter" ]'
 
+For more information see |autocmd-events|.
+
 **NOTE:**
 
 BufWinEnter is the default to enable lines like
@@ -208,6 +253,16 @@ BufWinEnter is the default to enable lines like
 <
 in the local vimrc file. Settings "local to window" need to be set for every
 time a buffer is displayed in a window.
+
+-------------------------------------------------------------------------------
+The *g:localvimrc_event_pattern* setting
+
+String defining the pattern for which the autocommand events trigger local
+vimrc file loading.
+
+- Default: '"*"'
+
+For more information see |autocmd-patterns|.
 
 -------------------------------------------------------------------------------
 The *g:localvimrc_reverse* setting
@@ -352,9 +407,13 @@ Debug level for this script.
                                                       *localvimrc-autocommands*
 Autocommands ~
 
-If enabled localvimrc emits autocommands before and after sourcing an local
-vimrc file.
-
+If enabled localvimrc emits autocommands before and after sourcing a local
+vimrc file. The autocommands are emitted as |User| events. Because of that
+commands need to be registered in the following way:
+>
+  autocmd User LocalVimRCPre  echom 'before loading local vimrc'
+  autocmd User LocalVimRCPost echom 'after loading local vimrc'
+<
 -------------------------------------------------------------------------------
 The *LocalVimRCPre* autocommand
 
@@ -390,10 +449,29 @@ Credits ~
                                                          *localvimrc-changelog*
 Changelog ~
 
+v2.7.0 : 2018-03-19
+
+- add setting |g:localvimrc_enable| and commands |LocalVimRCEnable| and
+  |LocalVimRCDisable| to globally disable processing of local vimrc files.
+
+- add setting |g:localvimrc_event_pattern| to change the pattern for which
+  the autocommand is executed.
+
+v2.6.1 : 2018-02-20
+
+- fix a bug with missing uniq() in Vim version 7.4
+
+v2.6.0 : 2018-01-22
+
+- add command |LocalVimRCEdit| to edit sourced local vimrc files for the
+  current buffer.
+
 v2.5.0 : 2017-03-08
 
-- |g:localvimrc_whitelist| and |g:localvimrc_blacklist| now takes optionally
-  a list of regular expressions.
+- add unit tests.
+
+- settings |g:localvimrc_whitelist| and |g:localvimrc_blacklist| now takes
+  optionally a list of regular expressions.
 
 - add convenience variables |g:localvimrc_script_unresolved| and
   |g:localvimrc_script_dir_unresolved|.
@@ -408,8 +486,6 @@ v2.5.0 : 2017-03-08
 
 - add |LocalVimRCFinish| function to stop loading of remaining local vimrc
   files from within a local vimrc file.
-
-- add unit tests.
 
 v2.4.0 : 2016-02-05
 

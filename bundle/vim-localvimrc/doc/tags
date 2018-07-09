@@ -1,5 +1,8 @@
 LocalVimRC	localvimrc.txt	/*LocalVimRC*
 LocalVimRCClear	localvimrc.txt	/*LocalVimRCClear*
+LocalVimRCDisable	localvimrc.txt	/*LocalVimRCDisable*
+LocalVimRCEdit	localvimrc.txt	/*LocalVimRCEdit*
+LocalVimRCEnable	localvimrc.txt	/*LocalVimRCEnable*
 LocalVimRCFinish	localvimrc.txt	/*LocalVimRCFinish*
 LocalVimRCPost	localvimrc.txt	/*LocalVimRCPost*
 LocalVimRCPre	localvimrc.txt	/*LocalVimRCPre*
@@ -8,7 +11,9 @@ g:localvimrc_autocmd	localvimrc.txt	/*g:localvimrc_autocmd*
 g:localvimrc_blacklist	localvimrc.txt	/*g:localvimrc_blacklist*
 g:localvimrc_count	localvimrc.txt	/*g:localvimrc_count*
 g:localvimrc_debug	localvimrc.txt	/*g:localvimrc_debug*
+g:localvimrc_enable	localvimrc.txt	/*g:localvimrc_enable*
 g:localvimrc_event	localvimrc.txt	/*g:localvimrc_event*
+g:localvimrc_event_pattern	localvimrc.txt	/*g:localvimrc_event_pattern*
 g:localvimrc_file	localvimrc.txt	/*g:localvimrc_file*
 g:localvimrc_file_dir	localvimrc.txt	/*g:localvimrc_file_dir*
 g:localvimrc_file_directory_only	localvimrc.txt	/*g:localvimrc_file_directory_only*
