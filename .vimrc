@@ -13,7 +13,7 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
-let g:bundle_dir = resolve(expand('<sfile>:h')) . "/bundle"
+let g:bundle_dir = fnamemodify(resolve(expand('<sfile>')), ':h') . "/bundle"
 exe "set rtp+=".escape(g:bundle_dir."/Vundle.vim", " \|,")
 call vundle#begin(g:bundle_dir)
 
