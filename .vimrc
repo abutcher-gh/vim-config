@@ -1007,9 +1007,16 @@ function! GitGrep(modifier, ...)
    endif
    if a:modifier != '!'
       let l:args = []
+      if exists('+shellslash')
+         let l:shellslash = &shellslash
+         let &shellslash = 0
+      endif
       for l:arg in a:000
          call add(l:args, shellescape(l:arg))
       endfor
+      if exists('+shellslash')
+         let &shellslash = l:shellslash
+      endif
    endif
    let l:oef=&errorformat | let &errorformat='%f:%l:%m'
    call CexLiveNoExpand('', 'git grep --no-color -n '.g:git_grep_submodule_opt.' '.join(l:args))
