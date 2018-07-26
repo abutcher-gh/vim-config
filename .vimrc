@@ -13,13 +13,9 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
-if g:windows && !g:cygwin
-set rtp+=~/vimfiles/bundle/Vundle.vim
-call vundle#begin('~/vimfiles/bundle')
-else
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-endif
+let g:bundle_dir = resolve(expand('<sfile>:h')) . "/bundle"
+exe "set rtp+=".escape(g:bundle_dir."/Vundle.vim", " \|,")
+call vundle#begin(g:bundle_dir)
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
