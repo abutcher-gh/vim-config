@@ -226,10 +226,12 @@ let g:asyncrun_windows = 0
 let s:asyncrun_support = 0
 let g:asyncrun_support = 0
 
-" check running in windows
-if has('win32') || has('win64') || has('win95') || has('win16')
-	let s:asyncrun_windows = 1
-	let g:asyncrun_windows = 1
+" use cmd on windows unless shell overridden to sh
+if &shell !~ 'sh' && &shell !~ 'sh.exe'
+   if has('win32') || has('win64') || has('win95') || has('win16')
+      let s:asyncrun_windows = 1
+      let g:asyncrun_windows = 1
+   endif
 endif
 
 " check has advanced mode

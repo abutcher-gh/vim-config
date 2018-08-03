@@ -1,5 +1,11 @@
 let g:windows = $OS =~ "Windows"
 let g:cygwin = g:windows && expand('~') =~ "^/"
+if g:windows && !g:cygwin
+   let g:msys = match(system('sh --version'), 'msys')
+   if g:msys
+      set shell=sh
+   endif
+endif
 
 if $PROFILE_VIM_STARTUP == 1
    profile start vim-startup-profile.log
