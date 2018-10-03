@@ -374,7 +374,7 @@ if &diff
    set lines=64 columns=250
    " turn off spelling in terminal (it can't do underlining and
    " background highlighting confuses the diff)
-   if &term !~ "gui" 
+   if &term !~ "gui"
       set nospell
    endif
 endif
@@ -1399,6 +1399,7 @@ if has("autocmd")
    " disable spell under some conditions
    autocmd FileType diff,patch setlocal nospell comments=n:###,n:##,n:#,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO
    autocmd FileType git-diff setlocal nospell
+   autocmd FileType git setlocal nospell
    autocmd FileType qf setlocal nospell
    autocmd FileType messages setlocal nospell
    autocmd BufNewFile __Tag_List__ setlocal nospell

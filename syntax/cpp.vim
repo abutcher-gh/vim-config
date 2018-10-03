@@ -177,6 +177,8 @@ syn keyword cppNull nullptr
 
 hi def link cppNull Constant
 
+" This is currently broken for cases such as shared_ptr<int[]>, so turn it off.
+syntax clear cErrInBracket
 
 " expand \\\ to the start of a documentation section
 "
