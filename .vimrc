@@ -1429,6 +1429,7 @@ if has("autocmd")
      autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.cs set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
      autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i set filetype=asm tabstop=14 formatoptions=croql cindent comments=";"
      autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
+     autocmd BufNewFile,BufRead *.glsl,*.gls,*.frag,*.vert set filetype=gls cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
    augroup END
    autocmd BufNewFile,BufRead *.js,*.html,*.jade,*.xml set ts=2 sw=2
