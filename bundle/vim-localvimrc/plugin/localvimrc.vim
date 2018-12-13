@@ -1,5 +1,5 @@
 " Name:    localvimrc.vim
-" Version: 2.7.0
+" Version: 3.0.1
 " Author:  Markus Braun <markus.braun@krawel.de>
 " Summary: Vim plugin to search local vimrc files and load them.
 " Licence: This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ let g:loaded_localvimrc = 1
 if version < 702
   finish
 endif
+
+" Section: Default settings {{{1
 
 " define default "localvimrc_enable" {{{2
 let s:localvimrc_enable = 1
@@ -146,29 +148,33 @@ if (exists("g:localvimrc_autocmd") && type(g:localvimrc_autocmd) == type(0))
   let s:localvimrc_autocmd = g:localvimrc_autocmd
 endif
 
+" define default "localvimrc_python2_enable" {{{2
+" copy to script local variable to prevent .lvimrc modifying the enable
+" option.
+let s:localvimrc_python2_enable = 1
+if (exists("g:localvimrc_python2_enable") && type(g:localvimrc_python2_enable) == type(0))
+  let s:localvimrc_python2_enable = g:localvimrc_python2_enable
+endif
+
+" define default "localvimrc_python3_enable" {{{2
+" copy to script local variable to prevent .lvimrc modifying the enable
+" option.
+let s:localvimrc_python3_enable = 1
+if (exists("g:localvimrc_python3_enable") && type(g:localvimrc_python3_enable) == type(0))
+  let s:localvimrc_python3_enable = g:localvimrc_python3_enable
+endif
+
 " define default "localvimrc_debug" {{{2
 if (!exists("g:localvimrc_debug"))
   let g:localvimrc_debug = 0
 endif
 
-" initialize data dictionary {{{2
-" key: localvimrc file
-" value: [ answer, sandbox_answer, checksum ]
-let s:localvimrc_data = {}
-
-" initialize sourced dictionary {{{2
-" key: localvimrc file
-" value: [ list of files triggered sourcing ]
-let s:localvimrc_sourced = {}
-
-" initialize persistence file checksum {{{2
-let s:localvimrc_persistence_file_checksum = ""
-
-" initialize persistent data {{{2
-let s:localvimrc_persistent_data = {}
-
-" initialize processing finish flag {{{2
-let s:localvimrc_finish = 0
+" define default "localvimrc_debug_lines" {{{2
+" this defines the number of debug messages kept in a buffer
+let s:localvimrc_debug_lines = 100
+if (exists("g:localvimrc_debug_lines"))
+  let s:localvimrc_debug_lines = g:localvimrc_debug_lines
+endif
 
 " Section: Autocmd setup {{{1
 
@@ -177,13 +183,37 @@ if has("autocmd")
     autocmd!
 
     for event in s:localvimrc_event
-      " call s:LocalVimRC() when creating or reading any file
-      exec "autocmd ".event." ".s:localvimrc_event_pattern." call s:LocalVimRC()"
+      " call s:LocalVimRC() when event occurs
+      exec "autocmd ".event." ".s:localvimrc_event_pattern." call s:LocalVimRCDebug(1, 'autocommand triggered on event ".event."')|call s:LocalVimRC()"
     endfor
   augroup END
 endif
 
 " Section: Functions {{{1
+
+" Function: s:LocalVimRCSourceScript() {{{2
+"
+" actually source script file and prevent nested local vimrc triggers by
+" setting a guard variable.
+"
+function! s:LocalVimRCSourceScript(script_path, sandbox)
+  let l:command = "source " . fnameescape(a:script_path)
+
+  if a:sandbox == 1
+    let l:command = "sandbox " . l:command
+  endif
+
+  " prevent nested sourcing possibly triggered by content of sourced script by
+  " setting a guard variable
+  let s:localvimrc_running = 1
+
+  " execute the command sourcing the local vimrc file
+  call s:LocalVimRCDebug(1, "sourcing script, command is: \"" . l:command . "\"")
+  exec l:command
+
+  " release the guard variable
+  let s:localvimrc_running = 0
+endf
 
 " Function: s:LocalVimRC() {{{2
 "
@@ -192,15 +222,21 @@ endif
 "
 function! s:LocalVimRC()
   " begin marker
-  call s:LocalVimRCDebug(1, "==================================================")
-
-  " print version
-  call s:LocalVimRCDebug(1, "localvimrc.vim " . g:loaded_localvimrc)
+  call s:LocalVimRCDebug(1, "== START LocalVimRC() ============================")
 
   " finish immediately if localvimrc is disabled
   if s:localvimrc_enable == 0
+    call s:LocalVimRCDebug(1, "== END LocalVimRC() (disabled) ===================")
     return
   endif
+
+  " finish immediately if we are being called recursively
+  if s:localvimrc_running == 1
+    call s:LocalVimRCDebug(1, "== END LocalVimRC() (already running) ============")
+    return
+  endif
+
+  call s:LocalVimRCDebug(1, "running for file \"" .  fnameescape(expand("%:p")) . "\"")
 
   " read persistent information
   call s:LocalVimRCReadPersistent()
@@ -438,9 +474,6 @@ function! s:LocalVimRC()
         endif
         call s:LocalVimRCDebug(3, "g:localvimrc_sourced_once = " . g:localvimrc_sourced_once . ", g:localvimrc_sourced_once_for_file = " . g:localvimrc_sourced_once_for_file)
 
-        " generate command
-        let l:command = "source " . fnameescape(l:rcfile)
-
         " emit an autocommand before sourcing
         if (s:localvimrc_autocmd == 1)
           call s:LocalVimRCUserAutocommand('LocalVimRCPre')
@@ -451,10 +484,10 @@ function! s:LocalVimRC()
           call s:LocalVimRCDebug(2, "using sandbox")
           try
             " execute the command
-            exec "sandbox " . l:command
-            call s:LocalVimRCDebug(1, "sourced " . l:rcfile)
+            call s:LocalVimRCSourceScript(l:rcfile, 1)
           catch ^Vim\%((\a\+)\)\=:E48
-            call s:LocalVimRCDebug(1, "unable to use sandbox on '" . l:rcfile . "'")
+            let l:message = printf("unable to use sandbox on '%s': %s (%s)", l:rcfile, v:exception, v:throwpoint)
+            call s:LocalVimRCDebug(1, l:message)
 
             if (s:localvimrc_ask == 1)
               if (l:sandbox_answer !~? "^a$")
@@ -466,16 +499,16 @@ function! s:LocalVimRC()
                   let l:sandbox_answer = ""
                   while (l:sandbox_answer !~? '^[ynaq]$')
                     if (s:localvimrc_persistent == 0)
-                      let l:message = "localvimrc: unable to use 'sandbox' for " . l:rcfile . ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit) "
+                      let l:message .= ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit) "
                     elseif (s:localvimrc_persistent == 1)
-                      let l:message = "localvimrc: unable to use 'sandbox' for " . l:rcfile . ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit ; persistent [Y]es/[N]o/[A]ll) "
+                      let l:message .= ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit ; persistent [Y]es/[N]o/[A]ll) "
                     else
-                      let l:message = "localvimrc: unable to use 'sandbox' for " . l:rcfile . ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit) "
+                      let l:message .= ".\nlocalvimrc: Source it anyway? ([y]es/[n]o/[a]ll/[q]uit) "
                     endif
 
                     " turn off possible previous :silent command to force this
                     " message to be printed
-                    unsilent let l:sandbox_answer = inputdialog(l:message)
+                    unsilent let l:sandbox_answer = inputdialog("\n" . l:message)
                     call s:LocalVimRCDebug(2, "sandbox answer is \"" . l:sandbox_answer . "\"")
 
                     if empty(l:sandbox_answer)
@@ -505,8 +538,7 @@ function! s:LocalVimRC()
               " check the sandbox_answer
               if (l:sandbox_answer =~? '^[ya]$')
                 " execute the command
-                exec l:command
-                call s:LocalVimRCDebug(1, "sourced " . l:rcfile)
+                call s:LocalVimRCSourceScript(l:rcfile, 0)
               elseif (l:sandbox_answer =~? "^q$")
                 call s:LocalVimRCDebug(1, "ended processing files")
                 break
@@ -515,8 +547,7 @@ function! s:LocalVimRC()
           endtry
         else
           " execute the command
-          exec l:command
-          call s:LocalVimRCDebug(1, "sourced " . l:rcfile)
+          call s:LocalVimRCSourceScript(l:rcfile, 0)
         endif
 
         " emit an autocommands after sourcing
@@ -572,9 +603,8 @@ function! s:LocalVimRC()
   call s:LocalVimRCWritePersistent()
 
   " end marker
-  call s:LocalVimRCDebug(1, "==================================================")
+  call s:LocalVimRCDebug(1, "== END LocalVimRC() ==============================")
 endfunction
-
 
 " Function: s:LocalVimRCUserAutocommand(event) {{{2
 "
@@ -604,12 +634,43 @@ function! s:LocalVimRCMatchAny(str, patterns)
   return 0
 endfunction
 
+" Function: s:LocalVimRCCalcFNV() {{{2
+"
+" implementation of Fowler–Noll–Vo (FNV-1) hash function calculated on given
+" string (https://en.wikipedia.org/wiki/Fowler-Noll-Vo_hash_function)
+"
+function! s:LocalVimRCCalcFNV(text)
+  " initialize the hash with defined offset value
+  let l:prime = 0x01000193
+  let l:checksum = 0x811c9dc5
+
+  " loop over all characters
+  for i in range(0, len(a:text)-1)
+    let l:checksum = and((l:checksum * prime), 0xFFFFFFFF)
+    let l:checksum = xor(l:checksum, char2nr(a:text[i]))
+  endfor
+
+  return l:checksum
+endfunction
+
+" Function: s:LocalVimRCCalcSHA256() {{{2
+"
+" calculate sha256 checksum using python hashlib
+"
+function! s:LocalVimRcCalcSHA256(text)
+  exec s:localvimrc_python_command . " text = vim.eval('a:text')"
+  exec s:localvimrc_python_command . " checksum = hashlib.sha256(text.encode('utf-8'))"
+  exec s:localvimrc_python_command . " vim.command('return \"%s\"' % checksum.hexdigest())"
+endfunction
+
 " Function: s:LocalVimRCCalcChecksum(filename) {{{2
 "
-" calculate checksum and store it in dictionary
+" calculate checksum. depending on Vim version this is done with sha256 or
+" with FNV-1
 "
 function! s:LocalVimRCCalcChecksum(file)
-  let l:checksum = getfsize(a:file) . getfperm(a:file) . getftime(a:file)
+  let l:content = join(readfile(a:file))
+  let l:checksum = s:localvimrc_checksum_func(l:content)
 
   call s:LocalVimRCDebug(3, "checksum calc -> " . fnameescape(a:file) . " : " . l:checksum)
 
@@ -618,7 +679,7 @@ endfunction
 
 " Function: s:LocalVimRCCheckChecksum(filename, checksum) {{{2
 "
-" Check checksum in dictionary. Return "0" if it does not exist, "1" otherwise
+" Check checksum. Return "0" if it does not exist, "1" otherwise
 "
 function! s:LocalVimRCCheckChecksum(file, checksum)
   let l:return = 0
@@ -768,7 +829,7 @@ endfunction
 
 " Function: s:LocalVimRCClear() {{{2
 "
-" clear all stored data
+" clear all stored persistence data
 "
 function! s:LocalVimRCClear()
   let s:localvimrc_data = {}
@@ -784,6 +845,57 @@ function! s:LocalVimRCClear()
     call delete(s:localvimrc_persistence_file)
     call s:LocalVimRCDebug(3, "deleted persistence file")
   endif
+endfunction
+
+" Function: s:LocalVimRCCleanup() {{{2
+"
+" cleanup stored persistence data
+"
+function! s:LocalVimRCCleanup()
+  " read persistent information
+  call s:LocalVimRCReadPersistent()
+  call s:LocalVimRCDebug(3, "read persistent data")
+
+  " loop over all persistent data entries
+  for l:file in keys(s:localvimrc_data)
+    if !filereadable(l:file)
+      unlet s:localvimrc_data[l:file]
+      call s:LocalVimRCDebug(3, "removed file '".l:file."' from persistence file")
+    else
+      call s:LocalVimRCDebug(3, "keeping file '".l:file."' in persistence file")
+    endif
+  endfor
+
+  " make information persistent
+  call s:LocalVimRCWritePersistent()
+  call s:LocalVimRCDebug(3, "write persistent data")
+endfunction
+
+" Function: s:LocalVimRCForget(...) {{{2
+"
+" forget stored persistence data for given files
+"
+function! s:LocalVimRCForget(...)
+  " read persistent information
+  call s:LocalVimRCReadPersistent()
+  call s:LocalVimRCDebug(3, "read persistent data")
+
+  " loop over all persistent data entries
+  for l:file in a:000
+    if !filereadable(l:file)
+      let l:file = resolve(fnamemodify(l:file, ":p"))
+      if has_key(s:localvimrc_data, l:file)
+        unlet s:localvimrc_data[l:file]
+        call s:LocalVimRCDebug(3, "removed file '".l:file."' from persistence file")
+      else
+        call s:LocalVimRCDebug(3, "file '".l:file."' does not exist in persistence file")
+      endif
+    endif
+  endfor
+
+  " make information persistent
+  call s:LocalVimRCWritePersistent()
+  call s:LocalVimRCDebug(3, "write persistent data")
 endfunction
 
 " Function: LocalVimRCEnable() {{{2
@@ -818,24 +930,6 @@ function! LocalVimRCFinish()
   let s:localvimrc_finish = 1
 endfunction
 
-" Function: s:LocalVimRCError(text) {{{2
-"
-" output error message
-"
-function! s:LocalVimRCError(text)
-  echohl ErrorMsg | echom "localvimrc: " . a:text | echohl None
-endfunction
-
-" Function: s:LocalVimRCDebug(level, text) {{{2
-"
-" output debug message, if this message has high enough importance
-"
-function! s:LocalVimRCDebug(level, text)
-  if (g:localvimrc_debug >= a:level)
-    echom "localvimrc: " . a:text
-  endif
-endfunction
-
 " Function: s:LocalVimRCEdit() {{{2
 "
 " open the local vimrc file for the current buffer in an split window for
@@ -868,11 +962,143 @@ function! s:LocalVimRCEdit()
   endif
 endfunction
 
+" Function: s:LocalVimRCError(text) {{{2
+"
+" output error message
+"
+function! s:LocalVimRCError(text)
+  echohl ErrorMsg | echom "localvimrc: " . a:text | echohl None
+endfunction
+
+" Function: s:LocalVimRCDebug(level, text) {{{2
+"
+" store debug message, if this message has high enough importance
+"
+function! s:LocalVimRCDebug(level, text)
+  if (g:localvimrc_debug >= a:level)
+    call add(s:localvimrc_debug_message, a:text)
+
+    " if the list is too long remove the first element
+    if len(s:localvimrc_debug_message) > s:localvimrc_debug_lines
+      call remove(s:localvimrc_debug_message, 0)
+    endif
+  endif
+endfunction
+
+" Function: s:LocalVimRCDebugShow() {{{2
+"
+" output stored debug message
+"
+function! s:LocalVimRCDebugShow()
+  for l:message in s:localvimrc_debug_message
+    echo l:message
+  endfor
+endfunction
+
+" Section: Initialize internal variables {{{1
+
+" initialize data dictionary {{{2
+" key: localvimrc file
+" value: [ answer, sandbox_answer, checksum ]
+let s:localvimrc_data = {}
+
+" initialize sourced dictionary {{{2
+" key: localvimrc file
+" value: [ list of files triggered sourcing ]
+let s:localvimrc_sourced = {}
+
+" initialize persistence file checksum {{{2
+let s:localvimrc_persistence_file_checksum = ""
+
+" initialize persistent data {{{2
+let s:localvimrc_persistent_data = {}
+
+" initialize nested execution guard {{{2
+let s:localvimrc_running = 0
+
+" initialize processing finish flag {{{2
+let s:localvimrc_finish = 0
+
+" initialize debug message buffer {{{2
+let s:localvimrc_debug_message = []
+
+" determine which function shall be used to calculate checksums {{{2
+let s:localvimrc_python_command = "not checked for python"
+let s:localvimrc_python_available = 0
+
+if exists("*sha256")
+  let s:localvimrc_checksum_func = function("sha256")
+else
+  " determine python version
+  " for each available python version try to load the required modules and use
+  " this version only if loading worked
+  let s:localvimrc_python_command = "no working python available"
+
+  if s:localvimrc_python_available == 0 &&
+    s:localvimrc_python2_enable == 1 &&
+    has("python")
+    try
+      python import hashlib, vim
+      let s:localvimrc_python_available = 1
+      let s:localvimrc_python_command = "python"
+    catch
+      call s:LocalVimRCDebug(1, "python is available but not working")
+    endtry
+  endif
+
+  if s:localvimrc_python_available == 0 &&
+    s:localvimrc_python3_enable == 1 &&
+    has("python3")
+    try
+      python3 import hashlib, vim
+      let s:localvimrc_python_available = 1
+      let s:localvimrc_python_command = "python3"
+    catch
+      call s:LocalVimRCDebug(1, "python3 is available but not working")
+    endtry
+  endif
+
+  if s:localvimrc_python_available == 1
+    let s:localvimrc_checksum_func = function("s:LocalVimRcCalcSHA256")
+  else
+    let s:localvimrc_checksum_func = function("s:LocalVimRCCalcFNV")
+  endif
+endif
+
+" Section: Report settings {{{1
+
+call s:LocalVimRCDebug(1, "== START settings ================================")
+call s:LocalVimRCDebug(1, "localvimrc_enable = \"" . string(s:localvimrc_enable) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_name = \"" . string(s:localvimrc_name) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_event = \"" . string(s:localvimrc_event) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_event_pattern = \"" . string(s:localvimrc_event_pattern) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_reverse = \"" . string(s:localvimrc_reverse) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_count = \"" . string(s:localvimrc_count) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_file_directory_only = \"" . string(s:localvimrc_file_directory_only) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_sandbox = \"" . string(s:localvimrc_sandbox) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_ask = \"" . string(s:localvimrc_ask) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_whitelist = \"" . string(s:localvimrc_whitelist) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_blacklist = \"" . string(s:localvimrc_blacklist) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_persistent = \"" . string(s:localvimrc_persistent) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_persistence_file = \"" . string(s:localvimrc_persistence_file) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_autocmd = \"" . string(s:localvimrc_autocmd) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_python2_enable = \"" . string(s:localvimrc_python2_enable) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_python3_enable = \"" . string(s:localvimrc_python3_enable) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_debug = \"" . string(g:localvimrc_debug) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_debug_lines = \"" . string(s:localvimrc_debug_lines) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_checksum_func = \"" . string(s:localvimrc_checksum_func) . "\"")
+call s:LocalVimRCDebug(1, "localvimrc_python_command = \"" . string(s:localvimrc_python_command) . "\"")
+call s:LocalVimRCDebug(1, "== END settings ==================================")
+
 " Section: Commands {{{1
+
 command! LocalVimRC        call s:LocalVimRC()
 command! LocalVimRCClear   call s:LocalVimRCClear()
+command! LocalVimRCCleanup call s:LocalVimRCCleanup()
+command! -nargs=+ -complete=file LocalVimRCForget  call s:LocalVimRCForget(<f-args>)
 command! LocalVimRCEdit    call s:LocalVimRCEdit()
 command! LocalVimRCEnable  call s:LocalVimRCEnable()
 command! LocalVimRCDisable call s:LocalVimRCDisable()
+command! LocalVimRCDebugShow call s:LocalVimRCDebugShow()
 
 " vim600: foldmethod=marker foldlevel=0 :

@@ -2,6 +2,7 @@ g:gitgutter_async	gitgutter.txt	/*g:gitgutter_async*
 g:gitgutter_diff_args	gitgutter.txt	/*g:gitgutter_diff_args*
 g:gitgutter_diff_base	gitgutter.txt	/*g:gitgutter_diff_base*
 g:gitgutter_enabled	gitgutter.txt	/*g:gitgutter_enabled*
+g:gitgutter_git_args	gitgutter.txt	/*g:gitgutter_git_args*
 g:gitgutter_git_executable	gitgutter.txt	/*g:gitgutter_git_executable*
 g:gitgutter_grep	gitgutter.txt	/*g:gitgutter_grep*
 g:gitgutter_highlight_lines	gitgutter.txt	/*g:gitgutter_highlight_lines*

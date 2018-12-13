@@ -1,9 +1,12 @@
 LocalVimRC	localvimrc.txt	/*LocalVimRC*
+LocalVimRCCleanup	localvimrc.txt	/*LocalVimRCCleanup*
 LocalVimRCClear	localvimrc.txt	/*LocalVimRCClear*
+LocalVimRCDebugShow	localvimrc.txt	/*LocalVimRCDebugShow*
 LocalVimRCDisable	localvimrc.txt	/*LocalVimRCDisable*
 LocalVimRCEdit	localvimrc.txt	/*LocalVimRCEdit*
 LocalVimRCEnable	localvimrc.txt	/*LocalVimRCEnable*
 LocalVimRCFinish	localvimrc.txt	/*LocalVimRCFinish*
+LocalVimRCForget	localvimrc.txt	/*LocalVimRCForget*
 LocalVimRCPost	localvimrc.txt	/*LocalVimRCPost*
 LocalVimRCPre	localvimrc.txt	/*LocalVimRCPre*
 g:localvimrc_ask	localvimrc.txt	/*g:localvimrc_ask*
@@ -11,6 +14,7 @@ g:localvimrc_autocmd	localvimrc.txt	/*g:localvimrc_autocmd*
 g:localvimrc_blacklist	localvimrc.txt	/*g:localvimrc_blacklist*
 g:localvimrc_count	localvimrc.txt	/*g:localvimrc_count*
 g:localvimrc_debug	localvimrc.txt	/*g:localvimrc_debug*
+g:localvimrc_debug_lines	localvimrc.txt	/*g:localvimrc_debug_lines*
 g:localvimrc_enable	localvimrc.txt	/*g:localvimrc_enable*
 g:localvimrc_event	localvimrc.txt	/*g:localvimrc_event*
 g:localvimrc_event_pattern	localvimrc.txt	/*g:localvimrc_event_pattern*
@@ -20,6 +24,8 @@ g:localvimrc_file_directory_only	localvimrc.txt	/*g:localvimrc_file_directory_on
 g:localvimrc_name	localvimrc.txt	/*g:localvimrc_name*
 g:localvimrc_persistence_file	localvimrc.txt	/*g:localvimrc_persistence_file*
 g:localvimrc_persistent	localvimrc.txt	/*g:localvimrc_persistent*
+g:localvimrc_python2_enable	localvimrc.txt	/*g:localvimrc_python2_enable*
+g:localvimrc_python3_enable	localvimrc.txt	/*g:localvimrc_python3_enable*
 g:localvimrc_reverse	localvimrc.txt	/*g:localvimrc_reverse*
 g:localvimrc_sandbox	localvimrc.txt	/*g:localvimrc_sandbox*
 g:localvimrc_script	localvimrc.txt	/*g:localvimrc_script*
