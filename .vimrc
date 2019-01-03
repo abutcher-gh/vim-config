@@ -1525,7 +1525,7 @@ let g:user = $USERNAME | if g:user == '' | let g:user = $USER | endif
 
 " preferred color scheme
 let g:preferred_bg='dark' | if &term =~ 'gui' | let g:preferred_bg='light' | endif
-let g:preferred_scheme='moria'
+let g:preferred_scheme='PaperColor'
 let g:fallback_bg='light'
 let g:fallback_scheme='default'
 
@@ -1541,7 +1541,7 @@ if g:user == 'root'
    colorscheme darkblue
    set bg=dark
 
-elseif g:fullcolorterm
+elseif g:fullcolorterm && exists(':GuiColorScheme')
 
    runtime plugin/guicolorscheme.vim
    let &bg=g:preferred_bg
@@ -1549,8 +1549,13 @@ elseif g:fullcolorterm
 
 else
 
-   exec "colorscheme ".g:fallback_scheme
-   let &bg=g:fallback_bg
+   try
+      silent! exec "colorscheme ".g:preferred_scheme
+      let &bg=g:preferred_bg
+   catch
+      exec "colorscheme ".g:fallback_scheme
+      let &bg=g:fallback_bg
+   endtry
 
 endif
 
