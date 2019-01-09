@@ -63,6 +63,12 @@ filetype plugin indent on    " required
 "                        Vundle                          "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Local vimrc (.lvimrc) file loading:
+" 0: Don't store and restore any decisions.
+" 1: Store and restore decisions only if the answer was given in upper case (Y/N/A).
+" 2: Store and restore all decisions.
+let g:localvimrc_persistent = 1
+
 let $GCCFILT_NO_COLOR = 1
 if g:cygwin
    let $GCCFILT_CYGWINIZE = 1
