@@ -42,6 +42,7 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'abutcher-gh/vim-clang-format'
 Plugin 'AndrewRadev/linediff.vim'
 Plugin 'NLKNguyen/papercolor-theme'
+Plugin 'jacoborus/tender.vim'
 Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
 if ! g:windows " too slow on windows

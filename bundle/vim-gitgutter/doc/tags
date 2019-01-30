@@ -23,6 +23,7 @@ gitgutter-:GitGutter	gitgutter.txt	/*gitgutter-:GitGutter*
 gitgutter-:GitGutterAll	gitgutter.txt	/*gitgutter-:GitGutterAll*
 gitgutter-:GitGutterDisable	gitgutter.txt	/*gitgutter-:GitGutterDisable*
 gitgutter-:GitGutterEnable	gitgutter.txt	/*gitgutter-:GitGutterEnable*
+gitgutter-:GitGutterFold	gitgutter.txt	/*gitgutter-:GitGutterFold*
 gitgutter-:GitGutterLineHighlightsDisable	gitgutter.txt	/*gitgutter-:GitGutterLineHighlightsDisable*
 gitgutter-:GitGutterLineHighlightsEnable	gitgutter.txt	/*gitgutter-:GitGutterLineHighlightsEnable*
 gitgutter-:GitGutterLineHighlightsToggle	gitgutter.txt	/*gitgutter-:GitGutterLineHighlightsToggle*

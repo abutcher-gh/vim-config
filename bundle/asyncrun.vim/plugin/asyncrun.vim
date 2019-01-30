@@ -1,9 +1,9 @@
 " asyncrun.vim - Run shell commands in background and output to quickfix
 "
-" Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018
+" Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2018/04/29 05:23
+" Last Modified: 2019/01/28 11:36
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -31,6 +31,7 @@
 "     $VIM_FILEDIR   - Full path of current buffer without the file name
 "     $VIM_FILEEXT   - File extension of current buffer
 "     $VIM_FILENOEXT - File name of current buffer without path and extension
+"     $VIM_PATHNOEXT - File name with full path but without extension
 "     $VIM_CWD       - Current directory
 "     $VIM_RELDIR    - File path relativize to current directory
 "     $VIM_RELNAME   - File name relativize to current directory
@@ -180,6 +181,11 @@ endif
 if !exists('g:asyncrun_save')
 	let g:asyncrun_save = 0
 endif
+
+if !exists('g:asyncrun_stdin')
+	let g:asyncrun_stdin = has('win32') || has('win64') || has('win95')
+endif
+
 
 
 "----------------------------------------------------------------------
@@ -673,9 +679,16 @@ function! s:AsyncRun_Job_Start(cmd)
 			let l:options['in_buf'] = s:async_info.range_buf
 			let l:options['in_top'] = s:async_info.range_top
 			let l:options['in_bot'] = s:async_info.range_bot
+		elseif exists('*ch_close_in')
+			if g:asyncrun_stdin != 0
+				let l:options['in_io'] = 'pipe'
+			endif
 		endif
 		let s:async_job = job_start(l:args, l:options)
 		let l:success = (job_status(s:async_job) != 'fail')? 1 : 0
+		if l:success && l:options['in_io'] == 'pipe'
+			silent! call ch_close_in(job_getchannel(s:async_job))
+		endif
 	else
 		let l:callbacks = {'shell': 'AsyncRun'}
 		let l:callbacks['on_stdout'] = function('s:AsyncRun_Job_NeoVim')
@@ -1185,6 +1198,7 @@ function! asyncrun#run(bang, opts, args, ...)
 	let l:macros['VIM_FILENAME'] = expand("%:t")
 	let l:macros['VIM_FILEDIR'] = expand("%:p:h")
 	let l:macros['VIM_FILENOEXT'] = expand("%:t:r")
+	let l:macros['VIM_PATHNOEXT'] = expand("%:r")
 	let l:macros['VIM_FILEEXT'] = "." . expand("%:e")
 	let l:macros['VIM_CWD'] = getcwd()
 	let l:macros['VIM_RELDIR'] = expand("%:h:.")
@@ -1318,7 +1332,7 @@ endfunc
 " asyncrun -version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.0.1'
+	return '2.0.7'
 endfunc
 
 
@@ -1577,3 +1591,6 @@ if has("autocmd")
 		au User AsyncRunStart call s:check_quickfix()
 	augroup END
 endif
+
+
+
