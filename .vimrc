@@ -53,6 +53,7 @@ Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
 Plugin 'pangloss/vim-javascript'
 Plugin 'embear/vim-localvimrc'
+Plugin 'lanza/vim-cmake-completion'
 endif
 
 if filereadable(expand("~/.vimrc-extra-vundle-plugins")) | source ~/.vimrc-extra-vundle-plugins | endif
