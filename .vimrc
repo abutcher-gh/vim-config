@@ -1411,6 +1411,8 @@ if has("autocmd")
    autocmd FileType messages setlocal nospell
    autocmd BufNewFile __Tag_List__ setlocal nospell
 
+   autocmd FileType md,rst,text,yaml setlocal spell
+
    autocmd ColorScheme * call SetTerminalHighlighting() | call ResetCursor()
 
    " Set reads from stdin to be considered unmodified
@@ -1430,20 +1432,20 @@ if has("autocmd")
      "   For *.c and *.h files set formatting of comments and set C-indenting on.
      "   For other files switch it off.
      "   Don't change the order, it's important that the line with * comes first.
-     autocmd BufNewFile,BufRead *       set formatoptions=tcql nocindent noautoindent comments&
-     autocmd BufNewFile,BufRead *.gpp set filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
-     autocmd BufNewFile,BufRead *.impl set filetype=cpp
-     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.cs set formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:-
-     autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i set filetype=asm tabstop=14 formatoptions=croql cindent comments=";"
-     autocmd BufNewFile,BufRead *.fp,*.cg,*.vp set filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://
-     autocmd BufNewFile,BufRead *.glsl,*.gls,*.frag,*.vert set filetype=gls cindent comments=sr:/*,mbl:*/,ex:*/,://
-     autocmd BufNewFile,BufRead mib2c.*.conf set filetype=mib2c
+     autocmd BufNewFile,BufRead *       setlocal formatoptions=tcql nocindent noautoindent comments&
+     autocmd BufNewFile,BufRead *.gpp setlocal filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
+     autocmd BufNewFile,BufRead *.impl setlocal filetype=cpp spell
+     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.cs setlocal formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:- spell
+     autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i setlocal filetype=asm tabstop=14 formatoptions=croql cindent comments=";" spell
+     autocmd BufNewFile,BufRead *.fp,*.cg,*.vp setlocal filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://  setlocal spell
+     autocmd BufNewFile,BufRead *.glsl,*.gls,*.frag,*.vert setlocal filetype=gls cindent comments=sr:/*,mbl:*/,ex:*/,:// spell
+     autocmd BufNewFile,BufRead mib2c.*.conf setlocal filetype=mib2c
    augroup END
-   autocmd BufNewFile,BufRead *.js,*.html,*.jade,*.xml set ts=2 sw=2
+   autocmd BufNewFile,BufRead *.js,*.html,*.jade,*.xml setlocal ts=2 sw=2 spell
 
-   autocmd BufNewFile,BufRead *.git-diff set ft=git-diff
-   autocmd BufNewFile,BufRead *.diff set ft=diff
-   autocmd BufNewFile,BufRead COMMIT_EDITMSG set ft=gitcommit
+   autocmd BufNewFile,BufRead *.git-diff setlocal ft=git-diff
+   autocmd BufNewFile,BufRead *.diff setlocal ft=diff
+   autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal ft=gitcommit spell
 
    autocmd BufNewFile,BufRead * call ShowWhitespaceErrors()
 
@@ -1458,10 +1460,10 @@ if has("autocmd")
      "      uncompress text in buffer after reading
      "    write:  compress file after writing
      "   append:  uncompress file, append, compress file
-     autocmd BufReadPre,FileReadPre *.gz set bin
-     autocmd BufReadPre,FileReadPre *.gz let ch_save = &ch|set ch=2
+     autocmd BufReadPre,FileReadPre *.gz setlocal bin
+     autocmd BufReadPre,FileReadPre *.gz let ch_save = &ch|setlocal ch=2
      autocmd BufReadPost,FileReadPost  *.gz '[,']!gunzip
-     autocmd BufReadPost,FileReadPost  *.gz set nobin
+     autocmd BufReadPost,FileReadPost  *.gz setlocal nobin
      autocmd BufReadPost,FileReadPost  *.gz let &ch = ch_save|unlet ch_save
      autocmd BufReadPost,FileReadPost  *.gz execute ":doautocmd BufReadPost %:r"
    
@@ -1483,10 +1485,10 @@ if has("autocmd")
      "             uncompress text in buffer after reading
      "      write: compress file after writing
      "     append: uncompress file, append, compress file
-     autocmd BufReadPre,FileReadPre        *.bz2 set bin
-     autocmd BufReadPre,FileReadPre        *.bz2 let ch_save = &ch|set ch=2
-     autocmd BufReadPost,FileReadPost      *.bz2 set cmdheight=2|'[,']!bunzip2
-     autocmd BufReadPost,FileReadPost      *.bz2 set cmdheight=1 nobin|execute ":doautocmd BufReadPost %:r"
+     autocmd BufReadPre,FileReadPre        *.bz2 setlocal bin
+     autocmd BufReadPre,FileReadPre        *.bz2 let ch_save = &ch|setlocal ch=2
+     autocmd BufReadPost,FileReadPost      *.bz2 setlocal cmdheight=2|'[,']!bunzip2
+     autocmd BufReadPost,FileReadPost      *.bz2 setlocal cmdheight=1 nobin|execute ":doautocmd BufReadPost %:r"
      autocmd BufReadPost,FileReadPost      *.bz2 let &ch = ch_save|unlet ch_save
    
      autocmd BufWritePost,FileWritePost    *.bz2 !mv <afile> <afile>:r
