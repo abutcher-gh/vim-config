@@ -363,7 +363,6 @@ command! -nargs=* Font :call Font(<f-args>)
 "     ctrl-x ctrl-o == omni-completion!
 "
 set thesaurus=~/.wordlists/mthes/mobythes.aur
-set spell
 
 " fix up vim's test diff on some systems by using stdin rather than a
 " temporary file for the first input.
