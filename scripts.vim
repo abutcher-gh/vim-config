@@ -24,5 +24,5 @@ if s:line1 =~ '^From [0-9a-f]\{40\}'
 endif
 
 if s:line1 =~ '^#!/bin/ash'
-  call SetFileTypeShell('sh')
+   set ft=sh
 endif
