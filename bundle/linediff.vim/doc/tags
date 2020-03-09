@@ -11,6 +11,7 @@ g:linediff_first_buffer_command	linediff.txt	/*g:linediff_first_buffer_command*
 g:linediff_further_buffer_command	linediff.txt	/*g:linediff_further_buffer_command*
 g:linediff_indent	linediff.txt	/*g:linediff_indent*
 g:linediff_modify_statusline	linediff.txt	/*g:linediff_modify_statusline*
+g:linediff_sign_highlight_group	linediff.txt	/*g:linediff_sign_highlight_group*
 linediff	linediff.txt	/*linediff*
 linediff-commands	linediff.txt	/*linediff-commands*
 linediff-contents	linediff.txt	/*linediff-contents*

@@ -41,8 +41,10 @@ localvimrc-changelog	localvimrc.txt	/*localvimrc-changelog*
 localvimrc-commands	localvimrc.txt	/*localvimrc-commands*
 localvimrc-contribute	localvimrc.txt	/*localvimrc-contribute*
 localvimrc-credits	localvimrc.txt	/*localvimrc-credits*
+localvimrc-frequently-asked-questions	localvimrc.txt	/*localvimrc-frequently-asked-questions*
 localvimrc-functions	localvimrc.txt	/*localvimrc-functions*
 localvimrc-introduction	localvimrc.txt	/*localvimrc-introduction*
+localvimrc-modeline-settings-are-overwritten-by-local-vimrc	localvimrc.txt	/*localvimrc-modeline-settings-are-overwritten-by-local-vimrc*
 localvimrc-references	localvimrc.txt	/*localvimrc-references*
 localvimrc-settings	localvimrc.txt	/*localvimrc-settings*
 localvimrc-variables	localvimrc.txt	/*localvimrc-variables*
