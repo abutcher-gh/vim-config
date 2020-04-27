@@ -52,7 +52,7 @@ gitgutter-<Leader>hu	gitgutter.txt	/*gitgutter-<Leader>hu*
 gitgutter-[c	gitgutter.txt	/*gitgutter-[c*
 gitgutter-]c	gitgutter.txt	/*gitgutter-]c*
 gitgutter-ac	gitgutter.txt	/*gitgutter-ac*
-gitgutter-autocommand	gitgutter.txt	/*gitgutter-autocommand*
+gitgutter-autocommands	gitgutter.txt	/*gitgutter-autocommands*
 gitgutter-commands	gitgutter.txt	/*gitgutter-commands*
 gitgutter-faq	gitgutter.txt	/*gitgutter-faq*
 gitgutter-highlights	gitgutter.txt	/*gitgutter-highlights*

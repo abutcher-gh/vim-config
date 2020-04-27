@@ -3,7 +3,7 @@
 " Maintainer: skywind3000 (at) gmail.com, 2016, 2017, 2018, 2019, 2020
 " Homepage: http://www.vim.org/scripts/script.php?script_id=5431
 "
-" Last Modified: 2020/03/09 16:39
+" Last Modified: 2020/04/09 11:13
 "
 " Run shell command in background and output to quickfix:
 "     :AsyncRun[!] [options] {cmd} ...
@@ -236,6 +236,18 @@ function! s:chdir(path)
 		let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
 	endif
 	silent execute cmd . ' '. fnameescape(a:path)
+endfunc
+
+" safe shell escape for neovim
+function! s:shellescape(path)
+	if s:asyncrun_windows == 0
+		return shellescape(a:path)
+	endif
+	let hr = shellescape(a:path)
+	if &ssl != 0
+		let hr = s:StringReplace(hr, "'", '"')
+	endif
+	return hr
 endfunc
 
 " save/restore view
@@ -663,7 +675,7 @@ function! s:AsyncRun_Job_Start(cmd)
 			if s:async_nvim == 0
 				let l:args += [l:tmp]
 			else
-				let l:args = shellescape(l:tmp)
+				let l:args = s:shellescape(l:tmp)
 			endif
 		endif
 	elseif type(a:cmd) == 3
@@ -897,7 +909,9 @@ function! s:ScriptWrite(command, pause)
 		let $VIM_COMMAND = a:command
 		let $VIM_PAUSE = (a:pause)? 'pause' : ''
 		let lines += ["call %VIM_COMMAND% \r"]
+		let lines += ["set VIM_EXITCODE=%ERRORLEVEL%\r"]
 		let lines += ["call %VIM_PAUSE% \r"]
+		let lines += ["exit %VIM_EXITCODE%\r"]
 	else
 		let shell = (g:asyncrun_shell != '')? g:asyncrun_shell : (&shell)
 		let lines = ['#! ' . shell]
@@ -917,7 +931,9 @@ function! s:ScriptWrite(command, pause)
 		redir END
 	endif
 	if s:asyncrun_windows == 0
-		call setfperm(tmpname, 'rwxrwxrws')
+		if exists('*setfperm')
+			silent! call setfperm(tmpname, 'rwxrwxrws')
+		endif
 	endif
 	return tmpname
 endfunc
@@ -936,7 +952,12 @@ function! asyncrun#fullname(f)
 			let f = '%'
 		endtry
 	endif
-	let f = (f != '%')? f : expand('%')
+	if f == '%'
+		let f = expand('%')
+		if &bt == 'terminal'
+			let f = ''
+		endif
+	endif
 	let f = fnamemodify(f, ':p')
 	if s:asyncrun_windows
 		let f = substitute(f, "\\", '/', 'g')
@@ -985,17 +1006,14 @@ endfunc
 
 " find project root
 function! s:find_root(path, markers, strict)
-    function! s:guess_root(filename, markers)
-        let fullname = asyncrun#fullname(a:filename)
-        if exists('b:asyncrun_root')
-			return b:asyncrun_root
-        endif
-        if fullname =~ '^fugitive:/'
-            if exists('b:git_dir')
-                return fnamemodify(b:git_dir, ':h')
-            endif
-            return '' " skip any fugitive buffers early
-        endif
+	function! s:guess_root(filename, markers)
+		let fullname = asyncrun#fullname(a:filename)
+		if fullname =~ '^fugitive:/'
+			if exists('b:git_dir')
+				return fnamemodify(b:git_dir, ':h')
+			endif
+			return '' " skip any fugitive buffers early
+		endif
 		let pivot = fullname
 		if !isdirectory(pivot)
 			let pivot = fnamemodify(pivot, ':h')
@@ -1004,7 +1022,11 @@ function! s:find_root(path, markers, strict)
 			let prev = pivot
 			for marker in a:markers
 				let newname = s:path_join(pivot, marker)
-				if filereadable(newname)
+				if newname =~ '[\*\?\[\]]'
+					if glob(newname) != ''
+						return pivot
+					endif
+				elseif filereadable(newname)
 					return pivot
 				elseif isdirectory(newname)
 					return pivot
@@ -1017,6 +1039,15 @@ function! s:find_root(path, markers, strict)
 		endwhile
         return ''
 	endfunc
+	if a:path == '%'
+		if exists('b:asyncrun_root') && b:asyncrun_root != ''
+			return b:asyncrun_root
+		elseif exists('t:asyncrun_root') && t:asyncrun_root != ''
+			return t:asyncrun_root
+		elseif exists('g:asyncrun_root') && g:asyncrun_root != ''
+			return g:asyncrun_root
+		endif
+	endif
 	let root = s:guess_root(a:path, a:markers)
 	if root != ''
 		return asyncrun#fullname(root)
@@ -1088,7 +1119,7 @@ function! s:terminal_open(opts)
 	if get(a:opts, 'safe', get(g:, 'asyncrun_term_safe', 0)) != 0
 		let command = s:ScriptWrite(command, 0)
 		if stridx(command, ' ') >= 0
-			let command = shellescape(command)
+			let command = s:shellescape(command)
 		endif
 		let shell = 0
 	endif
@@ -1238,9 +1269,12 @@ function! s:start_in_terminal(opts)
 		endif
 	endfor
 	let focus = get(a:opts, 'focus', 1)
-	if pos == 'tab'
+	if pos ==? 'tab'
 		if get(a:opts, 'reuse', 0) == 0
 			exec "tab split"
+			if pos ==# 'TAB'
+				exec "-tabmove"
+			endif
 		else
 			let avail = -1
 			for i in range(tabpagenr('$'))
@@ -1265,6 +1299,9 @@ function! s:start_in_terminal(opts)
 			endfor
 			if avail < 0
 				exec "tab split"
+				if pos ==# 'TAB'
+					exec "-tabmove"
+				endif
 			else
 				exec 'tabn ' . avail
 			endif
@@ -1288,7 +1325,7 @@ function! s:start_in_terminal(opts)
 	keepalt noautocmd windo call s:save_restore_view(0)
 	keepalt noautocmd call win_gotoid(uid)
 	let origin = win_getid()
-	if avail < 0
+	if avail < 0 || get(a:opts, 'reuse', 1) == 0
 		let rows = get(a:opts, 'rows', '')
 		let cols = get(a:opts, 'cols', '')
 		if pos == 'top'
@@ -1385,7 +1422,7 @@ function! s:run(opts)
 				call s:ErrorMsg("not find wsl in your system")
 				return
 			endif
-			let cmd = shellescape(substitute(tt, '\\', '\/', 'g'))
+			let cmd = s:shellescape(substitute(tt, '\\', '\/', 'g'))
 			let dist = get(l:opts, 'dist', get(g:, 'asyncrun_dist', ''))
 			if dist != ''
 				let cmd = cmd . ' -d ' . dist
@@ -1509,9 +1546,9 @@ function! s:run(opts)
 		let l:makesave = &l:makeprg
 		let l:script = s:ScriptWrite(l:command, 0)
 		if s:asyncrun_windows != 0
-			let &l:makeprg = shellescape(l:script)
+			let &l:makeprg = s:shellescape(l:script)
 		else
-			let &l:makeprg = 'source '. shellescape(l:script)
+			let &l:makeprg = 'source '. s:shellescape(l:script)
 		endif
 		let l:efm1 = &g:efm
 		let l:efm2 = &l:efm
@@ -1612,17 +1649,17 @@ function! s:run(opts)
 			let $VIM_COMMAND = l:command
 			let l:command = script . ' ' . l:command
 			if s:asyncrun_windows
-				let ccc = shellescape(s:ScriptWrite(l:command, 0))
+				let ccc = s:shellescape(s:ScriptWrite(l:command, 0))
 				silent exec '!start /b cmd /C '. ccc
 			else
 				call system(l:command . ' &')
 			endif
 		elseif s:asyncrun_windows
 			if l:mode == 4
-				let l:ccc = shellescape(s:ScriptWrite(l:command, 1))
+				let l:ccc = s:shellescape(s:ScriptWrite(l:command, 1))
 				silent exec '!start cmd /C '. l:ccc
 			else
-				let l:ccc = shellescape(s:ScriptWrite(l:command, 0))
+				let l:ccc = s:shellescape(s:ScriptWrite(l:command, 0))
 				silent exec '!start /b cmd /C '. l:ccc
 			endif
 			redraw
@@ -1673,8 +1710,10 @@ function! asyncrun#run(bang, opts, args, ...)
     let l:macros['VIM_HOME'] = expand(split(&rtp, ',')[0])
 	let l:macros['VIM_PRONAME'] = fnamemodify(l:macros['VIM_ROOT'], ':t')
 	let l:macros['VIM_DIRNAME'] = fnamemodify(l:macros['VIM_CWD'], ':t')
+	let l:macros['VIM_PWD'] = l:macros['VIM_CWD']
 	let l:macros['<cwd>'] = l:macros['VIM_CWD']
 	let l:macros['<root>'] = l:macros['VIM_ROOT']
+	let l:macros['<pwd>'] = l:macros['VIM_PWD']
 	let l:retval = ''
 
 	" handle: empty extension
@@ -1821,7 +1860,7 @@ endfunc
 " asyncrun - version
 "----------------------------------------------------------------------
 function! asyncrun#version()
-	return '2.6.5'
+	return '2.7.5'
 endfunc
 
 
@@ -1886,7 +1925,7 @@ function! s:program_msys(opts)
 	let bash = s:StringReplace(bash, '/', "\\")
 	let path = asyncrun#path_win2unix(fnamemodify(script, ':p'), mount)
 	let flag = ' --login ' . (get(a:opts, 'inter', '')? '-i' : '')
-	let text = shellescape(bash) . flag . ' "' . path . '"'
+	let text = s:shellescape(bash) . flag . ' "' . path . '"'
 	let lines += ['call ' . text . "\r"]
 	call writefile(lines, tmpname)
 	let command = a:opts.cmd

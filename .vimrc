@@ -52,6 +52,8 @@ Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
 Plugin 'pangloss/vim-javascript'
+Plugin 'editorconfig/editorconfig-vim'
+Plugin 'maxmellon/vim-jsx-pretty'
 Plugin 'embear/vim-localvimrc'
 Plugin 'lanza/vim-cmake-completion'
 endif
@@ -70,6 +72,8 @@ filetype plugin indent on    " required
 " 1: Store and restore decisions only if the answer was given in upper case (Y/N/A).
 " 2: Store and restore all decisions.
 let g:localvimrc_persistent = 1
+
+let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
 let $GCCFILT_NO_COLOR = 1
 if g:cygwin

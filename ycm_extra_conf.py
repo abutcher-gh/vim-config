@@ -181,3 +181,6 @@ def FlagsForFile( filename, **kwargs ):
     'flags': final_flags,
     'do_cache': True
   }
+
+def Settings( filename, **kwargs ):
+  return FlagsForFile( filename, **kwargs )
