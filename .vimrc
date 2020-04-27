@@ -1444,7 +1444,7 @@ if has("autocmd")
      autocmd BufNewFile,BufRead *       setlocal formatoptions=tcql nocindent noautoindent comments&
      autocmd BufNewFile,BufRead *.gpp setlocal filetype=cppcc cindent comments=sr:/*,mbl:*/,ex:*/,://
      autocmd BufNewFile,BufRead *.impl setlocal filetype=cpp spell
-     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.cs setlocal formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:- spell
+     autocmd BufNewFile,BufRead *.c,*.h,*.cpp,*.cxx,*.cc,*.inl,*.impl,*.hpp,*.java,*.js,*.jsx,*.ts,*.tsx,*.cs setlocal formatoptions=croql cindent comments=sr:/*,mb:\ *,ex:\ */,:///://,n:///,n://,n:FIXME:,n:TODO:,n:XXX:,n:FIXME,n:TODO,n:XXX,fb:- spell
      autocmd BufNewFile,BufRead *.s,*.asm,*.s11,*.i setlocal filetype=asm tabstop=14 formatoptions=croql cindent comments=";" spell
      autocmd BufNewFile,BufRead *.fp,*.cg,*.vp setlocal filetype=cg cindent comments=sr:/*,mbl:*/,ex:*/,://  setlocal spell
      autocmd BufNewFile,BufRead *.glsl,*.gls,*.frag,*.vert setlocal filetype=gls cindent comments=sr:/*,mbl:*/,ex:*/,:// spell
