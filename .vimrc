@@ -1727,6 +1727,8 @@ vnoremap <silent> # :<C-U>
 " lighten up control characters
 hi SpecialKey guifg=gray
 
+" show statusbar always
+set laststatus=2
 
 " allow overriding without changing this, possibly, version controlled
 " file; this file should be placed in ~/.vim/ on unix or personal or
