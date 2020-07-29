@@ -306,11 +306,12 @@ Signs:~
     |g:gitgutter_sign_removed|
     |g:gitgutter_sign_removed_first_line|
     |g:gitgutter_sign_modified_removed|
-    |g:gitgutter_override_sign_column_highlight|
+    |g:gitgutter_set_sign_backgrounds|
 
 Hunk previews:~
 
     |g:gitgutter_preview_win_floating|
+    |g:gitgutter_close_preview_on_escape|
 
 Terminal:~
 
@@ -445,31 +446,20 @@ Defaults:
     let g:gitgutter_sign_modified           = '~'
     let g:gitgutter_sign_removed            = '_'
     let g:gitgutter_sign_removed_first_line = '‾'
+    let g:gitgutter_sign_removed_above_and_below = '_¯'
     let g:gitgutter_sign_modified_removed   = '~_'
 <
 You can use unicode characters but not images.  Signs must not take up more than
 2 columns.
 
-                                   *g:gitgutter_override_sign_column_highlight*
-Default: 1
+                                              *g:gitgutter_set_sign_backgrounds*
+Default: 0
 
-Controls whether to make the sign column look like the line-number column (i.e.
-the |hl-LineNr| highlight group).
+Only applies to existing GitGutter* highlight groups.  See
+|gitgutter-highlights|.
 
-To customise your sign column's background color, first tell vim-gitgutter to
-leave it alone:
->
-    let g:gitgutter_override_sign_column_highlight = 0
-<
-
-And then either update your colorscheme's |hlSignColumn| highlight group or set
-it in your |vimrc|:
-
-  Desired appearance                  Command ~
-  Same as line-number column          highlight clear SignColumn
-  User-defined (terminal Vim)         highlight SignColumn ctermbg={whatever}
-  User-defined (graphical Vim)        highlight SignColumn guibg={whatever}
-
+Controls whether to override the signs' background colours to match the
+|hl-SignColumn|.
 
                                              *g:gitgutter_preview_win_floating*
 Default: 0 (Vim)
@@ -479,6 +469,11 @@ Default: 0 (Vim)
 Whether to use floating/popup windows for hunk previews.  Note that if you use
 popup windows on Vim you will not be able to stage partial hunks via the
 preview window.
+
+                                          *g:gitgutter_close_preview_on_escape*
+Default: 0
+
+Whether pressing <Esc> in a non-floating preview window closes it.
 
                                            *g:gitgutter_terminal_reports_focus*
 Default: 1
@@ -541,6 +536,10 @@ To change the signs' colours, specify these highlight groups in your |vimrc|:
 
 See |highlight-guifg| and |highlight-ctermfg| for the values you can use.
 
+If you do not like the signs' background colours and you do not want to update
+the GitGutter* highlight groups yourself, you can get the plugin to do it
+|g:gitgutter_set_sign_backgrounds|.
+
 To change the line highlights, set up the following highlight groups in your
 colorscheme or |vimrc|:
 >
@@ -596,8 +595,11 @@ c. Why can't I unstage staged changes?
 d. Why are the colours in the sign column weird?
 
   Your colorscheme is configuring the |hl-SignColumn| highlight group weirdly.
-  Please see |g:gitgutter_override_sign_column_highlight| on customising the
-  sign column.
+  Here are two ways you could change the colours:
+>
+    highlight! link SignColumn LineNr
+    highlight SignColumn guibg=whatever ctermbg=whatever
+<
 
 e. What happens if I also use another plugin which uses signs (e.g. Syntastic)?
 

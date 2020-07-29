@@ -1,5 +1,5 @@
 " Name:    localvimrc.vim
-" Version: 3.0.1
+" Version: 3.1.0
 " Author:  Markus Braun <markus.braun@krawel.de>
 " Summary: Vim plugin to search local vimrc files and load them.
 " Licence: This program is free software: you can redistribute it and/or modify
@@ -497,7 +497,7 @@ function! s:LocalVimRC()
             " execute the command
             call s:LocalVimRCSourceScript(l:rcfile, 1)
           catch /^sandbox$/
-            let l:message = printf("localvimrc: unable to use sandbox for \"" . l:rcfile . "\".")
+            let l:message = "localvimrc: unable to use sandbox for \"" . l:rcfile . "\"."
             call s:LocalVimRCDebug(1, l:message)
 
             if (s:localvimrc_ask == 1)
