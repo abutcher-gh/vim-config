@@ -93,6 +93,7 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_clangd_uses_ycmd_caching = 0
 " Use installed clangd, not YCM-bundled clangd which doesn't get updates.
 let g:ycm_clangd_binary_path = exepath("clangd")
+let g:ycm_auto_hover = ''
 
 nmap \q :YcmCompleter FixIt<C-M>
 nmap \? :YcmShowDetailedDiagnostic<C-M>
@@ -803,9 +804,12 @@ nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNav
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> \<Space> :call JumpToNav(0)<CR>
-nmap <silent> <Bar>? :call SplitEditBase()<CR>
+" nmap <silent> <Bar>? :call SplitEditBase()<CR>  -- now buffer-local to allow for |? to toggle hover-help
 nmap \<Tab> :EditAssociate<Space>
 nmap <Bar><Tab> :EditAssociate!<Space>
+
+" Toggle YCM hover-help
+nmap <silent> <Bar>? <plug>(YCMHover)
 
 " focus previously focused window
 nmap <silent> <Tab> 
@@ -1455,6 +1459,8 @@ if has("autocmd")
    autocmd BufNewFile,BufRead *.git-diff setlocal ft=git-diff
    autocmd BufNewFile,BufRead *.diff setlocal ft=diff
    autocmd BufNewFile,BufRead COMMIT_EDITMSG setlocal ft=gitcommit spell
+
+   autocmd BufNewFile,BufRead *.rej,*.orig nmap <silent><buffer> <Bar>? :call SplitEditBase()<CR>
 
    autocmd BufNewFile,BufRead * call ShowWhitespaceErrors()
 
