@@ -1,5 +1,6 @@
 :EditorConfigReload	editorconfig.txt	/*:EditorConfigReload*
 EditorConfig#AddNewHook()	editorconfig.txt	/*EditorConfig#AddNewHook()*
+b:EditorConfig_disable	editorconfig.txt	/*b:EditorConfig_disable*
 editorconfig-advanced	editorconfig.txt	/*editorconfig-advanced*
 editorconfig-commands	editorconfig.txt	/*editorconfig-commands*
 editorconfig-contents	editorconfig.txt	/*editorconfig-contents*

@@ -15,6 +15,7 @@ g:gitgutter_max_signs	gitgutter.txt	/*g:gitgutter_max_signs*
 g:gitgutter_preview_win_floating	gitgutter.txt	/*g:gitgutter_preview_win_floating*
 g:gitgutter_preview_win_location	gitgutter.txt	/*g:gitgutter_preview_win_location*
 g:gitgutter_set_sign_backgrounds	gitgutter.txt	/*g:gitgutter_set_sign_backgrounds*
+g:gitgutter_show_msg_on_hunk_jumping	gitgutter.txt	/*g:gitgutter_show_msg_on_hunk_jumping*
 g:gitgutter_sign_added	gitgutter.txt	/*g:gitgutter_sign_added*
 g:gitgutter_sign_allow_clobber	gitgutter.txt	/*g:gitgutter_sign_allow_clobber*
 g:gitgutter_sign_modified	gitgutter.txt	/*g:gitgutter_sign_modified*

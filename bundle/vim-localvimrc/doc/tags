@@ -1,6 +1,7 @@
 LocalVimRC	localvimrc.txt	/*LocalVimRC*
 LocalVimRCCleanup	localvimrc.txt	/*LocalVimRCCleanup*
 LocalVimRCClear	localvimrc.txt	/*LocalVimRCClear*
+LocalVimRCDebugDump	localvimrc.txt	/*LocalVimRCDebugDump*
 LocalVimRCDebugShow	localvimrc.txt	/*LocalVimRCDebugShow*
 LocalVimRCDisable	localvimrc.txt	/*LocalVimRCDisable*
 LocalVimRCEdit	localvimrc.txt	/*LocalVimRCEdit*
