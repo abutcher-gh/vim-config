@@ -1519,13 +1519,13 @@ endif " has ("autocmd")
 
 
 if $_ == "" || $_ =~ "gvim"
-" show the gui now, if possible (i.e. if running a gui capable vim).
-" some things below depend on overriding defaults provided by default
-" when opening the gui window.
-try
-:gui
-catch
-endtry
+   " show the gui now, if possible (i.e. if running a gui capable vim).
+   " some things below depend on overriding defaults provided by default
+   " when opening the gui window.
+   try
+      eval ':gui'
+   catch
+   endtry
 endif
 
 " vimwiki stuff
