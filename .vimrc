@@ -407,6 +407,9 @@ nmap \n ]c
 nmap <Bar>N [c
 nmap \z :diffupdate<CR>
 
+" quick toggle of ANSI escape parsing
+nmap @A :AnsiEsc<C-M>
+
 " remove some unnecessary gui bits
 set go-=m
 set go-=t
