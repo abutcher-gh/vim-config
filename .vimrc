@@ -45,6 +45,7 @@ Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'jacoborus/tender.vim'
 Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
+Plugin 'powerman/vim-plugin-ansiesc'
 if ! g:windows " too slow on windows
 Plugin 'airblade/vim-gitgutter'
 endif
