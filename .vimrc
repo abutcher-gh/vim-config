@@ -57,6 +57,7 @@ Plugin 'editorconfig/editorconfig-vim'
 Plugin 'maxmellon/vim-jsx-pretty'
 Plugin 'embear/vim-localvimrc'
 Plugin 'lanza/vim-cmake-completion'
+Bundle 'wellle/context.vim'
 endif
 
 if filereadable(expand("~/.vimrc-extra-vundle-plugins")) | source ~/.vimrc-extra-vundle-plugins | endif
