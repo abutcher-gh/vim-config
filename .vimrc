@@ -1721,6 +1721,33 @@ endfunction
 command! RediffWithoutNumbers call RediffWithoutNumbers()
 
 
+function! FocusOnCurrent()
+   let [l:_, l:line, l:col, l:_] = getpos('.')
+   exec 'silent! tabe %'
+   exec 'silent! vnew! +setlocal\ buftype=nofile\ nobuflisted\ noswapfile\ nonumber\ nomodified\ nomodifiable\ readonly -'
+   exec 'silent! vsplit'
+   wincmd L
+   let l:pad = &columns / 4
+   exec l:pad . 'wincmd |'
+   exec '1wincmd w'
+   exec l:pad . 'wincmd |'
+   exec '2wincmd w'
+   call cursor(l:line, l:col)
+endfunction
+function! FocusTabClose()
+   let l:first_buf = tabpagebuflist()[0]
+   if buffer_name(l:first_buf) == '-'
+      exec 'tabclose'
+   else
+      echo "Ignoring attempt to close tab that wasn't created with FocusOnCurrent."
+   endif
+endfunction
+command! FocusOnCurrent call FocusOnCurrent()
+command! FocusTabClose call FocusTabClose()
+nmap <silent> \<PageUp> :FocusOnCurrent<C-M>
+nmap <silent> \<PageDown> :FocusTabClose<C-M>
+
+
 " Support * and # in visual mode (http://vim.wikia.com/wiki/Search_for_visually_selected_text)
 " Search for selected text, forwards or backwards.
 vnoremap <silent> * :<C-U>
