@@ -4,6 +4,7 @@ g:gitgutter_diff_args	gitgutter.txt	/*g:gitgutter_diff_args*
 g:gitgutter_diff_base	gitgutter.txt	/*g:gitgutter_diff_base*
 g:gitgutter_diff_relative_to	gitgutter.txt	/*g:gitgutter_diff_relative_to*
 g:gitgutter_enabled	gitgutter.txt	/*g:gitgutter_enabled*
+g:gitgutter_floating_window_options	gitgutter.txt	/*g:gitgutter_floating_window_options*
 g:gitgutter_git_args	gitgutter.txt	/*g:gitgutter_git_args*
 g:gitgutter_git_executable	gitgutter.txt	/*g:gitgutter_git_executable*
 g:gitgutter_grep	gitgutter.txt	/*g:gitgutter_grep*
