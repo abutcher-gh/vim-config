@@ -84,6 +84,8 @@ if os.getenv('COTS'):
 
 if os.getenv('ANDROID_NDK'):
   flags.extend(['-isystem', os.getenv('ANDROID_NDK')+'/sysroot/usr/include']);
+if os.getenv('ANDROID_NDK_HOME'):
+  flags.extend(['-isystem', os.getenv('ANDROID_NDK_HOME')+'/sysroot/usr/include']);
 
 flags.extend(['-I/home/ajb/android-wip/cots/FFmpeg/']);
 

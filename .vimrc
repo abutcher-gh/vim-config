@@ -94,7 +94,7 @@ let g:ycm_complete_in_comments = 1
 " Let clangd fully control code completion
 let g:ycm_clangd_uses_ycmd_caching = 0
 " Use installed clangd, not YCM-bundled clangd which doesn't get updates.
-let g:ycm_clangd_binary_path = exepath("clangd")
+" let g:ycm_clangd_binary_path = exepath("clangd")
 let g:ycm_auto_hover = ''
 
 nmap \q :YcmCompleter FixIt<C-M>
@@ -1518,6 +1518,11 @@ if has("autocmd")
      autocmd FileAppendPre                 *.bz2 !mv <afile>:r <afile>
      autocmd FileAppendPost                *.bz2 !mv <afile> <afile>:r
      autocmd FileAppendPost                *.bz2 !bzip2 -9 --repetitive-best <afile>:r
+   augroup END
+
+   " Reset the multi-cursor highlight when colorscheme changes
+   augroup mc_cs_reload
+      autocmd ColorScheme * hi multiple_cursors_cursor term=reverse cterm=reverse gui=reverse | hi link multiple_cursors_visual Visual
    augroup END
 
 endif " has ("autocmd")

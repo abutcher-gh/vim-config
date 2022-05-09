@@ -1,10 +1,6 @@
 local terminal = require("toggleterm.terminal").Terminal
-
-local M = {
-  settings = {
-    mapping = "<leader>tt",
-  },
-}
+local config = require("toggleterm.config")
+local M = {}
 
 function M.reset()
   if M._asyncrun_term ~= nil then
@@ -30,9 +26,6 @@ function M.runner(opts, mapping)
     dir = opts.cwd,
     close_on_exit = false,
     hidden = true,
-    on_open = function(_)
-      vim.cmd("startinsert!")
-    end,
   })
 
   function M._asyncrun_term_toggle()
@@ -42,7 +35,7 @@ function M.runner(opts, mapping)
   if not opts.silent then
     M._asyncrun_term_toggle()
   end
-  M._asyncrun_mapping = mapping or M.settings.mapping
+  M._asyncrun_mapping = mapping or config.get("open_mapping")
   if M._asyncrun_mapping then
     vim.api.nvim_set_keymap(
       "n",

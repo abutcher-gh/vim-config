@@ -382,12 +382,6 @@ function! s:fix_file_references(filepath, hunk_diff)
   return join(lines, "\n")."\n"
 endfunction
 
-if $VIM_GITGUTTER_TEST
-  function! gitgutter#hunk#fix_file_references(filepath, hunk_diff)
-    return s:fix_file_references(a:filepath, a:hunk_diff)
-  endfunction
-endif
-
 
 function! s:adjust_hunk_summary(hunk_diff) abort
   let line_adjustment = s:line_adjustment_for_current_hunk()
@@ -466,7 +460,9 @@ function! s:open_hunk_preview_window()
     endif
   endif
 
-  let [previewpopup, &previewpopup] = [&previewpopup, '']
+  if exists('&previewpopup')
+    let [previewpopup, &previewpopup] = [&previewpopup, '']
+  endif
 
   " Specifying where to open the preview window can lead to the cursor going
   " to an unexpected window when the preview window is closed (#769).
@@ -487,7 +483,9 @@ function! s:open_hunk_preview_window()
     nnoremap <buffer> <silent> <Esc> :<C-U>wincmd p<Bar>pclose<CR>
   endif
 
-  let &previewpopup=previewpopup
+  if exists('&previewpopup')
+    let &previewpopup=previewpopup
+  endif
 endfunction
 
 
