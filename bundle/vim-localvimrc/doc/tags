@@ -44,8 +44,13 @@ localvimrc-contribute	localvimrc.txt	/*localvimrc-contribute*
 localvimrc-credits	localvimrc.txt	/*localvimrc-credits*
 localvimrc-frequently-asked-questions	localvimrc.txt	/*localvimrc-frequently-asked-questions*
 localvimrc-functions	localvimrc.txt	/*localvimrc-functions*
+localvimrc-installation	localvimrc.txt	/*localvimrc-installation*
 localvimrc-introduction	localvimrc.txt	/*localvimrc-introduction*
 localvimrc-modeline-settings-are-overwritten-by-local-vimrc	localvimrc.txt	/*localvimrc-modeline-settings-are-overwritten-by-local-vimrc*
+localvimrc-project-specific-settings-for-other-plugins-are-ignored	localvimrc.txt	/*localvimrc-project-specific-settings-for-other-plugins-are-ignored*
 localvimrc-references	localvimrc.txt	/*localvimrc-references*
 localvimrc-settings	localvimrc.txt	/*localvimrc-settings*
+localvimrc-using-third-party-package-manager	localvimrc.txt	/*localvimrc-using-third-party-package-manager*
+localvimrc-using-vim-8-package-management	localvimrc.txt	/*localvimrc-using-vim-8-package-management*
+localvimrc-using-vimball-archive	localvimrc.txt	/*localvimrc-using-vimball-archive*
 localvimrc-variables	localvimrc.txt	/*localvimrc-variables*
