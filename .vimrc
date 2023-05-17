@@ -81,6 +81,8 @@ if g:cygwin
    let $GCCFILT_CYGWINIZE = 1
 endif
 
+let g:context_skip_regex = '^\s*\($\|#\|//\|/\*\|\*\($\|/s\|\/\)\|\(public\|private\|protected\):\)'
+
 let g:undotree_DiffCommand = "diff"
 
 let g:ycm_key_invoke_completion = '<C-@>'
