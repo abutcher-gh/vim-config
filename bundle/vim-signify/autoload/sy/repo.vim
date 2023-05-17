@@ -468,7 +468,6 @@ function! s:initialize_buffer_job(bufnr, vcs) abort
   let basefile = tempname()
   let base_cmd = s:get_base_cmd(a:bufnr, a:vcs, g:signify_vcs_cmds_diffmode) . '>' . fnameescape(basefile) . ' && '
 
-  "let diff_cmd = base_cmd .  s:difftool . ' --strip-trailing-cr -U0 ' . fnameescape(basefile) . ' ' . fnameescape(bufferfile)
   let diff_cmd = base_cmd .  s:difftool . ' -U0 ' . fnameescape(basefile) . ' ' . fnameescape(bufferfile)
   let [cmd, options] = s:wrap_cmd(a:bufnr, a:vcs, diff_cmd)
 
