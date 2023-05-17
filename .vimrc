@@ -46,9 +46,8 @@ Plugin 'jacoborus/tender.vim'
 Plugin 'jonathanfilip/vim-lucius'
 Plugin 'digitaltoad/vim-jade'
 Plugin 'powerman/vim-plugin-ansiesc'
-if ! g:windows " too slow on windows
-Plugin 'airblade/vim-gitgutter'
-endif
+Plugin 'tpope/vim-fugitive'
+Plugin 'mhinz/vim-signify'
 Plugin 'wavded/vim-stylus'
 Plugin 'mbbill/undotree'
 Plugin 'skywind3000/asyncrun.vim'
