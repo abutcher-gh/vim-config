@@ -56,6 +56,7 @@ Plugin 'editorconfig/editorconfig-vim'
 Plugin 'maxmellon/vim-jsx-pretty'
 Plugin 'embear/vim-localvimrc'
 Plugin 'lanza/vim-cmake-completion'
+Plugin 'leafgarland/typescript-vim'
 Bundle 'wellle/context.vim'
 endif
 
