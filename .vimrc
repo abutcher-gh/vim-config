@@ -884,11 +884,15 @@ augroup END
 nmap <silent> <S-F5> :call ToggleQuickfix()<CR>
 nmap <silent> <Leader><F5> :call ToggleQuickfix()<CR>
 nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>Jzz
-nmap <silent> <S-F6> :cp<CR>:call CondCenterView()<CR>
 nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
 nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
 map <silent> <F8>   :cnf<CR>:call CondCenterView()<CR>
 map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
+"
+" navigate location list (without showing it); useful for ycm annotations
+"
+nmap <silent> <Leader><F6> :lnext<CR>
+nmap <silent> <Leader><F7> :lprevious<CR>
 "
 " quickfix history nav
 "
