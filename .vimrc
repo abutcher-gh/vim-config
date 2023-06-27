@@ -102,6 +102,20 @@ let g:ycm_auto_hover = ''
 nmap \q :YcmCompleter FixIt<C-M>
 nmap \? :YcmShowDetailedDiagnostic<C-M>
 
+" Use preferred rust-analyzer.
+let s:rust_toolchain_dirs = [
+   \ $HOME . '/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/',
+   \ '/usr/lib/rustup/',
+   \ g:bundle_dir . '/YouCompleteMe/third_party/ycmd/third_party/rust-analyzer/',
+   \ ]
+for g:ycm_rust_toolchain_root in s:rust_toolchain_dirs
+   if executable(g:ycm_rust_toolchain_root . 'rust-analyzer') ||
+    \ executable(g:ycm_rust_toolchain_root . 'bin/rust-analyzer')
+      break
+   endif
+endfor
+unlet s:rust_toolchain_dirs
+
 " Allow for ESC to switch mode with multiple cursors active.
 " Use backtick to exit multi-cursor mode quickly without ESC wait.
 let g:multi_cursor_quit_key = '`'
