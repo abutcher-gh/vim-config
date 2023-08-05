@@ -1694,15 +1694,14 @@ function! LogView()
 endfunction
 command! LogView call LogView()
 
-
-function! RediffWithoutNumbers()
+function! RediffWithout(...)
    let l:oldv = winsaveview()
    let l:oldw = winnr()
-   let l:pat = exists('g:numbers_pat')? g:numbers_pat :
-            \ '0x[0-9a-fA-F]\+\|\<[0-9]\+\>'
-   if exists('g:numbers_extra_pat')
-      let l:pat = l:pat . '\|' . g:numbers_extra_pat
+   if a:0 == 0
+      echoerr 'usage: RediffWithout(pat[, pat, [...]])'
+      throw 'badargs'
    endif
+   let l:pat = '\(' . join(a:000, '\)\|\(') . '\)'
    wincmd w
    while 1
       if &diff
@@ -1743,7 +1742,19 @@ function! RediffWithoutNumbers()
    endwhile
    call winrestview(l:oldv)
 endfunction
-command! RediffWithoutNumbers call RediffWithoutNumbers()
+
+function! RediffWithoutNumbers(...)
+   let l:pat = exists('g:numbers_pat')? g:numbers_pat :
+            \ '0x[0-9a-fA-F]\+\|\<[0-9]\+\>'
+   if exists('g:numbers_extra_pat')
+      let l:pat = l:pat . '\|' . g:numbers_extra_pat
+   endif
+   call call("RediffWithout", [l:pat] + a:000)
+endfunction
+
+
+command! -nargs=* RediffWithout call RediffWithout(<f-args>)
+command! -nargs=* RediffWithoutNumbers call RediffWithoutNumbers(<f-args>)
 
 
 function! FocusOnCurrent()
