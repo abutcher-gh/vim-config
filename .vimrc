@@ -1326,6 +1326,22 @@ set incsearch
 " set cursor indications in gui mode
 set guicursor=n-v-c:block-lCursor/Cursor,ve:ver35-Cursor,o:block-Cursor,i-ci:block-wCursor/Cursor-blinkwait60-blinkoff60-blinkon60,r-cr:block-oCursor/Cursor-blinkwait60-blinkoff60-blinkon60,sm:block-lCursor/Cursor-blinkwait175-blinkoff150-blinkon175
 
+" cursor defaults for terminal (wrapped in ESC P ESC \ for GNU screen passthrough)
+" NOTE: This is not perfect under GNU screen; since the control sequences are
+"       passed through, GNU screen is not aware of them and thus does not
+"       remember what the last cursor shape and cursor blink state was for
+"       each window when switching between them.
+let &t_ti = "\eP\e[1049h\e[2 q\e\\"       " enter termcap mode: use alt buffer and solid block cursor
+let &t_te = "\eP\e[1049l\e[0 q\e\\"       " leave termcap mode: back to default buffer and default cursor
+let &t_SI = "\eP\e[1 q\e\\"               " insert: blinking block
+let &t_SR = "\eP\e[3 q\e\\"               " replace: blinking underline
+let &t_EI = "\eP\e[2 q\e\\"               " normal: solid block
+" neuter hide/show cursor controls and just change shape and blinking state
+let &t_ve = ""
+let &t_vi = ""
+let &t_vs = ""
+let &t_VS = ""
+
 " show the position of the cursor
 set ruler
 
