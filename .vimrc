@@ -1353,6 +1353,7 @@ set showmatch
 " sequences include:
 "   *  ansi color escape sequences
 "   *  "[pid] " prefixes (including ones colored by ansi sequences)
+"   *  "|" prefixes (from, e.g., bitbake output)
 " This accepts n color escape sequences before and after file, line and
 " column refs as well as around directory names.
 "
@@ -1382,7 +1383,9 @@ if !exists("g:set_error_format")
      \ . ',%X%*\a[%*\d]: Leaving directory %.%f%.'
      \ . ',%DMaking %*\a in %f'
      \ . ',%f|%l| %m'
-   let &errorformat = substitute( &errorformat, '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)', '\1%\\%%([ %#%*\\d]%\\)%\\? %#', 'g' )
+   let s:mstart = '\(^\|,\(%\([DX]\|[-+]G\)\)\?\)'
+   let &errorformat = substitute( &errorformat, s:mstart, '\1%\\%%([ %#%*\\d]%\\)%\\? %#', 'g' )
+   let &errorformat = substitute( &errorformat, s:mstart, '\1%\\%%(%[| ]%#%\\)%\\?', 'g' )
    let &errorformat = substitute( &errorformat, '%[.flc]',   '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
    let &errorformat = substitute( &errorformat, '%\*\\[ad]', '%\\%%([%.%\\{-}m%\\)%#&%\\%%([%.%\\{-}m%\\)%#', 'g' )
 endif
