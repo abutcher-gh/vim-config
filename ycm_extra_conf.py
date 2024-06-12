@@ -31,6 +31,8 @@
 import os
 import ycm_core
 
+ycm_cxx_std = os.getenv('YCM_CXX_STD') or 'gnu++2a'
+
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
@@ -50,7 +52,7 @@ flags = [
 # a "-std=<something>".
 # For a C project, you would set this to something like 'c99' instead of
 # 'c++11'.
-'-std=c++2a',
+'-std=' + ycm_cxx_std,
 # ...and the same thing goes for the magic -x option which specifies the
 # language that the files to be compiled are written in. This is mostly
 # relevant for c++ headers.
@@ -64,9 +66,20 @@ flags = [
 '-stdlib=libstdc++',
 ]
 
+default_cxx = os.getenv("CXX") or (os.getenv("CROSS_PREFIX") or '') + 'g++'
+sysroot_opt = [f"-{x}" for x in default_cxx.split(' -') if x.startswith('-sysroot=')]
+if sysroot_opt:
+  flags.extend(sysroot_opt[0].split('=', 1))
+
+target = os.getenv('RESOLVED_TARGET') or os.popen(f"{default_cxx} -dumpmachine").read() or 'x86_64-linux-gnu'
+target = target.replace('v5te', '')
+target = target.replace('v5', '')
+
+flags.extend([f'--target={target}']);
+
 for p in os.popen(':| \
     CPATH= CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= \
-    ${CROSS_PREFIX}g++ -std=c++14 -Wp,-v -x c++ -E - 2>&1 | \
+    ${CXX:-${CROSS_PREFIX}g++} -std='+ycm_cxx_std+' -Wp,-v -x c++ -E - 2>&1 | \
     sed -n "1,/^#/d; /^ / s/.//p "').read().split():
   flags.extend(['-isystem', p]);
 
