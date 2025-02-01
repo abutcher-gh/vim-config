@@ -4,6 +4,7 @@ function! context#util#active() abort
     return 1
                 \ && w:context.enabled
                 \ && !get(g:context.filetype_blacklist, &filetype)
+                \ && !get(g:context.buftype_blacklist, &buftype)
 endfunction
 
 function! context#util#map(arg) abort
@@ -114,10 +115,10 @@ function! context#util#update_state() abort
     " NOTE: we need to save and restore the cursor position because setting
     " 'virtualedit' resets curswant #84
     let cursor = getcurpos()
-    let old = [&virtualedit, &conceallevel]
-    let [&virtualedit, &conceallevel] = ['all', 0]
+    let old = [&l:virtualedit, &l:conceallevel]
+    let [&l:virtualedit, &l:conceallevel] = ['all', 0]
     let sign_width = wincol() - virtcol('.') - number_width
-    let [&virtualedit, &conceallevel] = old
+    let [&l:virtualedit, &l:conceallevel] = old
     if match("\<C-v>", mode()) == -1
         " Don't set cursor in visual block mode because that breaks appending, see #114
         call setpos('.', cursor)
@@ -283,8 +284,12 @@ function! context#util#filter(context, line_number, consider_height) abort
         let indent2 = lines[-(max_height-1)/2][0].indent
         let ellipsis = repeat(c.char_ellipsis, max([indent2 - indent, 3]))
         let ellipsis_lines = [context#line#make_highlight(0, c.char_ellipsis, level, indent, ellipsis, 'Comment')]
-        call remove(lines, max_height/2, -(max_height+1)/2)
-        call insert(lines, ellipsis_lines, max_height/2)
+        if max_height == 1
+            call remove(lines, 0, -2)
+        else
+            call remove(lines, max_height/2, -(max_height+1)/2)
+            call insert(lines, ellipsis_lines, max_height/2)
+        endif
     endif
 
     return [lines, line_number]

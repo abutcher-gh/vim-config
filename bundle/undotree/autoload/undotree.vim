@@ -565,6 +565,7 @@ function! s:undotree.Show() abort
     setlocal buftype=nowrite
     setlocal bufhidden=delete
     setlocal nowrap
+    setlocal nolist
     setlocal foldcolumn=0
     setlocal nobuflisted
     setlocal nospell
@@ -1162,7 +1163,7 @@ function! s:diffpanel.ParseDiff(diffresult, targetBufnr) abort
     " matchadd associates with windows.
     if exists("w:undotree_diffmatches")
         for i in w:undotree_diffmatches
-            call matchdelete(i)
+            silent! call matchdelete(i)
         endfor
     endif
 
@@ -1235,9 +1236,14 @@ function! s:diffpanel.Init() abort
     let self.bufname = "diffpanel_".s:getUniqueID()
     let self.cache = {}
     let self.changes = {'add':0, 'del':0}
-    let self.diffexecutable = executable('diff')
+    let self.diffexecutable = executable(g:undotree_DiffCommand)
     if !self.diffexecutable
-        echoerr '"diff" is not executable.'
+        " If the command contains parameters, strip out the executable itself
+        let cmd = matchstr(g:undotree_DiffCommand.' ', '.\{-}\ze\s.*')
+        let self.diffexecutable = executable(cmd)
+        if !self.diffexecutable
+            echoerr '"'.cmd.'" is not executable.'
+        endif
     endif
 endfunction
 
@@ -1280,6 +1286,7 @@ function! s:diffpanel.Show() abort
     setlocal buftype=nowrite
     setlocal bufhidden=delete
     setlocal nowrap
+    setlocal nolist
     setlocal nobuflisted
     setlocal nospell
     setlocal nonumber
@@ -1322,7 +1329,7 @@ function! s:diffpanel.CleanUpHighlight() abort
         call s:exec_silent("norm! ".i."\<c-w>\<c-w>")
         if exists("w:undotree_diffmatches")
             for j in w:undotree_diffmatches
-                call matchdelete(j)
+                silent! call matchdelete(j)
             endfor
             let w:undotree_diffmatches = []
         endif
@@ -1459,6 +1466,28 @@ function! undotree#UndotreeFocus() abort
             echom v:exception
             echohl NONE
         endtry
+    endif
+endfunction
+
+function! undotree#UndotreePersistUndo(goSetUndofile) abort
+    call s:log("undotree#UndotreePersistUndo(" . a:goSetUndofile . ")")
+    if ! &undofile
+        if !isdirectory(g:undotree_UndoDir)
+            call mkdir(g:undotree_UndoDir, 'p', 0700)
+            call s:log(" > [Dir " . g:undotree_UndoDir . "] created.")
+        endif
+        exe "set undodir=" . fnameescape(g:undotree_UndoDir)
+        call s:log(" > [set undodir=" . g:undotree_UndoDir . "] executed.")
+        if filereadable(undofile(expand('%'))) || a:goSetUndofile
+            setlocal undofile
+            call s:log(" > [setlocal undofile] executed")
+        endif
+        if a:goSetUndofile
+            silent! write
+            echo "A persistence undo file has been created."
+        endif
+    else
+        call s:log(" > Undofile has been set. Do nothing.")
     endif
 endfunction
 

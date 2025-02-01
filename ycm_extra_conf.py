@@ -31,7 +31,7 @@
 import os
 import ycm_core
 
-ycm_cxx_std = os.getenv('YCM_CXX_STD') or 'gnu++2a'
+ycm_cxx_std = os.getenv('YCM_CXX_STD') or 'gnu++2b'
 
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
@@ -77,6 +77,9 @@ target = target.replace('v5', '')
 
 flags.extend([f'--target={target}']);
 
+for p in os.getenv('CPLUS_INCLUDE_PATH', '').split(':'):
+  flags.extend(['-isystem', p])
+
 for p in os.popen(':| \
     CPATH= CPLUS_INCLUDE_PATH= C_INCLUDE_PATH= \
     ${CXX:-${CROSS_PREFIX}g++} -std='+ycm_cxx_std+' -Wp,-v -x c++ -E - 2>&1 | \
@@ -85,9 +88,6 @@ for p in os.popen(':| \
 
 for p in os.getenv('CPATH', '').split(':'):
   flags.extend(['-I', p])
-
-for p in os.getenv('CPLUS_INCLUDE_PATH', '').split(':'):
-  flags.extend(['-isystem', p])
 
 flags.extend(os.popen("NO_STATUS_FILES=1 run wx-config --cxxflags").read().split());
 

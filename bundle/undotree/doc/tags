@@ -25,4 +25,5 @@ undotree_TreeNodeShape	undotree.txt	/*undotree_TreeNodeShape*
 undotree_TreeReturnShape	undotree.txt	/*undotree_TreeReturnShape*
 undotree_TreeSplitShape	undotree.txt	/*undotree_TreeSplitShape*
 undotree_TreeVertShape	undotree.txt	/*undotree_TreeVertShape*
+undotree_UndoDir	undotree.txt	/*undotree_UndoDir*
 undotree_WindowLayout	undotree.txt	/*undotree_WindowLayout*

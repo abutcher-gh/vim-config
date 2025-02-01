@@ -56,6 +56,7 @@ syn match cGhost /\(¯\)/ contained
 " highlight these differently
 syn match cdoxyMarkers contained /[\\@]\(end\)\?\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)/
 syn region cdoxyCode contained keepend start=/[\\@]\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/hs=e+1,rs=e+1 end=/[\\@]end\(code\|\(ez\)\?dot\|perl\|shell\|msc\|verbatim\)\>/ contains=cdoxyRepeatedStar,cdoxyMarkers
+syn region cdoxyCode contained keepend start=/[~][~][~]\+\(\s*{[^}]\+}\)\?/hs=e+1,rs=e+1 end=/[~][~][~]\+/he=b-1 contains=cdoxyRepeatedStar,cdoxyMarkers
 syn match cdoxyAngles contained /<[^A-Za-z0-9_()"/-]/hs=e+1
 syn match cdoxyAngles contained /[^A-Za-z0-9_()"/-]>/hs=e+1
 

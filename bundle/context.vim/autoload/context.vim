@@ -109,7 +109,7 @@ function! context#update(...) abort
                 \ || !s:activated
                 \ || s:ignore_update
                 \ || &previewwindow
-                \ || mode() != 'n'
+                \ || (mode() != 'n' && mode() != 't')
                 \ || !context#util#active()
                 \ || bufname("%") =~# '^term://'
         let w:context.needs_update = 0
