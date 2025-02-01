@@ -101,6 +101,8 @@ let g:ycm_auto_hover = ''
 
 nmap \q :YcmCompleter FixIt<C-M>
 nmap \? :YcmShowDetailedDiagnostic<C-M>
+nmap zq :YcmCompleter FixIt<C-M>
+nmap z? :YcmShowDetailedDiagnostic<C-M>
 
 " Use preferred rust-analyzer.
 let s:rust_toolchain_dirs = [
@@ -134,6 +136,7 @@ let g:ctrlp_user_command = {
 " List submodule files in CTRL-P and GitGrep output (or not).
 command! ToggleSubmodules :call ToggleSubmodules()
 nmap <silent> \` :ToggleSubmodules<CR>
+nmap <silent> z` :ToggleSubmodules<CR>
 function! ToggleSubmodules()
     " GitGrep
     if g:git_grep_submodule_opt == ''
@@ -194,6 +197,8 @@ nmap <Bar>X :call clang_format#toggle_format_on_insert()<CR>
 
 autocmd FileType c,cpp,objc nnoremap <buffer><Leader>x :<C-u>.ClangFormat<CR>
 autocmd FileType c,cpp,objc vnoremap <buffer><Leader>x :ClangFormat<CR>
+autocmd FileType c,cpp,objc nnoremap <buffer>zx :<C-u>.ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer>zx :ClangFormat<CR>
 
 let g:initial = " "
 let g:lead = " "
@@ -423,6 +428,12 @@ nmap \p :diffput<CR>
 nmap \n ]c
 nmap <Bar>N [c
 nmap \z :diffupdate<CR>
+
+nmap zg :diffget<CR>
+nmap zp :diffput<CR>
+nmap zn ]c
+nmap ZN [c
+nmap Zz :diffupdate<CR>
 
 " quick toggle of ANSI escape parsing
 nmap @A :AnsiEsc<C-M>
@@ -802,11 +813,12 @@ endfunction
 "  A-/  --  switch to an associated file if it exists (h->cpp, cpp->h etc.)
 "
 nmap <silent> <A-\> :call EditParent()<CR>
+nmap <silent> <A-z> :call EditParent()<CR>
 nmap <silent> <A-.> :call PushInclude(0)<CR>
 nmap <silent> <A-<Bar>> :call PushInclude(1)<CR>
+nmap <silent> <A-Z> :call PushInclude(1)<CR>
 nmap <silent> <A-,> :call PopInclude()<CR>
 nmap <silent> <A-/> :call EditAssociate()<CR>
-nmap <silent> <A-?> :call SplitEditBase()<CR>
 
 "
 " ALT/META <A-*>/<M-*> only works in an environment supporting
@@ -821,20 +833,29 @@ nmap <silent> <A-?> :call SplitEditBase()<CR>
 nmap <silent> \\ :call EditParent()<CR>
 nmap <silent> \. :call PushInclude(0)<CR>
 nmap <silent> <Bar>> :call PushInclude(1)<CR>
-nmap <silent> <Leader><CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNavLocation(0).':').' ('.len(g:file_nav_stack).' on stack).'<CR>
+nmap <silent> \<CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNavLocation(0).':').' ('.len(g:file_nav_stack).' on stack).'<CR>
 nmap <silent> \, :call PopInclude()<CR>
 nmap <silent> \/ :call EditAssociate()<CR>
 nmap <silent> \<Space> :call JumpToNav(0)<CR>
-" nmap <silent> <Bar>? :call SplitEditBase()<CR>  -- now buffer-local to allow for |? to toggle hover-help
 nmap \<Tab> :EditAssociate<Space>
 nmap <Bar><Tab> :EditAssociate!<Space>
 
-" Toggle YCM hover-help
-nmap <silent> <Bar>? <plug>(YCMHover)
+" Same again but using z instead of \ for US keyboards.  Note: first uses ZZ and not zz since the latter is already a useful sequence.
+nmap <silent> ZZ :call EditParent()<CR>
+nmap <silent> z. :call PushInclude(0)<CR>
+nmap <silent> z> :call PushInclude(1)<CR>
+nmap <silent> z<CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNavLocation(0).':').' ('.len(g:file_nav_stack).' on stack).'<CR>
+nmap <silent> z, :call PopInclude()<CR>
+nmap <silent> z/ :call EditAssociate()<CR>
+nmap <silent> z<Space> :call JumpToNav(0)<CR>
+nmap z<Tab> :EditAssociate<Space>
+nmap Z<Tab> :EditAssociate!<Space>
+nmap <silent> Z? <plug>(YCMHover)
 
 " focus previously focused window
 nmap <silent> <Tab> 
 nmap <silent> <C-Tab> 
+nmap <silent> <S-Tab> 
 
 " window resizing
 if !exists('g:winresizestep')
@@ -850,6 +871,12 @@ nmap <silent> \<Left> :call ResizeWin('vertical','-')<CR>
 nmap <silent> \<Right> :call ResizeWin('vertical','+')<CR>
 nmap <silent> \<Up> :call ResizeWin('','+')<CR>
 nmap <silent> \<Down> :call ResizeWin('','-')<CR>
+
+" Same again but using z instead of \ for US keyboards.
+nmap <silent> z<Left> :call ResizeWin('vertical','-')<CR>
+nmap <silent> z<Right> :call ResizeWin('vertical','+')<CR>
+nmap <silent> z<Up> :call ResizeWin('','+')<CR>
+nmap <silent> z<Down> :call ResizeWin('','-')<CR>
 
 " re-source vimrc
 com! Reinit :runtime! .vimrc
@@ -874,6 +901,8 @@ com! ToggleCenterViewOnJump :call ToggleCenterViewOnJump()
 
 nmap <silent> \; [{zz
 nmap <silent> \' :call search('{')<CR>zz
+nmap <silent> z; [{zz
+nmap <silent> z' :call search('{')<CR>zz
 
 " quickfix toggle
 "
@@ -896,7 +925,8 @@ augroup END
 " open/close error log and navigate log messages
 "
 nmap <silent> <S-F5> :call ToggleQuickfix()<CR>
-nmap <silent> <Leader><F5> :call ToggleQuickfix()<CR>
+nmap <silent> \<F5> :call ToggleQuickfix()<CR>
+nmap <silent> z<F5> :call ToggleQuickfix()<CR>
 nmap <silent> <F5>   :cclose<CR>:cw<CR><C-w>Jzz
 nmap <silent> <F6>   :cn<CR>:call CondCenterView()<CR>
 nmap <silent> <F7>   :cp<CR>:call CondCenterView()<CR>
@@ -907,6 +937,8 @@ map <silent> <F9>   :cpf<CR>:call CondCenterView()<CR>
 "
 nmap <silent> <Leader><F6> :lnext<CR>
 nmap <silent> <Leader><F7> :lprevious<CR>
+nmap <silent> z<F6> :lnext<CR>
+nmap <silent> z<F7> :lprevious<CR>
 "
 " quickfix history nav
 "
@@ -928,10 +960,18 @@ nmap \[ <C-T>
 nmap \# :ts<CR>
 nmap \= :tn<CR>
 nmap \- :tp<CR>
+
+nmap <silent> z] :call TagJump(expand('<cword>'))<CR>
+nmap <silent> Z} :call TagJump(expand('<cword>'), 'split')<CR>
+nmap z[ <C-T>
+nmap z# :ts<CR>
+nmap z= :tn<CR>
+nmap z- :tp<CR>
 "
 " Push current taglist into quickfix window.
 "
 nmap <silent> \l :call TagJump('')<CR>
+nmap <silent> zl :call TagJump('')<CR>
 "
 " Traverse into tag and open multiple matches in quickfix window
 "
@@ -987,6 +1027,7 @@ function! ToggleVirtualEdit(option)
    endif
 endfunction
 nmap \v :call ToggleVirtualEdit('all')<CR>
+nmap zv :call ToggleVirtualEdit('all')<CR>
 
 function! ReexpandTab(from, to) range
    let oldet = &expandtab
@@ -1043,12 +1084,18 @@ endfunction
 command! -range -nargs=1 GitShow let winnum = winnr() | let commit = expand(<q-args>) | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git log --patch-with-stat -C -n1 '.commit | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> \s :GitShow <cword><CR>
 nmap <silent> \h :GitShow HEAD<CR>
+nmap <silent> zs :GitShow <cword><CR>
+nmap <silent> zh :GitShow HEAD<CR>
 command! -range -nargs=* GitShowDiff let winnum = winnr() | if OpenNamedWindow('git-show-output-'.(1 + <line2> - <line1>)) == 1 | set ft=git-diff | endif | silent! exe ':%!git diff '.<q-args> | set nomodified | exe ':normal zR' | nmap <silent> <buffer> <LT>Bar>S :exe winnum.'wincmd w'<CR>
 nmap <silent> <Bar>S :GitShowDiff -C --staged<CR>
 nmap <silent> <Bar>H :GitShowDiff -C <CR>
+nmap <silent> ZS :GitShowDiff -C --staged<CR>
+nmap <silent> ZH :GitShowDiff -C <CR>
 command! -bang -range -nargs=* GitGrep :call GitGrep('<bang>', <f-args>)
 vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
-nmap <silent> <Bar>G :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
+vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
+nmap <silent> ZG :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
+nmap <silent> ZG :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
 
 let g:git_grep_submodule_opt = ''
 function! GitGrep(modifier, ...)
@@ -1124,11 +1171,22 @@ nmap <silent> \e :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLoc
 nmap <silent> \u :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 nmap <silent> \r :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
 
+nmap <silent> zd :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find g <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> zc :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> zi :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find i <C-R>=substitute(expand("<cfile>"),'/','.','g')<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> ze :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find e <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> zu :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+nmap <silent> zr :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cs find s <C-R>=expand("<cword>")<CR><CR>:normal zz<CR>:call OpenQuickfix()<CR>:cfirst<CR>
+
 nmap <Bar>E :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find e<Space>
 nmap <Bar>U :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
 nmap <Bar>R :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+nmap ZE :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find e<Space>
+nmap ZU :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
+nmap ZR :call ProbeCscopeAndTags(expand("%:h"))<CR>:call PushCurrentLocation()<CR>:cscope find s<Space>
 
 nmap <silent> \<Delete> :cscope reset<CR>
+nmap <silent> z<Delete> :cscope reset<CR>
 
 
 " for better interoperability with relative and fully-qualified paths
@@ -1801,6 +1859,8 @@ command! FocusOnCurrent call FocusOnCurrent()
 command! FocusTabClose call FocusTabClose()
 nmap <silent> \<PageUp> :FocusOnCurrent<C-M>
 nmap <silent> \<PageDown> :FocusTabClose<C-M>
+nmap <silent> z<PageUp> :FocusOnCurrent<C-M>
+nmap <silent> z<PageDown> :FocusTabClose<C-M>
 
 
 " Support * and # in visual mode (http://vim.wikia.com/wiki/Search_for_visually_selected_text)
