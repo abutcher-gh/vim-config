@@ -844,7 +844,7 @@ nmap <Bar><Tab> :EditAssociate!<Space>
 " Same again but using z instead of \ for US keyboards.  Note: first uses ZZ and not zz since the latter is already a useful sequence.
 nmap <silent> ZZ :call EditParent()<CR>
 nmap <silent> z. :call PushInclude(0)<CR>
-nmap <silent> z> :call PushInclude(1)<CR>
+nmap <silent> Z> :call PushInclude(1)<CR>
 nmap <silent> z<CR> :call PushCurrentLocation()<CR>:echo 'Pushed '.GetNavLocation(0).':').' ('.len(g:file_nav_stack).' on stack).'<CR>
 nmap <silent> z, :call PopInclude()<CR>
 nmap <silent> z/ :call EditAssociate()<CR>
@@ -1094,8 +1094,8 @@ nmap <silent> ZS :GitShowDiff -C --staged<CR>
 nmap <silent> ZH :GitShowDiff -C <CR>
 command! -bang -range -nargs=* GitGrep :call GitGrep('<bang>', <f-args>)
 vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
-vmap <silent> <Bar>G :call GitGrep('p', GetVisual())<CR>
-nmap <silent> ZG :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
+nmap <silent> <Bar>G :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
+vmap <silent> ZG :call GitGrep('p', GetVisual())<CR>
 nmap <silent> ZG :call GitGrep('p', '\<'.expand('<cword>').'\>')<CR>
 
 let g:git_grep_submodule_opt = ''
