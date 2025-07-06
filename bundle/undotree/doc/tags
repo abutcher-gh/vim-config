@@ -12,6 +12,7 @@ undotree_CustomUndotreeCmd	undotree.txt	/*undotree_CustomUndotreeCmd*
 undotree_DiffAutoOpen	undotree.txt	/*undotree_DiffAutoOpen*
 undotree_DiffCommand	undotree.txt	/*undotree_DiffCommand*
 undotree_DiffpanelHeight	undotree.txt	/*undotree_DiffpanelHeight*
+undotree_DisabledFiletypes	undotree.txt	/*undotree_DisabledFiletypes*
 undotree_HelpLine	undotree.txt	/*undotree_HelpLine*
 undotree_HighlightChangedText	undotree.txt	/*undotree_HighlightChangedText*
 undotree_HighlightSyntaxAdd	undotree.txt	/*undotree_HighlightSyntaxAdd*
@@ -20,6 +21,10 @@ undotree_HighlightSyntaxDel	undotree.txt	/*undotree_HighlightSyntaxDel*
 undotree_RelativeTimestamp	undotree.txt	/*undotree_RelativeTimestamp*
 undotree_SetFocusWhenToggle	undotree.txt	/*undotree_SetFocusWhenToggle*
 undotree_ShortIndicators	undotree.txt	/*undotree_ShortIndicators*
+undotree_SignAdded	undotree.txt	/*undotree_SignAdded*
+undotree_SignDeleted	undotree.txt	/*undotree_SignDeleted*
+undotree_SignDeletedEnd	undotree.txt	/*undotree_SignDeletedEnd*
+undotree_SignModified	undotree.txt	/*undotree_SignModified*
 undotree_SplitWidth	undotree.txt	/*undotree_SplitWidth*
 undotree_TreeNodeShape	undotree.txt	/*undotree_TreeNodeShape*
 undotree_TreeReturnShape	undotree.txt	/*undotree_TreeReturnShape*

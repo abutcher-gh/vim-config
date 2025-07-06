@@ -74,6 +74,7 @@ if sysroot_opt:
 target = os.getenv('RESOLVED_TARGET') or os.popen(f"{default_cxx} -dumpmachine").read() or 'x86_64-linux-gnu'
 target = target.replace('v5te', '')
 target = target.replace('v5', '')
+target = target.replace('\n', '')
 
 flags.extend([f'--target={target}']);
 
