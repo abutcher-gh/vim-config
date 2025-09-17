@@ -1491,6 +1491,12 @@ function! SetTerminalHighlighting()
    \.'| hi SpellLocal term=bold cterm=bold'.l:cunderline.' ctermbg=none ctermfg=42  gui=undercurl guisp=Cyan'
    \.'| hi SpellRare  term=bold cterm=bold ctermbg=none ctermfg=206 gui=undercurl guisp=Magenta'
 
+   " Prevent syntax highlighting from being clobbered by visual selections and searches
+   hi Visual cterm=none ctermbg=238 ctermfg=none
+   hi Search cterm=none ctermbg=239 ctermfg=none
+   hi CurSearch ctermbg=237 cterm=none ctermfg=none
+   hi IncSearch ctermbg=240 cterm=none ctermfg=none
+
    if exists(':Hreload')
       Hreload
    endif
@@ -1624,7 +1630,6 @@ if has("autocmd")
    augroup END
 
 endif " has ("autocmd")
-
 
 if $_ == "" || $_ =~ "gvim"
    " show the gui now, if possible (i.e. if running a gui capable vim).
