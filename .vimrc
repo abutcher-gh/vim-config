@@ -1497,6 +1497,13 @@ function! SetTerminalHighlighting()
    hi CurSearch ctermbg=237 cterm=none ctermfg=none
    hi IncSearch ctermbg=240 cterm=none ctermfg=none
 
+   " Prevent syntax highlighting from being clobbered by diff backgrounds
+   hi DiffDelete  cterm=none ctermbg=52 ctermfg=none
+   hi DiffAdd     cterm=none ctermbg=22 ctermfg=none
+   hi DiffChange  cterm=none ctermbg=17 ctermfg=none
+   hi DiffText    cterm=none ctermbg=25 ctermfg=none
+   hi DiffTextAdd cterm=none ctermbg=25 ctermfg=none
+
    if exists(':Hreload')
       Hreload
    endif
