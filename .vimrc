@@ -1504,6 +1504,9 @@ function! SetTerminalHighlighting()
    hi DiffText    cterm=none ctermbg=25 ctermfg=none
    hi DiffTextAdd cterm=none ctermbg=25 ctermfg=none
 
+   " Highlight diffs within a line to the character level by default
+   set diffopt+=inline:char
+
    if exists(':Hreload')
       Hreload
    endif
