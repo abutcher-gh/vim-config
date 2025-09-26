@@ -1492,10 +1492,17 @@ function! SetTerminalHighlighting()
    \.'| hi SpellRare  term=bold cterm=bold ctermbg=none ctermfg=206 gui=undercurl guisp=Magenta'
 
    " Prevent syntax highlighting from being clobbered by visual selections and searches
-   hi Visual cterm=none ctermbg=238 ctermfg=none
-   hi Search cterm=none ctermbg=239 ctermfg=none
-   hi CurSearch ctermbg=237 cterm=none ctermfg=none
-   hi IncSearch ctermbg=240 cterm=none ctermfg=none
+   if &bg =~ 'light'
+      hi Visual cterm=none ctermbg=248 ctermfg=none
+      hi Search cterm=none ctermbg=249 ctermfg=none
+      hi CurSearch ctermbg=247 cterm=none ctermfg=none
+      hi IncSearch ctermbg=250 cterm=none ctermfg=none
+   else
+      hi Visual cterm=none ctermbg=238 ctermfg=none
+      hi Search cterm=none ctermbg=239 ctermfg=none
+      hi CurSearch ctermbg=237 cterm=none ctermfg=none
+      hi IncSearch ctermbg=240 cterm=none ctermfg=none
+   endif
 
    " Prevent syntax highlighting from being clobbered by diff backgrounds
    hi DiffDelete  cterm=none ctermbg=52 ctermfg=none
