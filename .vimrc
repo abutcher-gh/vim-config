@@ -658,7 +658,7 @@ endfunction
 
 function! EditParent() range
 
-   try 
+   try
       e %:h
    catch 
       e %:p:h
@@ -1794,14 +1794,15 @@ function! LogView()
 endfunction
 command! LogView call LogView()
 
-function! RediffWithout(...)
+function! RediffWithoutI(mod, ...)
    let l:oldv = winsaveview()
    let l:oldw = winnr()
+   let l:sort = a:mod != ''
    if a:0 == 0
-      echoerr 'usage: RediffWithout(pat[, pat, [...]])'
+      echoerr 'usage: RediffWithoutI(mod, pat[, pat, [...]])'
       throw 'badargs'
    endif
-   let l:pat = '\(' . join(a:000, '\)\|\(') . '\)'
+   let l:pat = '\(\s*' . join(a:000, '\s*\)\|\(\s*') . '\s*\)'
    wincmd w
    while 1
       if &diff
@@ -1810,7 +1811,20 @@ function! RediffWithout(...)
          let &modifiable = 1
          if search(l:pat) > 0
             call feedkeys("i\<C-G>u", 'intx')
-            exec 'silent noautocmd %s/'.l:pat.'//g'
+            if l:sort
+               let l:n = 1
+               for l:line in getline(1, '$')
+                  call setline(l:n, substitute(l:line, l:pat, '', 'g') . nr2char(0xffff) . l:line)
+                  let l:n = l:n + 1
+               endfor
+               exec 'silent noautocmd %!sort'
+
+               " Extra undo state to allow for recovering the non-mutated line after sorting
+               call feedkeys("i\<C-G>u", 'intx')
+               exec 'silent noautocmd %s/\%uffff.*'
+            else
+               exec 'silent noautocmd %s/'.l:pat.'//g'
+            endif
             let b:numsubst = 1
          else
             unlet b:numsubst
@@ -1831,6 +1845,9 @@ function! RediffWithout(...)
          let l:modifiable = &modifiable
          let &modifiable = 1
          exec 'silent noautocmd undo'
+         if l:sort
+            exec 'silent noautocmd %s/.*\%uffff'
+         endif
          unlet b:numsubst
          let &modified = l:modified
          let &modifiable = l:modifiable
@@ -1843,18 +1860,29 @@ function! RediffWithout(...)
    call winrestview(l:oldv)
 endfunction
 
-function! RediffWithoutNumbers(...)
+function! RediffWithoutNumbersI(bang, ...)
    let l:pat = exists('g:numbers_pat')? g:numbers_pat :
             \ '0x[0-9a-fA-F]\+\|\<[0-9]\+\>'
    if exists('g:numbers_extra_pat')
       let l:pat = l:pat . '\|' . g:numbers_extra_pat
    endif
-   call call("RediffWithout", [l:pat] + a:000)
+   call call("RediffWithoutI", [a:bang, l:pat] + a:000)
+endfunction
+
+function! RediffWithout(...)
+   if a:0 == 0
+      echoerr 'usage: RediffWithout(pat[, pat, [...]])'
+      throw 'badargs'
+   endif
+   call call(function('RediffWithoutI'), [''] + a:000);
+endfunction
+function! RediffWithoutNumbers(...)
+   call call(function('RediffWithoutNumbersI'), [''] + a:000);
 endfunction
 
 
-command! -nargs=* RediffWithout call RediffWithout(<f-args>)
-command! -nargs=* RediffWithoutNumbers call RediffWithoutNumbers(<f-args>)
+command! -bang -nargs=* RediffWithout call RediffWithoutI('<bang>', <f-args>)
+command! -bang -nargs=* RediffWithoutNumbers call RediffWithoutNumbersI('<bang>', <f-args>)
 
 
 function! FocusOnCurrent()
