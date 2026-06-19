@@ -42,7 +42,7 @@ function! s:callback_vim_close(channel) dict abort
 endfunction
 
 " s:write_buffer {{{1
-function! s:write_buffer(bufnr, vcs, file)
+function! s:write_buffer(bufnr, file)
   let bufcontents = getbufline(a:bufnr, 1, '$')
 
   if bufcontents == [''] && line2byte(1) == -1
@@ -52,13 +52,9 @@ function! s:write_buffer(bufnr, vcs, file)
     return
   endif
 
-  try
-    if ! s:diffmode_has_no_cr[a:vcs]
-      if getbufvar(a:bufnr, '&fileformat') ==# 'dos'
-        call map(bufcontents, 'v:val."\r"')
-      endif
-    endif
-  endtry
+  if getbufvar(a:bufnr, '&fileformat') ==# 'dos'
+    call map(bufcontents, 'v:val."\r"')
+  endif
 
   let fenc = getbufvar(a:bufnr, '&fileencoding')
   let enc  = getbufvar(a:bufnr, '&encoding')
@@ -88,6 +84,10 @@ function! sy#repo#get_diff(bufnr, vcs, func) abort
   endif
 
   let options.func = a:func
+
+  let s:job_gen = get(s:, 'job_gen', 0) + 1
+  let options.job_gen = s:job_gen
+  call setbufvar(a:bufnr, 'sy_job_gen_'.a:vcs, s:job_gen)
 
   if has('nvim')
     if job_id
@@ -155,7 +155,12 @@ function! s:handle_diff(options, exitval) abort
     call sy#verbose('No valid diff found. Disabling this VCS.', a:options.vcs)
   endif
 
-  call setbufvar(a:options.bufnr, 'sy_job_id_'.a:options.vcs, 0)
+  " Only clear the job marker if this is still the current job.
+  " A stale job's callback must not clobber a newer job's marker,
+  " otherwise the newer job becomes orphaned and never gets stopped.
+  if get(a:options, 'job_gen', -1) == getbufvar(a:options.bufnr, 'sy_job_gen_'.a:options.vcs, -2)
+    call setbufvar(a:options.bufnr, 'sy_job_id_'.a:options.vcs, 0)
+  endif
 endfunction
 
 " s:check_diff_diff {{{1
@@ -180,6 +185,11 @@ endfunction
 
 " s:check_diff_svn {{{1
 function! s:check_diff_svn(exitval, diff) abort
+  return a:exitval ? [0, []] : [1, a:diff]
+endfunction
+
+" s:check_diff_jj {{{1
+function! s:check_diff_jj(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
@@ -463,7 +473,7 @@ endfunction
 " s:initialize_buffer_job {{{1
 function! s:initialize_buffer_job(bufnr, vcs) abort
   let bufferfile = tempname()
-  call s:write_buffer(a:bufnr, a:vcs, bufferfile)
+  call s:write_buffer(a:bufnr, bufferfile)
 
   let basefile = tempname()
   let base_cmd = s:get_base_cmd(a:bufnr, a:vcs, g:signify_vcs_cmds_diffmode) . '>' . fnameescape(basefile) . ' && '
@@ -632,8 +642,9 @@ let s:default_vcs_cmds = {
       \ 'cvs':      'cvs diff -U0 -- %f',
       \ 'rcs':      'rcsdiff -U0 %f 2>%n',
       \ 'accurev':  'accurev diff %f -- -U0',
-      \ 'perforce': 'p4 info '. sy#util#shell_redirect('%n') . (has('win32') ? ' &&' : ' && env P4DIFF= P4COLORS=') .' p4 diff -du0 %f',
-      \ 'tfs':      'tf diff -version:W -noprompt -format:Unified %f'
+      \ 'perforce': 'p4 info '. sy#util#shell_redirect('%n') . (has('win32') ? ' && set P4DIFF=&&' : ' && env P4DIFF=') .' p4 diff -du0 %f',
+      \ 'tfs':      'tf diff -version:W -noprompt -format:Unified %f',
+      \ 'jj':       'jj diff --ignore-working-copy --color=never --git --context=0 -r @ -- %f',
       \ }
 
 let s:default_vcs_cmds_diffmode = {
@@ -647,12 +658,9 @@ let s:default_vcs_cmds_diffmode = {
       \ 'cvs':      'cvs up -p -- %f 2>%n',
       \ 'rcs':      'co -q -p %f',
       \ 'accurev':  'accurev cat %f',
-      \ 'perforce': 'p4 print %f',
+      \ 'perforce': 'p4 print -q %f',
       \ 'tfs':      'tf view -version:W -noprompt %f',
-      \ }
-
-let s:diffmode_has_no_cr = {
-      \ 'git':  1,
+      \ 'jj':       'jj file show -r @- -- %f',
       \ }
 
 if exists('g:signify_vcs_cmds')

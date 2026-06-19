@@ -190,9 +190,19 @@ if !exists('g:undotree_CursorLine')
     let g:undotree_CursorLine = 1
 endif
 
+" Set statusline
+if !exists('g:undotree_StatusLine')
+    let g:undotree_StatusLine = 1
+endif
+
 " Ignored filetypes
 if !exists('g:undotree_DisabledFiletypes')
     let g:undotree_DisabledFiletypes = []
+endif
+
+" Ignored buftypes
+if !exists('g:undotree_DisabledBuftypes')
+    let g:undotree_DisabledBuftypes = ['terminal', 'prompt', 'quickfix', 'nofile']
 endif
 
 " Define the default persistence undo directory if not defined in vim/nvim
