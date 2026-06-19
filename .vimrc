@@ -109,6 +109,23 @@ nmap \? :YcmShowDetailedDiagnostic<C-M>
 nmap zq :YcmCompleter FixIt<C-M>
 nmap z? :YcmShowDetailedDiagnostic<C-M>
 
+function! ToggleYCM()
+   if g:ycm_show_diagnostics_ui == 0
+      let g:ycm_auto_trigger = 1
+      let g:ycm_show_diagnostics_ui = 1
+      :YcmRestartServer
+      :e
+      :echo "YCM diagnostics enabled"
+   elseif g:ycm_show_diagnostics_ui == 1
+      let g:ycm_auto_trigger = 0
+      let g:ycm_show_diagnostics_ui = 0
+      :YcmRestartServer
+      :e
+      :echo "YCM diagnostics disabled"
+   endif
+endfunction
+command! ToggleYCM :call ToggleYCM()
+
 " Use preferred rust-analyzer.
 let s:rust_toolchain_dirs = [
    \ $HOME . '/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/',
