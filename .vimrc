@@ -1808,6 +1808,7 @@ function! LogView()
    set ts=10
    set nospell
    set ve=all
+   set cursorline
    syn clear
    runtime syntax/logfile.vim
    let g:match_maps = 0
