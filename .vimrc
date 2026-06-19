@@ -83,6 +83,10 @@ if g:cygwin
 endif
 
 let g:context_skip_regex = '^\s*\($\|#\|//\|/\*\|\*\($\|/s\|\/\)\|\(public\|private\|protected\):\)'
+let g:context_enabled = 0
+
+nmap <Leader>1 :ContextPeek<CR>
+nmap <Bar>! :ContextToggle<CR>
 
 let g:undotree_DiffCommand = "diff"
 
