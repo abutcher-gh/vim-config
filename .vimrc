@@ -37,7 +37,7 @@ if filereadable(expand("~/.vimrc-vundle-plugins")) | source ~/.vimrc-vundle-plug
 " override the plugin set.
 if !exists('g:no_default_plugins') || !g:no_default_plugins
 Plugin 'Valloric/YouCompleteMe'
-Plugin 'terryma/vim-multiple-cursors'
+Plugin 'mg979/vim-visual-multi'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'abutcher-gh/vim-clang-format'
 Plugin 'AndrewRadev/linediff.vim'
@@ -143,6 +143,16 @@ unlet s:rust_toolchain_dirs
 " Allow for ESC to switch mode with multiple cursors active.
 " Use backtick to exit multi-cursor mode quickly without ESC wait.
 let g:multi_cursor_quit_key = '`'
+
+" For vim-visual-multi (make it work like vim-multi-cursor)
+let g:VM_maps = {}
+let g:VM_maps['Exit']               = '`'
+let g:VM_maps['Find Under']         = '<C-n>'
+let g:VM_maps['Find Subword Under'] = '<C-n>'
+let g:VM_maps['Skip Region']        = '<C-x>'
+let g:VM_maps['Remove Region']      = '<C-p>'
+let g:VM_maps['Select Operator']    = 'gs'
+let g:VM_custom_remaps              = {'s': 'c'}
 
 " let s:ctrlp_fallback = 'find %s -type f'
 let s:ctrlp_fallback = 'echo "Not a VCS directory"'
